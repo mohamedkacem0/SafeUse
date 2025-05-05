@@ -19,7 +19,7 @@ export default function Header() {
       </div>
       <div>
         {/* Navegación central – oculta en móvil */}
-        <nav className="space-x-[30px]">
+        <nav className="space-x-[30px] text-[36px] font-medium">
           <NavLink to="/sustances" className={navLinkClasses}>
             Substances
           </NavLink>
