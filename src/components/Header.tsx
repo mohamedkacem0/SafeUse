@@ -2,7 +2,7 @@ import { NavLink, Link } from 'react-router-dom';
 import { ShoppingCart } from 'lucide-react';
 import Button from './PrimaryButton'; // Importa el componente Button
 
-export default function Navbar() {
+export default function Header() {
   const navLinkClasses = '';
 
   if (location.pathname === '/politica-de-cookies') return null;
