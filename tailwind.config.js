@@ -1,22 +1,18 @@
-/** @type {import('tailwindcss').Config} */
+// tailwind.config.js
 export default {
-    content: [
-      './index.html',
-      './src/**/*.{js,ts,jsx,tsx}',
-    ],
+    content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
     theme: {
       extend: {
-        /* Ejemplo de tokens -> cámbialos por los de tu Figma
         colors: {
-          primary:   '#217aff',
-          accent:    '#ff6b00',
+          primary:  '#2076FF',
+          accent:   '#FF6C4C',
+          surface:  '#F5F7FA',
         },
         fontFamily: {
           sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+          display: ['Lilita One', 'cursive'],
         },
-        */
       },
     },
-    plugins: [],
   };
   
