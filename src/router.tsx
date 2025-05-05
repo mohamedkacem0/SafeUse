@@ -5,14 +5,15 @@ import * as Pages from './pages';
 
 export const router = createBrowserRouter([
   {
-    element: <AppLayout />, // Layout raíz
+    element: <AppLayout />, 
     children: [
-      { path: '/', element: <Pages.Home /> }, // Ruta para el Home
+      { path: '/', element: <Pages.Home /> }, 
       { path: '/sustancias', element: <Pages.Substances /> },
       { path: '/sustancia/:slug', element: <Pages.SubstanceDetail /> },
-      { path: '/reduccion', element: <Pages.HarmReduction /> },
+      { path: '/Advice', element: <Pages.Advice /> },
       { path: '/recursos', element: <Pages.Resources /> },
       { path: '/login', element: <Pages.Login /> },
+      { path: '*', element: <Pages.NotFound /> },
     ],
   },
 ]);
