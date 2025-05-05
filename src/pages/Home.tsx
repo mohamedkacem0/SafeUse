@@ -16,8 +16,8 @@ export default function Home() {
         </p>
       </div>
       <div className="flex justify-between items-center mt-[33px] px-[138px]">
-        <PrimaryButton text="Explore Substances" className="bg-[#546843] h-[88px] w-[459px] text-[36px] font-medium" />
-        <PrimaryButton text="Explore Substances" className="bg-[#4D9e81] h-[88px] w-[459px] text-[36px] font-medium text-black" />
+        <PrimaryButton text="Explore Substances" className="!bg-[#546843] h-[88px] w-[459px] text-[36px] font-medium" />
+        <PrimaryButton text="Learn Harm Reduction" className="!bg-[#4D9e81] h-[88px] w-[459px] text-[36px] font-medium !text-black" />
       </div>
 
       <div className="flex justify-around items-center mt-[77px] px-[68px]">
