@@ -2,7 +2,7 @@ import React from 'react';
 
 interface ButtonProps {
   text: string;
-  className?: string; // Optional className prop for additional styles
+  className?: string; 
 }
 
 export default function PrimaryButton({ text, className }: ButtonProps) {

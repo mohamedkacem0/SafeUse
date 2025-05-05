@@ -1,9 +1,9 @@
 import React from 'react';
 
 interface SquareBoxProps {
-  image: string; // Ruta de la imagen
-  title: string; // Texto principal (36px)
-  subtitle: string; // Texto secundario (24px)
+  image: string; 
+  title: string; 
+  subtitle: string; 
 }
 
 export default function SquareBox({ image, title, subtitle }: SquareBoxProps) {
