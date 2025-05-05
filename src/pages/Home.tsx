@@ -1,3 +1,8 @@
 export default function Home() {
-  return <h2 className="text-2xl font-bold">Home (en construcción)</h2>;
+  <div className="">
+  <p className="">Test color primario</p>
+  <button className="">
+    Botón Tailwind
+  </button>
+</div>
 }
