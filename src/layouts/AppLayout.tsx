@@ -1,18 +1,19 @@
-import Navbar from '../components/NavBar';
+import Header from '../components/Header';
+import Footer from '../components/Footer'; // Importa el componente Footer
 import { Outlet } from 'react-router-dom';
 
 export default function AppLayout() {
   return (
     <div className="">
-    <Navbar />
-
-    <main className="">
-      <Outlet />
-    </main>
-
-    <footer className="">
-      © 2025 SafeUse
-    </footer>
-  </div>
+      <div className="">
+      <Header />
+      </div>
+      <main className="">
+        <Outlet />
+      </main>
+      <div className="">
+      <Footer /> 
+      </div>
+      </div>
   );
 }
