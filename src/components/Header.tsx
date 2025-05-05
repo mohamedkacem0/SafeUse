@@ -1,6 +1,7 @@
 import { NavLink, Link } from 'react-router-dom';
 import { ShoppingCart } from 'lucide-react';
 import Button from './PrimaryButton'; // Importa el componente Button
+import logo from '../assets/logo/logo.svg';
 
 export default function Header() {
   const navLinkClasses = '';
@@ -12,13 +13,13 @@ export default function Header() {
       <div className="">
         {/* Logo + nombre */}
         <Link to="/" className="flex flex-row items-center">
-          <img src="/logo-pill.svg" alt="logo" className="" />
+          <img src={logo} alt="logo" className="" />
           <span className="font-lato font-bold text-[64px] leading-none tracking-normal">SafeUse</span>
         </Link>
       </div>
       <div>
         {/* Navegación central – oculta en móvil */}
-        <nav className="space-x-[30px]">
+        <nav className="space-x-[30px] text-[36px] font-medium">
           <NavLink to="/sustances" className={navLinkClasses}>
             Substances
           </NavLink>
