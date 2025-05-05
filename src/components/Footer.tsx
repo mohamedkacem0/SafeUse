@@ -3,7 +3,7 @@ import logo from '../assets/logo/logo.svg';
 export default function Footer() {
   return (
     <footer className=" border-t-[1px] border-black">
-        <div className='flex flex-row justify-between items-center p-[100px]'>
+        <div className='flex flex-row justify-between items-center p-[20px]'>
             <div className="flex flex-col items-center">
                 <Link to="/" className="flex flex-col items-center">
                     <img src={logo} alt="logo" className="" />

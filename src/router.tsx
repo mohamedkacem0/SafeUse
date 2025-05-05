@@ -13,7 +13,6 @@ export const router = createBrowserRouter([
       { path: '/reduccion', element: <Pages.HarmReduction /> },
       { path: '/recursos', element: <Pages.Resources /> },
       { path: '/login', element: <Pages.Login /> },
-      { path: '*', element: <Pages.NotFound /> }, // Ruta para 404
     ],
   },
 ]);
