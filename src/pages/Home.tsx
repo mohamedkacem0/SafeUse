@@ -23,7 +23,7 @@ export default function Home() {
         <PrimaryButton text="Learn Harm Reduction" className="!bg-[#44844D] h-[81px] w-[422px] text-[36px] font-medium " />
       </div>
 
-      <div className="flex justify-around items-center mt-[77px] px-[68px]">
+      <div className="flex justify-between items-center mt-[77px] px-[120px]">
         <SquareBox
           image={InfoDrugs}
           title="InfoDrugs"
@@ -42,7 +42,7 @@ export default function Home() {
       </div>
 
       <div className='border-t-[1px] border-black mt-[37px]'>
-      <p className="text-center text-black font-light text-[36px] py-[40px]">
+      <p className="text-center text-[#111111] font-light italic text-[36px] py-[40px]">
           “This web site helped me understand the real risks.”
         </p>
       </div>
