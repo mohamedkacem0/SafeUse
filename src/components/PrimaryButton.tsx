@@ -8,7 +8,7 @@ interface ButtonProps {
 export default function PrimaryButton({ text, className }: ButtonProps) {
   return (
     <button
-      className={`w-[128px] h-[40px] bg-black text-white text-[16px] rounded-[20px] flex items-center justify-center ${className}`}
+      className={`w-[128px] h-[40px] bg-black text-white text-[16px] rounded-[20px] flex items-center justify-center hover:scale-105 duration-300  ${className}`}
     >
       {text}
     </button>
