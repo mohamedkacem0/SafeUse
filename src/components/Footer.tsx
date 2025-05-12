@@ -36,7 +36,7 @@ export default function Footer() {
               { name: 'Home', path: '/' },
               { name: 'Substances', path: '/sustancias' },
               { name: 'Advice', path: '/advice' },
-              { name: 'Shop', path: '/recursos' },
+              { name: 'Shop', path: '/Shop' },
               { name: 'Contact', path: '/login' },
               { name: 'Log in/Sign up', path: '/login' },
             ]}
