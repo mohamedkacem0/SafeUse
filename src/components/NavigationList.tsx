@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NavLink } from 'react-router-dom';
+import arrow from '../assets/icons/arrowNav.svg';
 
 interface NavigationListProps {
   links: { name: string; path: string }[]; // Array of links with name and path
@@ -38,10 +39,10 @@ export default function NavigationList({ links }: NavigationListProps) {
         {/* Arrow Icon */}
         <div
           className={`transform transition-transform duration-100 -rotate-90 flex items-center ${
-            isOpen ? '!rotate-90' : 'rotate-0'
+            isOpen ? '!rotate-180' : 'rotate-0'
           }`}
         >
-          &lt;
+          <img src={arrow} />
         </div>
       </button>
 
