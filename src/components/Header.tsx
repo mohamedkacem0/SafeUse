@@ -9,7 +9,7 @@ export default function Header() {
   if (location.pathname === '/politica-de-cookies') return null;
 
   return (
-    <div className='fixed top-0 left-0 right-0 z-50'>
+    <div className='fixed top-0 left-0 right-0 z-50  border-b-[1px] border-[#111111]'>
     <div className="bg-white h-[70px] w-[1440] flex flex-row justify-between items-center">
       <div className="">
 

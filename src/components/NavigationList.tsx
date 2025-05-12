@@ -9,6 +9,7 @@ interface NavigationListProps {
 export default function NavigationList({ links }: NavigationListProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null); // Reference to the dropdown container
+  const buttonRef = useRef<HTMLButtonElement>(null); // Reference to the button
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -28,21 +29,29 @@ export default function NavigationList({ links }: NavigationListProps) {
     };
   }, []);
 
+  // Scroll into view when the dropdown is opened
+  useEffect(() => {
+    if (isOpen && dropdownRef.current) {
+      dropdownRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [isOpen]);
+
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Navigation Button */}
       <button
+        ref={buttonRef}
         onClick={toggleDropdown}
         className="text-[36px] font-medium text-black flex items-center gap-2"
       >
         Navigation
         {/* Arrow Icon */}
         <div
-          className={`transform transition-transform duration-100 -rotate-90 flex items-center ${
-            isOpen ? '!rotate-180' : 'rotate-0'
+          className={`transform transition-transform duration-300 ${
+            isOpen ? 'rotate-180' : 'rotate-0'
           }`}
         >
-          <img src={arrow} />
+          <img src={arrow} alt="arrow" />
         </div>
       </button>
 
