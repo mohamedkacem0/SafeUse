@@ -1,52 +1,70 @@
-import phone from '../assets/icons/phoneIcon.svg';
-import mail from '../assets/icons/mail.svg';
-import gps from '../assets/icons/gps.svg';
+import React, { useState } from "react";
+import { Search } from "lucide-react"; // ícono de búsqueda
+import DrugCard from "../components/Card";
+import PrimaryButton from "../components/PrimaryButton";
 
-export default function Contact() {
-  return (
-    <div>
-      <div className="p-[70px]">
-        <h1 className="text-[96px] font-medium">Contact</h1>
-      </div>
+// Datos de ejemplo — podrías traerlos de una API
+const DRUGS = [
+  {
+    imageSrc: "/img/lsd.png",
+    name: "LSD",
+    title: "Type: Psychedelic",
+    subtitle: "C₂₀H₂₅N₃O",
+  },
+  {
+    imageSrc: "/img/cannabis.png",
+    name: "Cannabis",
+    title: "Psychoactive depressant",
+    subtitle: "C₂₁H₃₀O₂",
+  },
+  {
+    imageSrc: "/img/cocaine.png",
+    name: "Cocaine",
+    title: "Psychoactive depressant",
+    subtitle: "C₁₇H₂₁NO₄",
+  },
+  {
+    imageSrc: "/img/mushrooms.png",
+    name: "Mushrooms",
+    title: "Psychoactive depressant",
+    subtitle: "C₁₂H₁₇N₂O₄P",
+  },
+];
 
-      <div className="border-t-[1px] border-[#111111] rounded-[10px] bg-[#335A2C]">
-        <div>
-          <div>
-          <p className=" text-[#111111]">
-            Berrinche
-          </p>
-          <p className=" text-[#111111]">
-            Reach out to us, we’d love to provide help.
-          </p>
-          </div>
-            
-          <div>
-            <div>
-            <div className="flex flex-row gap-[20px]">
-              <img src={phone} alt="phone" />
-              <p className="text-[#111111]">+1 234 567 890</p>
-            </div>
-            <div className="flex flex-row gap-[20px]">
-              <img src={mail} alt="mail" />
-              <p className="text-[#111111]">SafeUse@gmail.com</p>
-            </div>
-            <div className="flex flex-row gap-[20px]">
-              <img src={gps} alt="gps" />
-              <p className="text-[#111111]">Madrid 28065</p>
-            </div>
-            
-          </div>
+export default function ShopPage() {
+  const [query, setQuery] = useState("");
 
-          <div>
-
-          </div>
-        </div>
-        <div>
-
-        </div>
-
-      </div>
-    </div>
-    </div>
+  // Filtra drogas por nombre
+  const filtered = DRUGS.filter((d) =>
+    d.name.toLowerCase().includes(query.toLowerCase())
   );
-};
+
+  return (
+    <section className="flex flex-col items-center mt-10 p-6 gap-8 max-w-5xl mx-auto">
+      {/* Título */}
+      <h1 className="self-start  text-[46px] mt-10 mb-5">Shop</h1>
+
+      {/* Buscador */}
+      <div className="relative w-full max-w-md">
+        <input
+          type="text"
+          placeholder="Filter by test kit name"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="w-full border border-gray-400 rounded-[8px] py-2 pl-4 pr-12 font-lato focus:ring-2 focus:ring-blue-500 outline-none"
+        />
+        <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-700" />
+      </div>
+
+      {/* Grid de tarjetas */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 ">
+        {filtered.slice(0, 4).map((drug) => (
+          <DrugCard key={drug.name} {...drug} />
+        ))}
+      </div>
+        
+      {/* Botón cargar más */}
+      <PrimaryButton text="Load more" />
+    </section>
+  );
+}
