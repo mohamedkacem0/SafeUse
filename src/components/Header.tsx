@@ -39,8 +39,10 @@ export default function Header() {
         <NavLink to="/cart" aria-label="Cart" className="">
           <ShoppingCart className="" />
           </NavLink>
+          <NavLink to="/login" aria-label="Cart" className="">
+          <Button text="Log in/Sign up" />
+          </NavLink>
  
-        <Button text="Log in/Sign up" />
       </div>
     </div>
     </div>

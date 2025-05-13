@@ -26,9 +26,9 @@ export default function Contact() {
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-16">
-      <h1 className="mb-10 text-4xl  mt-10 tracking-tight">Contact</h1>
+      <h1 className="mb-10 self-start  text-[46px] mt-10 ">Contact</h1>
 
-      <div className="overflow-hidden bg-[#335A2C] rounded-xl border border-gray-300 shadow-sm md:grid md:grid-cols-3">
+      <div className="overflow-hidden bg-[#335A2C] rounded-xl border border-gray-300 shadow-sm md:grid md:grid-cols-3 md:gap-8 ">
         {/* Left panel */}
         <aside className="flex flex-col gap-8 bg-primary px-8 py-10 text-white sm:px-10 md:col-span-1">
           <header>
