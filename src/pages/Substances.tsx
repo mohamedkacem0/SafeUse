@@ -42,7 +42,7 @@ export default function SubstancesPage() {
   return (
     <section className="flex flex-col items-center mt-10 p-6 gap-8 max-w-5xl mx-auto">
       {/* Título */}
-      <h1 className="self-start font-lato font-bold text-4xl underline">Substances</h1>
+      <h1 className="self-start  text-[46px] mt-10 mb-5">Substances</h1>
 
       {/* Buscador */}
       <div className="relative w-full max-w-md">
@@ -57,7 +57,7 @@ export default function SubstancesPage() {
       </div>
 
       {/* Grid de tarjetas */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 ">
         {filtered.slice(0, 4).map((drug) => (
           <DrugCard key={drug.name} {...drug} />
         ))}
