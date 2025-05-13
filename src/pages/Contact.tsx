@@ -98,8 +98,4 @@ export default function Contact() {
       </div>
     </section>
   );
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes
