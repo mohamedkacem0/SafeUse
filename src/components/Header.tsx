@@ -19,7 +19,7 @@ export default function Header() {
         </Link>
       </div>
       <div>
-        <nav className="space-x-[30px] text-[36px] font-medium">
+        <nav className="space-x-[30px] text-[24px] font-medium">
           <NavLink to='/sustancias' className={navLinkClasses}>
             Substances
           </NavLink>
