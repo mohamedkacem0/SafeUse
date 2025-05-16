@@ -1,15 +1,16 @@
 import Description from '../components/Description';
 import { NavLink, Link } from 'react-router-dom';
 import PrimaryButton from '../components/PrimaryButton'; 
+import Banner from '../assets/images/adviceBanner.png';
 
 export default function Advice() {
   return (
     <div>
-      <div className="p-[70px]">
-        <h1 className="text-[96px] font-medium">Advice</h1>
-      </div>
-
-      <div className="border-t-[1px] border-black mt-[37px]">
+      <div className="sticky top-0 z-10 h-[400px] w-full overflow-hidden">
+        <img src={Banner} alt="Advice Banner" className="w-full object-cover" />
+      </div>  
+      <div className='sticky top-0 z-10 bg-white'>
+      <div className="border-t-[1px] border-b-[1px] border-black">
         <p className="text-center text-black font-light text-[36px] py-[40px]">
           "Take care of your mind and body."
         </p>
@@ -71,6 +72,7 @@ export default function Advice() {
           <PrimaryButton text="Load more" />
         </div>
       </div>
+    </div>
     </div>
   );
 }
