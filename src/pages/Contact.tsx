@@ -26,7 +26,11 @@ export default function Contact() {
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-16">
-      <h1 className="mb-10 self-start  text-[46px] mt-10 ">Contact</h1>
+      <div className="border-t-[1px] border-b-[1px] border-black">
+        <p className="text-center text-black font-light text-[36px] py-[40px]">
+          “We’d love to hear from you. Get in touch!”
+        </p>
+      </div>
 
       <div className="overflow-hidden bg-[#335A2C] rounded-xl border border-gray-300 shadow-sm md:grid md:grid-cols-3 md:gap-8 ">
         {/* Left panel */}

@@ -18,12 +18,12 @@ export default function Home() {
         </p>
         </div>
         <div className='sticky top-0 z-20 bg-white'>
-      <div className="flex justify-evenly items-center pt-[33px] px-[138px]">
-        <PrimaryButton text="Explore Substances" className="!bg-[#909E52] h-[81px] w-[422px] !text-[#111111] text-[36px] font-medium " />
-        <PrimaryButton text="Learn Harm Reduction" className="!bg-[#44844D] h-[81px] w-[422px] text-[36px] font-medium " />
+      <div className="flex justify-evenly items-center pt-[40px] px-[200px]">
+        <PrimaryButton text="Explore Substances" className="!bg-[#909E52] h-[80px] w-[400px] !text-[#111111] text-[32px] font-medium " />
+        <PrimaryButton text="Learn Harm Reduction" className="!bg-[#44844D] h-[80px] w-[400px] text-[32px] font-medium " />
       </div>
 
-      <div className="flex justify-between items-center mt-[77px] px-[120px]">
+      <div className="flex justify-between items-center mt-[77px] px-[220px]">
         <SquareBox
           image={InfoDrugs}
           title="InfoDrugs"
@@ -42,17 +42,17 @@ export default function Home() {
       </div>
 
       <div className='border-t-[1px] border-black mt-[37px]'>
-      <p className="text-center text-[#111111] font-light italic text-[36px] py-[40px]">
+      <p className="text-center text-[#111111] font-light italic text-[32px] py-[40px]">
           “This web site helped me understand the real risks.”
         </p>
       </div>
 
       <div className='border-t-[1px] border-black'>
-        <p className="text-center text-black font-medium text-[48px] pt-[35px]">
+        <p className="text-center text-black font-medium text-[36px] pt-[35px]">
           Create your account and stay safe
         </p>
         <div className='flex justify-center pt-[40px] pb-[52px]'>
-        <PrimaryButton text="Get started" className="bg-black h-[66px] w-[229px] rounded-[20px] text-[36px] font-medium text-white" />
+        <PrimaryButton text="Get started" className="bg-black h-[66px] w-[229px] rounded-[20px] text-[32px] font-medium text-white" />
         </div>
         </div>
       </div>
