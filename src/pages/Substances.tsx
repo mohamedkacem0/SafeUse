@@ -46,6 +46,7 @@ export default function SubstancesPage() {
       <div className="sticky top-0 z-10 h-[400px] w-full overflow-hidden">
         <img src={Banner} alt="Advice Banner" className="w-full object-cover" />
       </div>
+      
       <div className="sticky top-0 z-10 bg-white">
       <div className="border-t-[1px] border-b-[1px] border-black">
         <p className="text-center text-black font-light text-[36px] py-[40px]">

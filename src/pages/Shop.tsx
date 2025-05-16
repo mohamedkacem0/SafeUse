@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Search } from "lucide-react"; // ícono de búsqueda
 import DrugCard from "../components/Card";
 import PrimaryButton from "../components/PrimaryButton";
+import Banner from '../assets/images/shop.png';
 
 // Datos de ejemplo — podrías traerlos de una API
 const DRUGS = [
@@ -40,9 +41,17 @@ export default function ShopPage() {
   );
 
   return (
+    <div>
+      <div className="sticky top-0 z-10 h-[400px] w-full overflow-hidden">
+        <img src={Banner} alt="Advice Banner" className="w-full object-cover" />
+      </div>
+      <div className="sticky top-0 z-10 bg-white">
+        <div className="border-t-[1px] border-b-[1px] border-black">
+        <p className="text-center text-black font-light text-[36px] py-[40px]">
+          “Test with confidence, stay in control.”
+        </p>
+      </div>
     <section className="flex flex-col items-center mt-10 p-6 gap-8 max-w-5xl mx-auto">
-      {/* Título */}
-      <h1 className="self-start  text-[46px] mt-10 mb-5">Shop</h1>
 
       {/* Buscador */}
       <div className="relative w-full max-w-md">
@@ -66,5 +75,7 @@ export default function ShopPage() {
       {/* Botón cargar más */}
       <PrimaryButton text="Load more" />
     </section>
+    </div>
+    </div>
   );
 }
