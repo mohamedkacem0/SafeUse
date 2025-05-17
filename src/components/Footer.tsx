@@ -4,7 +4,7 @@ import NavigationList from './NavigationList';
 
 export default function Footer() {
   return (
-    <footer className="border-t-[1px] border-black">
+    <footer className="border-t-[1px] border-[#111111]">
       <div className="flex flex-row justify-evenly items-center p-[20px]">
         {/* Logo Section */}
         <div className="flex flex-col items-center">

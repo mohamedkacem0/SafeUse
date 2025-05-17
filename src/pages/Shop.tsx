@@ -46,8 +46,8 @@ export default function ShopPage() {
         <img src={Banner} alt="Advice Banner" className="w-full object-cover" />
       </div>
       <div className="sticky top-0 z-10 bg-white">
-        <div className="border-t-[1px] border-b-[1px] border-black">
-        <p className="text-center text-black font-light text-[36px] py-[40px]">
+        <div className="border-t-[1px] border-b-[1px] border-[#111111]">
+        <p className="text-center text-[#111111] font-light text-[36px] py-[40px]">
           “Test with confidence, stay in control.”
         </p>
       </div>

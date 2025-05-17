@@ -41,18 +41,18 @@ export default function Home() {
         />
       </div>
 
-      <div className='border-t-[1px] border-black mt-[37px]'>
+      <div className='border-t-[1px] border-[#111111] mt-[37px]'>
       <p className="text-center text-[#111111] font-light italic text-[32px] py-[40px]">
           “This web site helped me understand the real risks.”
         </p>
       </div>
 
-      <div className='border-t-[1px] border-black'>
-        <p className="text-center text-black font-medium text-[36px] pt-[35px]">
+      <div className='border-t-[1px] border-[#111111]'>
+        <p className="text-center text-[#111111] font-medium text-[36px] pt-[35px]">
           Create your account and stay safe
         </p>
         <div className='flex justify-center pt-[40px] pb-[52px]'>
-        <PrimaryButton text="Get started" className="bg-black h-[66px] w-[229px] rounded-[20px] text-[32px] font-medium text-white" />
+        <PrimaryButton text="Get started" className="bg-[#111111] h-[66px] w-[229px] rounded-[20px] text-[32px] font-medium text-white" />
         </div>
         </div>
       </div>

@@ -42,7 +42,7 @@ export default function NavigationList({ links }: NavigationListProps) {
       <button
         ref={buttonRef}
         onClick={toggleDropdown}
-        className="text-[24px] font-medium text-black flex items-center gap-2"
+        className="text-[24px] font-medium text-[#111111] flex items-center gap-2"
       >
         Navigation
         {/* Arrow Icon */}
@@ -57,13 +57,13 @@ export default function NavigationList({ links }: NavigationListProps) {
 
       {/* Dropdown List */}
       {isOpen && (
-        <div className="absolute w-full top-[50px] left-0 bg-white border border-black rounded-lg shadow-lg p-4">
+        <div className="absolute w-full top-[50px] left-0 bg-white border border-[#111111] rounded-lg shadow-lg p-4">
           <ul className="flex flex-col gap-2">
             {links.map((link, index) => (
               <li key={index}>
                 <NavLink
                   to={link.path}
-                  className="text-[16px] text-black hover:underline"
+                  className="text-[16px] text-[#111111] hover:underline"
                   onClick={() => setIsOpen(false)} // Close dropdown on click
                 >
                   {link.name}
