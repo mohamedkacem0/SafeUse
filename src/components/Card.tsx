@@ -8,6 +8,7 @@ interface DrugCardProps {
   title: string;
   subtitle: string;
   button?: string;
+  onButtonClick?: () => void; // Optional handler for button click
 }
 
 const DrugCard: React.FC<DrugCardProps> = ({
@@ -16,6 +17,7 @@ const DrugCard: React.FC<DrugCardProps> = ({
   title,
   subtitle,
   button = "See more",
+  onButtonClick,
 }) => {
   return (
     <div className="w-[350px] border border-gray-300 rounded-[12px] flex flex-col items-center p-6 gap-2 shadow-sm">
@@ -37,7 +39,11 @@ const DrugCard: React.FC<DrugCardProps> = ({
         {subtitle}
       </p>
 
-      <PrimaryButton className="!bg-[#44844D]" text={button} />
+      <PrimaryButton
+        className={`!bg-[#44844D]`}
+        text={button}
+        onClick={onButtonClick}
+      />
     </div>
   );
 };
