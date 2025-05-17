@@ -26,7 +26,7 @@ export default function Contact() {
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-16">
-      <div className="border-t-[1px] border-b-[1px] border-black">
+      <div className="border-t-[1px]  border-black">
         <p className="text-center text-black font-light text-[36px] py-[40px]">
           “We’d love to hear from you. Get in touch!”
         </p>

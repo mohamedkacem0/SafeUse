@@ -23,7 +23,7 @@ export default function Home() {
         <PrimaryButton text="Learn Harm Reduction" className="!bg-[#44844D] h-[80px] w-[400px] text-[32px] font-medium " />
       </div>
 
-      <div className="flex justify-between items-center mt-[77px] px-[220px]">
+      <div className="flex justify-between items-center mt-[77px] px-[15%]">
         <SquareBox
           image={InfoDrugs}
           title="InfoDrugs"

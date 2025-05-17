@@ -50,7 +50,7 @@ export default function SubstancesPage() {
       <div className="sticky top-0 z-10 bg-white">
       <div className="border-t-[1px] border-b-[1px] border-black">
         <p className="text-center text-black font-light text-[36px] py-[40px]">
-          "Get informed, stay safe."
+          "Take care of your mind and body."
         </p>
       </div>
       <section className="flex flex-col items-center mt-10 p-6 gap-8 max-w-5xl mx-auto">
