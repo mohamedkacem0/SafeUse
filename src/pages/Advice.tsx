@@ -49,7 +49,7 @@ export default function Advice() {
       </div>  
 
       <div className='sticky top-0 z-20 bg-white'>
-        <div className="flex justify-center gap-[100px] py-[20px] border-t-[1px] border-b-[1px] border-black sticky top-[70px] z-30 bg-white">
+        <div className="flex justify-center gap-[100px] py-[20px] border-t-[1px] border-b-[1px] border-[#111111] sticky top-[70px] z-30 bg-white">
           <a
             href="#before-use"
             onClick={handleNavClick(beforeRef)}

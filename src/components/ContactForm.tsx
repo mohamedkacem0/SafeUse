@@ -15,7 +15,7 @@ export default function ContactForm() {
             type="text"
             id="firstName"
             name="firstName"
-            className="w-full p-[10px] text-black border-b-black border-b-[1px]"
+            className="w-full p-[10px] text-[#111111] border-b-[#111111] border-b-[1px]"
             placeholder="Enter your first name"
           />
         </div>
@@ -29,7 +29,7 @@ export default function ContactForm() {
             type="text"
             id="lastName"
             name="lastName"
-            className="w-full p-[10px] text-black border-b-black border-b-[1px]"
+            className="w-full p-[10px] text-[#111111] border-b-[#111111] border-b-[1px]"
             placeholder="Enter your last name"
           />
         </div>
@@ -45,7 +45,7 @@ export default function ContactForm() {
             type="email"
             id="email"
             name="email"
-            className="w-full p-[10px] border-b-black border-b-[1px] text-black"
+            className="w-full p-[10px] border-b-[#111111] border-b-[1px] text-[#111111]"
             placeholder="Enter your email"
           />
         </div>
@@ -59,7 +59,7 @@ export default function ContactForm() {
             type="tel"
             id="phone"
             name="phone"
-            className="w-full p-[10px] border-b-black border-b-[1px] text-black"
+            className="w-full p-[10px] border-b-[#111111] border-b-[1px] text-[#111111]"
             placeholder="Enter your phone number"
           />
         </div>
@@ -74,7 +74,7 @@ export default function ContactForm() {
             id="message"
             name="message"
             rows={4}
-            className="w-full p-[10px] rounded-[5px] text-black"
+            className="w-full p-[10px] rounded-[5px] text-[#111111]"
             placeholder="Write your message here"
           ></textarea>
         </div>
