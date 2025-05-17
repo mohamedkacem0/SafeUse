@@ -18,7 +18,7 @@ const DrugCard: React.FC<DrugCardProps> = ({
   button = "See more",
 }) => {
   return (
-    <div className="w-[260px] border border-gray-300 rounded-[12px] flex flex-col items-center p-6 gap-2 shadow-sm">
+    <div className="w-[350px] border border-gray-300 rounded-[12px] flex flex-col items-center p-6 gap-2 shadow-sm">
       <img
         src={imageSrc}
         alt={name}

@@ -66,7 +66,7 @@ export default function ShopPage() {
       </div>
 
       {/* Grid de tarjetas */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 ">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-[100px] ">
         {filtered.slice(0, 4).map((drug) => (
           <DrugCard key={drug.name} {...drug} />
         ))}
