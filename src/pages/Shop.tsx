@@ -3,6 +3,7 @@ import { Search } from "lucide-react"; // ícono de búsqueda
 import DrugCard from "../components/Card";
 import PrimaryButton from "../components/PrimaryButton";
 import Banner from '../assets/images/shop.png';
+import { useNavigate } from "react-router-dom";
 
 // Datos de ejemplo — podrías traerlos de una API
 const DRUGS = [
@@ -34,6 +35,7 @@ const DRUGS = [
 
 export default function ShopPage() {
   const [query, setQuery] = useState("");
+  const navigate = useNavigate();
 
   // Filtra drogas por nombre
   const filtered = DRUGS.filter((d) =>
@@ -73,6 +75,7 @@ export default function ShopPage() {
             {...drug}
             button="Add to cart"
             onButtonClick={() => alert(`Added ${drug.name} to cart`)}
+            onCardClick={() => navigate(`/shop/${encodeURIComponent(drug.name.toLowerCase())}`)}
           />
         ))}
       </div>

@@ -3,7 +3,7 @@ import { Search } from "lucide-react";
 import DrugCard from "../components/Card";
 import PrimaryButton from "../components/PrimaryButton";
 import Banner from '../assets/images/substanceBanner.png';
-// import { useNavigate } from "react-router-dom"; // Uncomment if you want to navigate
+import { useNavigate } from "react-router-dom"; // <-- Importa esto
 
 const DRUGS = [
   {
@@ -34,7 +34,7 @@ const DRUGS = [
 
 export default function SubstancesPage() {
   const [query, setQuery] = useState("");
-  // const navigate = useNavigate(); // Uncomment if you want to navigate
+  const navigate = useNavigate(); // <-- Descomenta esto
 
   const filtered = DRUGS.filter((d) =>
     d.name.toLowerCase().includes(query.toLowerCase())
@@ -71,8 +71,9 @@ export default function SubstancesPage() {
                 key={drug.name}
                 {...drug}
                 button="See more"
-                onButtonClick={() => alert(`See more about ${drug.name}`)}
-                // onButtonClick={() => navigate(`/sustancia/${drug.name.toLowerCase()}`)} // If you want to navigate
+                onButtonClick={() =>
+                  navigate(`/sustancia/${encodeURIComponent(drug.name.toLowerCase())}`)
+                }
               />
             ))}
           </div>

@@ -1,3 +1,12 @@
+import { useParams } from "react-router-dom";
+
 export default function SubstanceDetail() {
-  return <h2 className="">Home (en construcción)</h2>;
+  const { slug } = useParams();
+
+  return (
+    <div className="mt-[70px]">
+      <h1>Detalle de la sustancia: {slug}</h1>
+      
+    </div>
+  );
 }
