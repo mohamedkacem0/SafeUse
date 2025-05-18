@@ -6,26 +6,19 @@ interface DrugCardProps {
   imageSrc: string;
   name: string;
   title: string;
-  subtitle: string;
+  formula: string;
   button?: string;
-  onButtonClick?: () => void;
-  onCardClick?: () => void; // Nuevo prop
 }
 
 const DrugCard: React.FC<DrugCardProps> = ({
   imageSrc,
   name,
   title,
-  subtitle,
+  formula,
   button = "See more",
-  onButtonClick,
-  onCardClick,
 }) => {
   return (
-    <div
-      className="w-[350px] border border-gray-300 rounded-[12px] flex flex-col items-center p-6 gap-2 shadow-sm cursor-pointer hover:shadow-lg transition"
-      onClick={onCardClick}
-    >
+    <div className="w-[350px] border border-gray-300 rounded-[12px] flex flex-col items-center p-6 gap-2 shadow-sm">
       <img
         src={imageSrc}
         alt={name}
@@ -41,18 +34,10 @@ const DrugCard: React.FC<DrugCardProps> = ({
       </p>
 
       <p className="font-lato text-[12px] italic text-center leading-tight mb-4">
-        {subtitle}
+        {formula}
       </p>
 
-      <div
-        onClick={e => e.stopPropagation()} // Evita que el click en el botón propague al card
-      >
-        <PrimaryButton
-          className={`!bg-[#44844D]`}
-          text={button}
-          onClick={onButtonClick}
-        />
-      </div>
+      <PrimaryButton className="!bg-[#44844D]" text={button} />
     </div>
   );
 };

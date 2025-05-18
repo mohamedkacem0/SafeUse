@@ -1,14 +1,11 @@
+/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    './src/**/*.{js,jsx,ts,tsx}', // Asegúrate de incluir todos los archivos relevantes
+    './frontend/index.html',
+    './frontend/src/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
-    extend: {
-      fontFamily: {
-        sans: ['Lato', 'sans-serif'], // Configura Lato como fuente predeterminada
-      },
-    },
+    extend: {},
   },
   plugins: [],
 };
-
