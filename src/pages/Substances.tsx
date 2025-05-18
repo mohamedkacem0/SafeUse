@@ -34,7 +34,8 @@ const DRUGS = [
 
 export default function SubstancesPage() {
   const [query, setQuery] = useState("");
-  const navigate = useNavigate(); // <-- Descomenta esto
+  const [popupImage, setPopupImage] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const filtered = DRUGS.filter((d) =>
     d.name.toLowerCase().includes(query.toLowerCase())
@@ -74,6 +75,7 @@ export default function SubstancesPage() {
                 onButtonClick={() =>
                   navigate(`/sustancia/${encodeURIComponent(drug.name.toLowerCase())}`)
                 }
+                onCardClick={() => setPopupImage(drug.imageSrc)}
               />
             ))}
           </div>
@@ -82,6 +84,25 @@ export default function SubstancesPage() {
           <PrimaryButton text="Load more" />
         </section>
       </div>
+
+      {/* Popup de imagen */}
+      {popupImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60"
+          onClick={() => setPopupImage(null)}
+        >
+          <div
+            className="bg-white rounded-xl p-4 shadow-lg transform transition-all duration-300 scale-100 opacity-100"
+            onClick={e => e.stopPropagation()}
+          >
+            <img
+              src={popupImage}
+              alt="Substance"
+              className="w-[450px] h-[450px] object-contain"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
