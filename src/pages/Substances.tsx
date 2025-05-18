@@ -88,7 +88,7 @@ export default function SubstancesPage() {
       {/* Popup de imagen */}
       {popupImage && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm"
           onClick={() => setPopupImage(null)}
         >
           <div
