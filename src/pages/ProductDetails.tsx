@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
 import PrimaryButton from "../components/PrimaryButton";
+import Description from "../components/Description"; // <-- Import Description
 
 export default function SubstanceDetail() {
   const { slug } = useParams();
@@ -68,15 +69,17 @@ export default function SubstanceDetail() {
               className="w-full border rounded px-2 py-1"
             />
           </div>
-          <PrimaryButton text="Add to cart" className="w-full mt-2" />
+          <PrimaryButton text="Add to cart" className=" mt-2" />
         </div>
       </div>
       {/* Información adicional */}
-      <div className="mt-10">
-        <h3 className="text-center text-[20px] font-semibold mb-2">Additional information</h3>
-        <div className="border rounded p-4 text-center text-gray-800 bg-white">
-          {substance.additional}
-        </div>
+      <div className="my-[100px]">
+        <Description
+          title="Additional information"
+          subtitle={substance.additional}
+          link=""
+          width="w-full"
+        />
       </div>
     </div>
   );

@@ -21,7 +21,7 @@ export default function Description({
     <div
       className={`
         ${width}
-        h-[381px] border-[1px] rounded-[20px] text-center flex flex-col justify-center gap-[32px] transition-all duration-500
+        h-auto p-[2%] border-[1px] rounded-[20px] text-center flex flex-col justify-center gap-[32px] transition-all duration-500
         ${active ? 'border-[#44844D] shadow-[0_0_24px_0_rgba(68,132,77,0.18)] scale-[1.02]' : 'border-[#111111]'}
         ${className}
       `}
