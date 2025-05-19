@@ -20,13 +20,13 @@ export default function Footer() {
         {/* Navigation Section */}
         <div className='flex flex-row justify-between items-center'>
           <NavLink
-            to="/legal-terms"
+            to="/LegalTerms"
             className="font-lato font-medium text-[24px] leading-none tracking-normal mr-[45px]"
           >
             Legal Terms
           </NavLink>
           <NavLink
-            to="/privacy-policy"
+            to="/PrivacyPolicy"
             className="font-lato font-medium text-[24px] leading-none tracking-normal mr-[45px]"
           >
             Privacy Policy

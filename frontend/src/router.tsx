@@ -19,6 +19,10 @@ export const router = createBrowserRouter([
       { path: '/passwordReset', element: <Pages.PasswordReset /> },
       { path: '/success', element: <Pages.Success /> },
       { path: '/login', element: <Pages.Login /> },
+      { path: '/LegalTerms', element: <Pages.LegalTerms /> },
+      { path: '/PrivacyPolicy', element: <Pages.PrivacyPolicy /> },
+
+
     ],
   },
 ]);
