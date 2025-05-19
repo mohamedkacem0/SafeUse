@@ -115,7 +115,7 @@ export default function LoginSignup() {
           </div>
 
           <p className="mb-8 max-w-xs text-center text-xs text-gray-600">
-            By signing up, you agree to the <a className="underline" href="#">Terms of Service</a> and acknowledge you've read our <a className="underline" href="#">Privacy Policy</a>.
+            By signing up, you agree to the <a className="underline" href="LegalTerms">Terms of Service</a> and acknowledge you've read our <a className="underline" href="PrivacyPolicy">Privacy Policy</a>.
           </p>
 
           <button className="rounded-full bg-neutral-900 px-8 py-2 text-sm font-semibold text-white hover:bg-neutral-800">
