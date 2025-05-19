@@ -10,3 +10,5 @@ export { default as Verification } from './Verification';
 export { default as PasswordReset } from './PasswordReset';
 export { default as Success } from './Success';
 export { default as Login } from './Login';
+export { default as LegalTerms } from './LegalTerms'; 
+export { default as PrivacyPolicy } from './PrivacyPolicy'; 
