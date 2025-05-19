@@ -15,7 +15,7 @@ export default function Advice() {
   ];
 
   const handleScroll = () => {
-    const scrollPosition = window.scrollY + 200; // Offset for sticky nav
+    const scrollPosition = window.scrollY + 200; 
     let current = 'before-use';
     for (const section of sections) {
       if (section.ref.current) {
@@ -31,10 +31,8 @@ export default function Advice() {
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-    // eslint-disable-next-line
   }, []);
 
-  // Smooth scroll handler
   const handleNavClick = (ref: React.RefObject<HTMLDivElement>) => (e: React.MouseEvent) => {
     e.preventDefault();
     if (ref.current) {
@@ -44,7 +42,7 @@ export default function Advice() {
 
   return (
     <div>
-      <div className="sticky top-0 z-10 h-[400px] w-full overflow-hidden">
+      <div className="sticky top-0 z-10 h-[500px] w-full overflow-hidden">
         <img src={Banner} alt="Advice Banner" className="w-full object-cover" />
       </div>  
 

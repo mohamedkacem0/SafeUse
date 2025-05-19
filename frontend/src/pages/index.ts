@@ -12,3 +12,4 @@ export { default as Success } from './Success';
 export { default as Login } from './Login';
 export { default as LegalTerms } from './LegalTerms'; 
 export { default as PrivacyPolicy } from './PrivacyPolicy'; 
+export { default as Cart } from './Cart'; 

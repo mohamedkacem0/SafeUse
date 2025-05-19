@@ -4,6 +4,7 @@ import HarmReduction from '../assets/images/HarmReduction.png';
 import TestKits from '../assets/images/TestKits.png';
 import PrimaryButton from '../components/PrimaryButton';
 import SquareBox from '../components/SquareBox';
+import { NavLink, Link } from 'react-router-dom';
 
 export default function Home() {
   return (
@@ -52,7 +53,12 @@ export default function Home() {
           Create your account and stay safe
         </p>
         <div className='flex justify-center pt-[40px] pb-[52px]'>
-        <PrimaryButton text="Get started" className="bg-[#111111] h-[66px] w-[229px] rounded-[20px] text-[32px] font-medium text-white" />
+          <NavLink to="/Login" className="inline-block">
+      <PrimaryButton
+        text="Get started"
+        className="bg-[#111111] h-[66px] w-[229px] rounded-[20px] text-[32px] font-medium text-white"
+      />
+    </NavLink>
         </div>
         </div>
       </div>
