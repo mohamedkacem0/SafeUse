@@ -44,7 +44,7 @@ export default function ShopPage() {
 
   return (
     <div>
-      <div className="sticky top-0 z-10 h-[500px] w-full overflow-hidden">
+      <div className="sticky top-0 z-10 h-[450px] w-full overflow-hidden">
         <img src={Banner} alt="Advice Banner" className="w-full object-cover" />
       </div>
       <div className="sticky top-0 z-10 bg-white">

@@ -57,7 +57,7 @@ export default function Contact() {
             <a href="#" aria-label="Twitter" className="transition hover:opacity-100">
               <Twitter className="h-5 w-5" />
             </a>
-            <a href="#" aria-label="Instagram" className="transition hover:opacity-100">
+            <a href="https://www.instagram.com/safeusetfg/" aria-label="Instagram" className="transition hover:opacity-100">
               <Instagram className="h-5 w-5" />
             </a>
             <a href="#" aria-label="Discord" className="transition hover:opacity-100">
