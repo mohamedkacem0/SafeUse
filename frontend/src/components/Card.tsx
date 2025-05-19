@@ -37,7 +37,7 @@ const DrugCard: React.FC<DrugCardProps> = ({
         {formula}
       </p>
 
-      <PrimaryButton className="!bg-[#44844D]" text={button} />
+      <PrimaryButton className="!bg-[#335A2C]" text={button} />
     </div>
   );
 };

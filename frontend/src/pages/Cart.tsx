@@ -107,10 +107,13 @@ export default function Cart() {
             <span>€ {(subtotal * 1.21).toFixed(2)}</span>
           </div>
 
-          <PrimaryButton
-            text="Checkout"
-            className="w-full rounded-full bg-primary bg-[#44844D] py-3 text-center text-lg font-semibold text-white hover:bg-primary/90"
-          />
+           <NavLink to="/Checkout" className="w-full">
+            <PrimaryButton
+              text="Checkout"
+            className="w-full rounded-full bg-primary bg-[#335A2C] py-3 text-center text-lg font-semibold text-white hover:bg-primary/90"
+            />
+          </NavLink>
+          
         </aside>
       </div>
     </section>

@@ -13,3 +13,4 @@ export { default as Login } from './Login';
 export { default as LegalTerms } from './LegalTerms'; 
 export { default as PrivacyPolicy } from './PrivacyPolicy'; 
 export { default as Cart } from './Cart'; 
+export { default as Checkout } from './Checkout'; 

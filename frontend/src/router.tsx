@@ -22,6 +22,8 @@ export const router = createBrowserRouter([
       { path: '/LegalTerms', element: <Pages.LegalTerms /> },
       { path: '/PrivacyPolicy', element: <Pages.PrivacyPolicy /> },
       { path: '/cart', element: <Pages.Cart /> },
+      { path: '/Checkout', element: <Pages.Checkout /> },
+
 
 
 

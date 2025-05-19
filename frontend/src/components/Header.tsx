@@ -35,7 +35,7 @@ export default function Header() {
         </nav>
       </div>
 
-      <div className="flex flex-row items-center gap-[12px] mr-[65px] ">
+      <div className="flex flex-row items-center  gap-[12px] mr-[65px] ">
         <NavLink to="/cart" aria-label="Cart" className="">
           <ShoppingCart className="" />
           </NavLink>
