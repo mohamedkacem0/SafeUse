@@ -5,4 +5,8 @@ export { default as Advice } from './Advice';
 export { default as Shop } from './Shop';
 export { default as ProductDetails } from './ProductDetails';
 export { default as Contact } from './Contact';
+export { default as Profile } from './Profile';
+export { default as Verification } from './Verification';
+export { default as PasswordReset } from './PasswordReset';
+export { default as Success } from './Success';
 export { default as Login } from './Login';
