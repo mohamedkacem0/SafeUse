@@ -9,7 +9,7 @@ interface ButtonProps {
 export default function PrimaryButton({ text, className, onClick }: ButtonProps) {
   return (
     <button
-      className={`w-[128px] h-[40px] bg-[#111111] text-white text-[16px] rounded-[20px] flex items-center justify-center hover:scale-105 duration-300  ${className}`}
+      className={`w-[128px] h-[40px] bg-[#335A2C] text-white text-[16px] rounded-[20px] flex items-center justify-center hover:scale-105 duration-300  ${className}`}
       onClick={onClick}
     >
       {text}

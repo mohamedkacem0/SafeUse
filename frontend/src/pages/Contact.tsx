@@ -96,7 +96,7 @@ export default function Contact() {
 
           {/* Submit button */}
           <div className="sm:col-span-2 flex justify-end">
-            <button type="submit" className="rounded-full bg-neutral-900 px-8 py-2 text-white transition hover:bg-neutral-800">Send</button>
+            <button type="submit" className="rounded-full bg-[#335A2C] px-8 py-2 text-white transition hover:bg-neutral-800">Send</button>
           </div>
         </form>
       </div>
