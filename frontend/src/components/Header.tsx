@@ -95,7 +95,7 @@ export default function Header() {
               onClick={() => setMenuOpen(false)}
             >
               <span className="flex items-center gap-2">
-                <ShoppingCart /> Cart
+                Cart<ShoppingCart /> 
               </span>
             </NavLink>
             <NavLink

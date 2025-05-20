@@ -27,7 +27,7 @@ export default function Contact() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-16">
       <div className="border-t-[1px]  border-[#111111]">
-        <p className="text-center text-[#111111] font-light text-[36px] py-[40px]">
+        <p className="text-center text-[#111111] font-light text-[20px] md:text-[36px] py-[40px]">
           “We’d love to hear from you. Get in touch!”
         </p>
       </div>
@@ -95,7 +95,7 @@ export default function Contact() {
           </div>
 
           {/* Submit button */}
-          <div className="sm:col-span-2 flex justify-end">
+          <div className="sm:col-span-2 flex justify-center md:justify-end">
             <button type="submit" className="rounded-full bg-[#335A2C] px-8 py-2 text-white transition hover:bg-neutral-800">Send</button>
           </div>
         </form>

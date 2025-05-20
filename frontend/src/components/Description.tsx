@@ -26,8 +26,8 @@ export default function Description({
         ${className}
       `}
     >
-      <h2 className="text-[32px] font-medium text-[#111111]">{title}</h2>
-      <p className="text-[24px] font-medium text-[#111111] px-[50px]">{subtitle}</p>
+      <h2 className="text-[20px] md:text-[32px] font-medium text-[#111111]">{title}</h2>
+      <p className="text-[12px] md:text-[24px] font-medium text-[#111111] px-[50px]">{subtitle}</p>
       {link && (
         <a href={link} className="text-[#111111] underline text-[20px]">
           Article Link
