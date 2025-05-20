@@ -11,25 +11,25 @@ const DRUGS = [
     imageSrc: "/img/lsd.png",
     name: "LSD",
     title: "Type: Psychedelic",
-    subtitle: "C₂₀H₂₅N₃O",
+    formula: "C₂₀H₂₅N₃O",
   },
   {
     imageSrc: "/img/cannabis.png",
     name: "Cannabis",
     title: "Psychoactive depressant",
-    subtitle: "C₂₁H₃₀O₂",
+    formula: "C₂₁H₃₀O₂",
   },
   {
     imageSrc: "/img/cocaine.png",
     name: "Cocaine",
     title: "Psychoactive depressant",
-    subtitle: "C₁₇H₂₁NO₄",
+    formula: "C₁₇H₂₁NO₄",
   },
   {
     imageSrc: "/img/mushrooms.png",
     name: "Mushrooms",
     title: "Psychoactive depressant",
-    subtitle: "C₁₂H₁₇N₂O₄P",
+    formula: "C₁₂H₁₇N₂O₄P",
   },
 ];
 
