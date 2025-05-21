@@ -1,4 +1,4 @@
-import Banner from '../assets/images/bannerHome4K.mp4';
+import Banner from '../assets/images/homeBanner4K.mp4';
 import InfoDrugs from '../assets/images/InfoDrugs.png';
 import HarmReduction from '../assets/images/HarmReduction.png';
 import TestKits from '../assets/images/TestKits.png';
