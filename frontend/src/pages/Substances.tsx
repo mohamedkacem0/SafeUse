@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Search } from "lucide-react";
 import DrugCard from "../components/Card";
 import PrimaryButton from "../components/PrimaryButton";
-import Banner from "../assets/images/substanceBanner.png";
+import Banner from "../assets/images/substanceBanner4K.png";
 
 // 🧪 Define the drug type
 interface Drug {

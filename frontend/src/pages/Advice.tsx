@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import Description from '../components/Description';
-import Banner from '../assets/images/adviceBanner.png';
+import Banner from '../assets/images/adviceBanner4K.png';
 
 export default function Advice() {
   const [activeSection, setActiveSection] = useState('before-use');
