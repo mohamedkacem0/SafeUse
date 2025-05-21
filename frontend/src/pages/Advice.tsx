@@ -42,10 +42,10 @@ export default function Advice() {
   };
 
   return (
-    <div>
+    <div className='relative'>
       {/* Banner */}
-      <div className="sticky top-0 z-10 h-[220px] md:h-[350px] lg:h-[450px] w-full ">
-        <img src={Banner} alt="Advice Banner" className="w-full object-cover pt-[70px] md:pt-0" />
+      <div className="sticky top-0 h-[220px] md:h-[350px] lg:h-[450px] w-full ">
+        <img src={Banner} alt="Advice Banner" className="w-full pt-[70px] md:pt-0" />
       </div>
 
       <div className='sticky top-0 z-20 bg-white'>
@@ -128,7 +128,7 @@ export default function Advice() {
             ref={afterRef}
             className="scroll-mt-[120px] md:scroll-mt-[200px] transition-all duration-500"
           >
-            <div className="flex flex-col gap-10 md:gap-[70px] items-center my-8 md:my-[50px] px-2 md:px-0">
+            <div className="flex flex-col gap-10 md:gap-[70px] items-center py-8 md:py-[50px] px-2 md:px-0">
               <Description
                 title="Sleep & Nutrition"
                 subtitle="Testing drugs before use is essential to ensure they are safe and effective for humans. Without proper testing, a drug could cause harmful side effects or even be life-threatening. Clinical trials and laboratory studies help identify potential risks, correct dosages, and how a drug interacts with the body."
