@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Search } from "lucide-react"; // ícono de búsqueda
 import DrugCard from "../components/Card";
 import PrimaryButton from "../components/PrimaryButton";
-import Banner from '../assets/images/shop.png';
+import Banner from '../assets/images/shop4K.png';
 import { useNavigate } from "react-router-dom";
 
 // Datos de ejemplo — podrías traerlos de una API
