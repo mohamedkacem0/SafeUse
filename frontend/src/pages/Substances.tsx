@@ -4,7 +4,15 @@ import DrugCard from "../components/Card";
 import PrimaryButton from "../components/PrimaryButton";
 import Banner from "../assets/images/substanceBanner4K.png";
 
-// 🧪 Define the drug type
+interface ApiSubstance {
+  ID_Sustancia: number;
+  Nombre: string;
+  Imagen: string;
+  Titulo: string;
+  Formula: string;
+}
+
+/** Cómo la usará el componente Card */
 interface Drug {
   name: string;
   imageSrc: string;
@@ -12,14 +20,28 @@ interface Drug {
   formula: string;
 }
 
+/* ------------ 2. Componente -------------------- */
+
 export default function SubstancesPage() {
-  const [query, setQuery] = useState("");
-  const [drugs, setDrugs] = useState<Drug[]>([]);
+  const [query, setQuery]   = useState("");
+  const [drugs, setDrugs]   = useState<Drug[]>([]);
 
   useEffect(() => {
-    fetch("http://localhost/alex/SAFEUSE/SafeUse/backend/api/app/core/response.php") // ← Ajusta la URL si es necesario
-      .then((res) => res.json())
-      .then((data) => setDrugs(data))
+    fetch(
+      "http://localhost/backend/api/public/index.php?route=api/sustancias"
+    )
+      // indicamos a TS qué va a venir: Promise<ApiSubstance[]>
+      .then<ApiSubstance[]>(res => res.json())
+      .then(apiData => {
+        /* 3. Mapeamos con tipado → Drug[] */
+        const parsed: Drug[] = apiData.map((s) => ({
+          name:     s.Nombre,
+          imageSrc: s.Imagen,
+          title:    s.Titulo,
+          formula:  s.Formula,
+        }));
+        setDrugs(parsed);
+      })
       .catch((err) => console.error("Error loading drugs:", err));
   }, []);
 
