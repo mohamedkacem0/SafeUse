@@ -1,17 +1,23 @@
 <?php
-namespace app\models;
-use app\core\db;
+namespace App\Models;                       // ← Mayúsculas
+
+use App\Core\DB;                            // ← Clase correcta
 use PDO;
 
-class SubstanceModel {
-    public static function all(?string $q = ''): array {
-        $pdo = DB::getInstance()->conn();
-        if ($q !== '') {
-            $stmt = $pdo->prepare('SELECT * FROM substances WHERE name LIKE :q');
-            $stmt->execute([':q' => "%$q%"]);
-        } else {
-            $stmt = $pdo->query('SELECT * FROM substances');
-        }
+class SubstanceModel
+{
+    /** Devuelve todas las sustancias */
+    public static function getAll(): array  // ← nombre esperado por el controlador
+    {
+        $pdo  = DB::getInstance()->conn();
+        $stmt = $pdo->query(
+            'SELECT ID_Sustancia,
+                    Nombre,
+                    Imagen,
+                    Titulo,
+                    Formula
+             FROM sustancias'               // ← tabla existente
+        );
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
