@@ -28,7 +28,7 @@ export default function SubstancesPage() {
 
   useEffect(() => {
     fetch(
-      "http://localhost/backend/api/public/index.php?route=api/sustancias"
+      "http://localhost/alex/SAFEUSE/SafeUse/backend/api/public/index.php?route=api/sustancias"
     )
       // indicamos a TS qué va a venir: Promise<ApiSubstance[]>
       .then<ApiSubstance[]>(res => res.json())
