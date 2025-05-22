@@ -6,7 +6,6 @@ export default function Verification() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Aquí puedes poner la lógica para enviar el email
     alert(`Reset link sent to ${email}`);
   };
 

@@ -4,7 +4,14 @@ import DrugCard from "../components/Card";
 import PrimaryButton from "../components/PrimaryButton";
 import Banner from "../assets/images/substanceBanner4K.png";
 
-// 🧪 Define the drug type
+interface ApiSubstance {
+  ID_Sustancia: number;
+  Nombre: string;
+  Imagen: string;
+  Titulo: string;
+  Formula: string;
+}
+
 interface Drug {
   name: string;
   imageSrc: string;
@@ -12,14 +19,25 @@ interface Drug {
   formula: string;
 }
 
+
 export default function SubstancesPage() {
-  const [query, setQuery] = useState("");
-  const [drugs, setDrugs] = useState<Drug[]>([]);
+  const [query, setQuery]   = useState("");
+  const [drugs, setDrugs]   = useState<Drug[]>([]);
 
   useEffect(() => {
-    fetch("http://localhost/alex/SAFEUSE/SafeUse/backend/api/app/core/response.php") // ← Ajusta la URL si es necesario
-      .then((res) => res.json())
-      .then((data) => setDrugs(data))
+    fetch(
+      "http://localhost/alex/SAFEUSE/SafeUse/backend/api/public/index.php?route=api/sustancias"
+    )
+      .then<ApiSubstance[]>(res => res.json())
+      .then(apiData => {
+        const parsed: Drug[] = apiData.map((s) => ({
+          name:     s.Nombre,
+          imageSrc: s.Imagen,
+          title:    s.Titulo,
+          formula:  s.Formula,
+        }));
+        setDrugs(parsed);
+      })
       .catch((err) => console.error("Error loading drugs:", err));
   }, []);
 
@@ -40,7 +58,6 @@ export default function SubstancesPage() {
           </p>
         </div>
         <section className="flex flex-col items-center mt-10 p-6 gap-8 max-w-5xl mx-auto">
-          {/* Search input */}
           <div className="relative w-full max-w-md">
             <input
               type="text"
@@ -52,7 +69,6 @@ export default function SubstancesPage() {
             <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-700" />
           </div>
 
-          {/* Card grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-[100px] ">
             {filtered.slice(0, 4).map((drug) => (
               <DrugCard key={drug.name} {...drug} />

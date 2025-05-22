@@ -13,9 +13,7 @@ export default function LoginSignup() {
     <section className="mx-auto max-w-5xl mt-10 px-4 py-16">
       <h1 className="mb-12 text-center text-5xl font-extrabold">Login/Sign up</h1>
 
-      {/* contenedor responsive: column en móvil, row en desktop */}
       <div className="flex flex-col gap-12 lg:flex-row lg:gap-0">
-        {/* LOGIN */}
         <form
           onSubmit={(e) => e.preventDefault()}
           className="flex w-full flex-col items-center lg:w-1/2 lg:pr-12"
@@ -56,10 +54,8 @@ export default function LoginSignup() {
           </button>
         </form>
 
-        {/* DIVIDER (solo desktop) */}
         <div className="hidden h-auto w-px self-stretch bg-gray-300 lg:block" />
 
-        {/* SIGN UP */}
         <form
           onSubmit={(e) => e.preventDefault()}
           className="flex w-full flex-col items-center lg:w-1/2 lg:pl-12"
@@ -84,7 +80,6 @@ export default function LoginSignup() {
             </div>
           ))}
 
-          {/* Password */}
           <div className="mb-4 w-full max-w-xs relative">
             <label className={label}>Password</label>
             <input
@@ -99,7 +94,6 @@ export default function LoginSignup() {
             </button>
           </div>
 
-          {/* Confirm */}
           <div className="mb-6 w-full max-w-xs relative">
             <label className={label}>Confirm password</label>
             <input
