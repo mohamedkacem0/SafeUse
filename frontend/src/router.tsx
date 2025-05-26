@@ -12,7 +12,7 @@ export const router = createBrowserRouter([
       { path: '/sustancia/:slug', element: <Pages.SubstanceDetail /> },
       { path: '/advice', element: <Pages.Advice /> },
       { path: '/Shop', element: <Pages.Shop /> },
-      { path: '/shop/:slug', element: <Pages.ProductDetails /> },
+      { path: '/shop/:id', element: <Pages.ProductDetails /> },
       { path: '/contact', element: <Pages.Contact /> },
       { path: '/profile', element: <Pages.Profile /> },
       { path: '/verification', element: <Pages.Verification /> },
