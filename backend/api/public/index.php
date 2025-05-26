@@ -1,4 +1,5 @@
 <?php
+
 // Carga manual sin Composer
 require_once __DIR__ . '/../app/core/Config.php';
 require_once __DIR__ . '/../app/core/DB.php';
@@ -9,6 +10,7 @@ require_once __DIR__ . '/../app/controller/substancecontroller.php';
 
 require_once __DIR__ . '/../app/models/ShopModel.php';
 require_once __DIR__ . '/../app/controller/shopcontroller.php';
+
 
 use App\Controllers\SubstanceController;
 use App\Controllers\ShopController;
@@ -37,6 +39,10 @@ switch ($route) {
             http_response_code(400);
             echo json_encode(['error' => 'Falta el parámetro ID']);
         }
+        break;
+
+         case 'api/contact':          
+        ContactController::send();
         break;
 
     default:
