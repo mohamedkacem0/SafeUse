@@ -94,7 +94,7 @@ export default function ShopPage() {
                 key={product.id}
                 imageSrc={product.imageSrc}
                 name={product.name}
-                title={product.description}
+                title=''/*{product.description}*/
                 formula={`€${product.price.toFixed(2)}`}
                 button="Add to cart"
                 onButtonClick={() => alert(`Added ${product.name} to cart`)}
