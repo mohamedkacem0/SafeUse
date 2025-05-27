@@ -65,7 +65,7 @@ export default function ProductDetailPage() {
         ← Back to shop
       </button>
 
-      <h1 className="text-[40px] font-bold mb-8">{product.name} details</h1>
+      {/*<h1 className="text-[32px] font-bold mb-8 text-center">{product.name}</h1>*/}
       <div className="flex flex-col md:flex-row gap-10">
         {/* Imagen principal + galería */}
         <div className="flex-1 flex flex-col items-center">
@@ -95,12 +95,12 @@ export default function ProductDetailPage() {
 
         {/* Info y compra */}
         <div className="flex-1 flex flex-col gap-4">
-          <h2 className="text-[28px] font-semibold">{product.name}</h2>
-          <p className="text-gray-700">{product.description}</p>
+         <h2 className="text-[28px] font-semibold">{product.name}</h2>
+          {/*<p className="text-gray-700">{product.description}</p>*/}
           <div className="text-[22px] font-bold">€{product.price.toFixed(2)}</div>
 
           <div className="flex items-center gap-2">
-            <label htmlFor="quantity" className="font-medium">Quassntity:</label>
+            <label htmlFor="quantity" className="font-medium">Quantity:</label>
             <input
               id="quantity"
               type="number"
@@ -115,13 +115,14 @@ export default function ProductDetailPage() {
 
           <PrimaryButton
             text="Add to cart"
-            className="mt-2"
+            className="my-2"
             onClick={() => alert(`Added ${qty} × ${product.name} to cart`)}
           />
         </div>
       </div>
 
       {/* Información adicional */}
+
       {product.description && (
         <div className="my-[100px]">
           <Description
