@@ -1,4 +1,4 @@
-import React from "react";
+
 import PrimaryButton from './PrimaryButton'; 
 interface DrugCardProps {
   imageSrc: string;
@@ -15,7 +15,6 @@ const DrugCard: React.FC<DrugCardProps> = ({
   imageSrc,
   name,
   title,
-  formula,
   button = "See more",
   onButtonClick,
   onCardClick,
