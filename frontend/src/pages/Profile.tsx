@@ -3,7 +3,7 @@ import { Pencil } from "lucide-react";
 import PrimaryButton from "../components/PrimaryButton";
 
 export default function Profile() {
-  const [user, setUser] = useState({
+  const [user] = useState({
     name: "Your name",
     email: "SafeUse@gmail.com",
     mobile: "",

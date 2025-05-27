@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import PrimaryButton from "../components/PrimaryButton";
-import { NavLink, Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 interface CartItem {
   id: number;

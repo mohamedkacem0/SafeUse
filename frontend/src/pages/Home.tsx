@@ -4,7 +4,7 @@ import HarmReduction from '../assets/images/HarmReduction.png';
 import TestKits from '../assets/images/TestKits.png';
 import PrimaryButton from '../components/PrimaryButton';
 import SquareBox from '../components/SquareBox';
-import { NavLink, Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 export default function Home() {
   return (
