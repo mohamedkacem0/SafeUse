@@ -7,7 +7,8 @@ interface DrugCardProps {
   formula: string;
   button?: string;
   onButtonClick?: () => void;
-  onCardClick?: () => void; // Nuevo prop
+  onCardClick?: () => void;
+  hideTitle?: boolean; // NUEVO
 }
 
 const DrugCard: React.FC<DrugCardProps> = ({
@@ -18,6 +19,7 @@ const DrugCard: React.FC<DrugCardProps> = ({
   button = "See more",
   onButtonClick,
   onCardClick,
+  hideTitle = false,
 }) => {
   return (
     <div
@@ -32,16 +34,16 @@ const DrugCard: React.FC<DrugCardProps> = ({
       <h3 className="font-lato font-bold text-[20px] leading-tight text-center">
         {name}
       </h3>
-      <p className="font-lato text-[14px] text-center leading-none">
-        {title}
-      </p>
-
-      <p className="font-lato text-[12px] italic text-center leading-tight mb-4">
+      {!hideTitle && (
+        <p className="font-lato text-[14px] text-center leading-none">
+          {title}
+        </p>
+      )}
+      {/*<p className="font-lato text-[12px] italic text-center leading-tight mb-4">
         {formula}
-      </p>
-
+      </p>*/}
       <div
-        onClick={e => e.stopPropagation()} // Evita que el click en el botón propague al card
+        onClick={e => e.stopPropagation()}
       >
         <PrimaryButton
           className={`!bg-[#44844D] hover:scale-105 transition-all duration-300`}
