@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
 import DrugCard from "../components/Card";
 import PrimaryButton from "../components/PrimaryButton";
@@ -25,6 +26,8 @@ export default function SubstancesPage() {
   const [query, setQuery] = useState("");
   const [drugs, setDrugs] = useState<Drug[]>([]);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [modalDrug, setModalDrug] = useState<Drug | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch(
@@ -57,6 +60,16 @@ export default function SubstancesPage() {
     setVisibleCount(prev => Math.min(prev + PAGE_SIZE, filtered.length));
   };
 
+  const handleOpenModal = (drug: Drug) => setModalDrug(drug);
+  const handleCloseModal = () => setModalDrug(null);
+
+  function formatFormula(formula: string) {
+    // Reemplaza cada número por <sub>número</sub>
+    return formula.replace(/([A-Za-z])(\d+)/g, (_, letter, num) => {
+      return `${letter}<sub>${num}</sub>`;
+    });
+  }
+
   return (
     <div>
       <div className="sticky top-0 z-10 h-[450px] w-full overflow-hidden">
@@ -83,10 +96,55 @@ export default function SubstancesPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-[100px] ">
             {filtered.slice(0, visibleCount).map(drug => (
-              <DrugCard key={drug.name} {...drug} />
+              <DrugCard
+                key={drug.name}
+                {...drug}
+                hideTitle={true}
+                onButtonClick={() =>
+                  navigate(`/sustancia/${encodeURIComponent(drug.name.toLowerCase().replace(/\s+/g, '-'))}`)
+                }
+                onCardClick={() => handleOpenModal(drug)}
+              />
             ))}
           </div>
-
+          {/* Modal */}
+          {modalDrug && (
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+              onClick={handleCloseModal}
+            >
+              <div
+                className="bg-white rounded-lg p-8 max-w-md w-full relative flex flex-col items-center"
+                onClick={e => e.stopPropagation()}
+              >
+                <button
+                  className="absolute top-2 right-4 text-2xl font-bold text-gray-500 hover:text-black"
+                  onClick={handleCloseModal}
+                >
+                  ×
+                </button>
+                <h2 className="text-2xl font-bold mb-2">{modalDrug.name}</h2>
+                <p className="text-lg text-gray-700">{modalDrug.title}</p>
+                <img
+                  src={modalDrug.imageSrc}
+                  alt={modalDrug.name}
+                  className="w-[300px] h-[300px] object-contain m-4"
+                />
+                <p
+                  className="text-xl font-bold text-center mb-4"
+                  dangerouslySetInnerHTML={{ __html: formatFormula(modalDrug.formula) }}
+                />
+                <PrimaryButton
+                  className="!bg-[#44844D] hover:scale-105 transition-all duration-300"
+                  text="See more"
+                  onClick={() => {
+                    handleCloseModal();
+                    navigate(`/sustancia/${encodeURIComponent(modalDrug.name.toLowerCase().replace(/\s+/g, '-'))}`);
+                  }}
+                />
+              </div>
+            </div>
+          )}
           {canLoadMore ? (
             <PrimaryButton text="Load more" onClick={handleLoadMore} />
           ) : (
