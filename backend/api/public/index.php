@@ -11,10 +11,14 @@ require_once __DIR__ . '/../app/controller/substancecontroller.php';
 require_once __DIR__ . '/../app/models/ShopModel.php';
 require_once __DIR__ . '/../app/controller/shopcontroller.php';
 
+require_once __DIR__ . '/../app/models/userModel.php';
+require_once __DIR__ . '/../app/controller/userController.php';
+
 // Añadido para detalles de sustancia
 require_once __DIR__ . '/../app/models/SubstanceDetailModel.php';
 require_once __DIR__ . '/../app/controller/SubstanceDetailController.php';
 
+use App\Controllers\UserController;
 use App\Controllers\SubstanceController;
 use App\Controllers\ShopController;
 // Añadido para detalles de sustancia
@@ -63,11 +67,16 @@ switch ($route) {
         }
         break;
 
-    case 'api/contact':          
-        ContactController::send();
+    case 'api/register': UserController::register();
         break;
 
-    default:
+    case 'api/login':    UserController::login();  
+        break;
+
+    case 'api/logout':   UserController::logout(); 
+        break;
+
+        default:
         http_response_code(404);
         echo json_encode(['error' => 'Ruta no encontrada']);
 }
