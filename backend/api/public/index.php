@@ -18,18 +18,21 @@ require_once __DIR__ . '/../app/controller/userController.php';
 require_once __DIR__ . '/../app/models/SubstanceDetailModel.php';
 require_once __DIR__ . '/../app/controller/SubstanceDetailController.php';
 
+// Añadido para consejos de sustancias
+require_once __DIR__ . '/../app/models/AdviceModel.php';
+require_once __DIR__ . '/../app/controller/AdviceController.php';
+
 use App\Controllers\UserController;
 use App\Controllers\SubstanceController;
 use App\Controllers\ShopController;
 // Añadido para detalles de sustancia
 use App\Controllers\SubstanceDetailController;
+use App\Controllers\AdviceController;
 
 /*
  |---------------------------------------------------------
  |  Router sencillo:
- |  http://localhost/backend/api/public/index.php?route=...
-
-    http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/...
+ |  http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/...
  |---------------------------------------------------------
 */
 $route = $_GET['route'] ?? '';
@@ -60,27 +63,43 @@ switch ($route) {
 
     case 'api/producto':
         if (isset($_GET['id'])) {
-            ShopController::show((int)$_GET['id']);
+            ShopController::show((int) $_GET['id']);
         } else {
             http_response_code(400);
             echo json_encode(['error' => 'Falta el parámetro ID']);
         }
         break;
 
-    case 'api/register': UserController::register();
+    case 'api/register':
+        UserController::register();
         break;
 
-    case 'api/login':    UserController::login();  
+    case 'api/login':
+        UserController::login();
         break;
 
-    case 'api/logout':   UserController::logout(); 
+    case 'api/logout':
+        UserController::logout();
         break;
 
     case 'api/profile':  UserController::profile();
         break;
 
+    case 'api/advice':
+        // Devuelve consejo individual o lista
+        if (isset($_GET['id'])) {
+            AdviceController::show((int) $_GET['id']);
+        } else {
+            AdviceController::index();
+        }
+        break;
 
-        default:
+    case 'api/advices':
+        AdviceController::index();
+        break;
+
+    default:
+
         http_response_code(404);
         echo json_encode(['error' => 'Ruta no encontrada']);
 }
