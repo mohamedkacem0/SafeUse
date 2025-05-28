@@ -128,4 +128,31 @@ class UserController {
         session_destroy();
         Response::json(['success' => true]);
     }
+
+     public static function profile(): void {
+        session_start();
+        if (empty($_SESSION['user']['ID_Usuario'])) {
+            Response::json(['error' => 'No autenticado'], 401);
+            return;
+        }
+
+        $id = (int) $_SESSION['user']['ID_Usuario'];
+        $user = UserModel::findById($id);
+
+        if (!$user) {
+            Response::json(['error' => 'Usuario no encontrado'], 404);
+            return;
+        }
+
+        // Mapea el campo Dirección a Direccion para el frontend
+        Response::json(['user' => [
+            'ID_Usuario'   => $user['ID_Usuario'],
+            'Nombre'       => $user['Nombre'],
+            'Correo'       => $user['Correo'],
+            'Telefono'     => $user['Telefono'],
+            'Direccion'    => $user['Dirección'],
+            'Tipo_Usuario' => $user['Tipo_Usuario'],
+        ]]);
+}
+
 }

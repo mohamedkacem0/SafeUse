@@ -5,6 +5,5 @@ class Config {
     public const DB_NAME = 'safeuse_db';
     public const DB_USER = 'root';
     public const DB_PASS = '';
-    public const DSN     = 'mysql:host=127.0.0.1;port=3306;dbname=safeusedb;charset=utf8mb4';
+    public const DSN     = 'mysql:host=localhost;port=3306;dbname=safeuse_db;charset=utf8mb4';
 }
-*/

@@ -1,12 +1,21 @@
-import { useState } from "react";
-import { NavLink, Link } from "react-router-dom";
-import { ShoppingCart, Menu, X } from "lucide-react";
+// src/components/Header.tsx
+import React, { useState, useEffect } from "react";
+import { NavLink, Link, useLocation } from "react-router-dom";
+import { ShoppingCart, Menu, X, User } from "lucide-react";
 import Button from "./PrimaryButton";
 import logo from "../assets/logo/logo.svg";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [user, setUser] = useState<{ ID_Usuario: number; Nombre: string; Correo: string; Tipo_Usuario: string } | null>(null);
   const navLinkClasses = "block md:inline px-4 py-2 md:p-0";
+  const location = useLocation();
+
+  // Cada vez que cambie la ruta (login/logout produce un cambio de ruta), recarga el user
+  useEffect(() => {
+    const stored = localStorage.getItem("user");
+    setUser(stored ? JSON.parse(stored) : null);
+  }, [location.pathname]);
 
   if (location.pathname === "/politica-de-cookies") return null;
 
@@ -42,9 +51,15 @@ export default function Header() {
           <NavLink to="/cart" aria-label="Cart">
             <ShoppingCart />
           </NavLink>
-          <NavLink to="/login" aria-label="Login">
-            <Button text="Log in/Sign up" />
-          </NavLink>
+          {user ? (
+            <NavLink to="/profile" aria-label="Profile">
+              <User />
+            </NavLink>
+          ) : (
+            <NavLink to="/login" aria-label="Login">
+              <Button text="Log in/Sign up" />
+            </NavLink>
+          )}
         </div>
 
         {/* Hamburger menu (mobile only) */}
@@ -95,16 +110,28 @@ export default function Header() {
               onClick={() => setMenuOpen(false)}
             >
               <span className="flex items-center gap-2">
-                Cart<ShoppingCart /> 
+                Cart<ShoppingCart />
               </span>
             </NavLink>
-            <NavLink
-              to="/login"
-              className={navLinkClasses}
-              onClick={() => setMenuOpen(false)}
-            >
-              <Button text="Log in/Sign up" />
-            </NavLink>
+            {user ? (
+              <NavLink
+                to="/profile"
+                className={navLinkClasses}
+                onClick={() => setMenuOpen(false)}
+              >
+                <span className="flex items-center gap-2">
+                  Profile<User />
+                </span>
+              </NavLink>
+            ) : (
+              <NavLink
+                to="/login"
+                className={navLinkClasses}
+                onClick={() => setMenuOpen(false)}
+              >
+                <Button text="Log in/Sign up" />
+              </NavLink>
+            )}
           </nav>
         </div>
       )}
