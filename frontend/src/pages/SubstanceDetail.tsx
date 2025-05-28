@@ -1,110 +1,118 @@
 import { useParams } from "react-router-dom";
+import { useEffect, useState, useRef } from "react";
 import Description from "../components/Description";
 
-const substanceData: Record<string, any> = {
-  cannabis: {
-    name: "Cannabis",
-    image: "/img/cannabis.png",
-    description:
-      "Testing drugs before use is essential to ensure they are safe and effective for humans. Without proper testing, a drug could cause harmful side effects or even be life-threatening. Clinical trials and laboratory studies help identify potential risks, correct dosages, and how a drug interacts with the body.",
-    consumption:
-      "Testing drugs before use is essential to ensure they are safe and effective for humans. Without proper testing, a drug could cause harmful side effects or even be life-threatening. Clinical trials and laboratory studies help identify potential risks, correct dosages, and how a drug interacts with the body.",
-    effects:
-      "Testing drugs before use is essential to ensure they are safe and effective for humans. Without proper testing, a drug could cause harmful side effects or even be life-threatening. Clinical trials and laboratory studies help identify potential risks, correct dosages, and how a drug interacts with the body.",
-  },
-  // Puedes agregar más sustancias aquí...
+// Mapeo de campos de la API a títulos legibles
+const FIELD_TITLES: Record<string, string> = {
+  descripcion: "Description",
+  metodos_consumo: "Consumption Methods",
+  efectos_deseados: "Desired Effects",
+  composicion: "Composition",
+  riesgos: "Risks",
+  interaccion_otras_sustancias: "Interaction with other Substances",
+  reduccion_riesgos: "Risk Reduction",
+  legislacion: "Legislation",
 };
 
 export default function SubstanceDetail() {
   const { slug } = useParams();
-  const data =
-    substanceData[slug?.toLowerCase() || "cannabis"] ||
-    substanceData["cannabis"];
+  const [data, setData] = useState<Record<string, any> | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const mainRef = useRef<HTMLDivElement>(null);
+
+  // Ajusta este valor para definir el espacio superior al hacer scroll
+  const SCROLL_OFFSET = 140; // en pixeles
+
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      try {
+        const resSubstances = await fetch(
+          `http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/sustancias`
+        );
+        const substances: any[] = await resSubstances.json();
+        const substance = substances.find(
+          (s) => s.Nombre.toLowerCase() === slug?.toLowerCase()
+        );
+        if (!substance) throw new Error("Sustancia no encontrada");
+
+        const resDetail = await fetch(
+          `http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/sustancia&id=${substance.ID_Sustancia}`
+        );
+        const detail = await resDetail.json();
+
+        setData({
+          name: substance.Nombre,
+          image: substance.Imagen,
+          ...detail,
+        });
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, [slug]);
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, key: string) => {
+    e.preventDefault();
+    const container = mainRef.current;
+    const section = container?.querySelector<HTMLElement>(`#${key}`);
+    if (container && section) {
+      const topPosition = section.offsetTop - SCROLL_OFFSET;
+      container.scrollTo({
+        top: topPosition >= 0 ? topPosition : 0,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  if (loading) return <p>Cargando...</p>;
+  if (error || !data) return <p>Error: {error || 'Unknown error'}</p>;
+
+  const sections = Object.keys(FIELD_TITLES).filter(
+    (key) => data[key] != null && data[key] !== ''
+  );
 
   return (
-    <div className="max-w-6xl mx-auto mt-[70px] px-4">
-      <h1 className="text-[40px] font-bold mb-8">{data.name}</h1>
-      <div className="flex flex-col md:flex-row gap-8">
-        {/* Sidebar */}
-        <aside className="w-full md:w-[220px] mb-6 md:mb-0">
-          <nav className="flex md:flex-col gap-2 text-[18px]">
-            <a
-              href="#description"
-              className="hover:underline text-[#335A2C]"
-            >
-              Description
-            </a>
-            <a
-              href="#consumption"
-              className="hover:underline text-[#335A2C]"
-            >
-              Consumption Methods
-            </a>
-            <a
-              href="#effects"
-              className="hover:underline text-[#335A2C]"
-            >
-              Desired Effects
-            </a>
-            <a
-              href="#Composition"
-              className="hover:underline text-[#335A2C]"
-            >
-              Composition
-            </a>
-            <a
-              href="#Risks"
-              className="hover:underline text-[#335A2C]"
-            >
-              Risks
-            </a>
-            <a
-              href="#Interaction"
-              className="hover:underline text-[#335A2C]"
-            >
-              Interaction with other Substances
-            </a>
-            <a
-              href="#Reduction"
-              className="hover:underline text-[#335A2C]"
-            >
-              Risk Reduction
-            </a>
-            <a
-              href="#Legislation"
-              className="hover:underline text-[#335A2C]"
-            >
-              Legislation
-            </a>
-            {/* Puedes agregar más links aquí */}
+    // contenedor principal con altura fija y overflow hidden
+    <div className="max-w-6xl mx-auto mt-[70px] p-[60px] h-[calc(100vh-70px)] overflow-hidden">
+      <div className="flex h-full">
+        {/* Columna fija: título + menú */}
+        <aside className="w-[220px] bg-white border-r border-gray-200 p-4 flex-shrink-0">
+          <h1 className="text-[24px] font-bold mb-6">{data.name}</h1>
+          <nav className="flex flex-col gap-3 text-[16px]">
+            {sections.map((key) => (
+              <a
+                key={key}
+                href={`#${key}`}
+                onClick={(e) => handleNavClick(e, key)}
+                className="hover:underline text-[#335A2C]"
+              >
+                {FIELD_TITLES[key]}
+              </a>
+            ))}
           </nav>
         </aside>
-        {/* Main content */}
-        <main className="flex-1 flex flex-col gap-8">
-          <section id="description">
-            <Description
-              title="Description"
-              subtitle={data.description}
-              link=""
-              width="w-full"
-            />
-          </section>
-          <section id="consumption">
-            <Description
-              title="Consumption methods"
-              subtitle={data.consumption}
-              link=""
-              width="w-full"
-            />
-          </section>
-          <section id="effects">
-            <Description
-              title="Desired effects"
-              subtitle={data.effects}
-              link=""
-              width="w-full"
-            />
-          </section>
+
+        {/* Columna scrollable: contenido principal */}
+        <main
+          ref={mainRef}
+          className="flex-1 p-4 overflow-y-auto"
+        >
+          {sections.map((key) => (
+            <section id={key} key={key} className="mb-8">
+              <Description
+                title={FIELD_TITLES[key]}
+                subtitle={data[key]}
+                link=""
+                width="w-full"
+              />
+            </section>
+          ))}
         </main>
       </div>
     </div>
