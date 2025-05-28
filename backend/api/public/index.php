@@ -76,6 +76,10 @@ switch ($route) {
     case 'api/logout':   UserController::logout(); 
         break;
 
+    case 'api/profile':  UserController::profile();
+        break;
+
+
         default:
         http_response_code(404);
         echo json_encode(['error' => 'Ruta no encontrada']);

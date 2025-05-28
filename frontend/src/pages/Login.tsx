@@ -40,6 +40,8 @@ export default function LoginSignup() {
       if (!res.ok) {
         setLoginError(data.error || "Error al iniciar sesión");
       } else {
+        // Guardamos datos de usuario y redirigimos
+        localStorage.setItem("user", JSON.stringify(data.user));
         navigate("/");
       }
     } catch (err) {
@@ -65,13 +67,15 @@ export default function LoginSignup() {
           password: sign.password,
           telefono: sign.phone,
           direccion: sign.address,
-          tipo_usuario: "usuario",
+          tipo_usuario: "user",
         }),
       });
       const data = await res.json();
       if (!res.ok) {
         setSignError(data.error || "Error al crear cuenta");
       } else {
+        // Guardamos datos de usuario y redirigimos
+        localStorage.setItem("user", JSON.stringify(data.user));
         navigate("/");
       }
     } catch (err) {
@@ -90,6 +94,7 @@ export default function LoginSignup() {
           className="flex w-full flex-col items-center lg:w-1/2 lg:pr-12"
         >
           <h2 className="mb-8 text-[30px] font-bold">Log in</h2>
+
           {loginError && <p className="mb-4 text-red-600">{loginError}</p>}
 
           <div className="mb-6 w-full max-w-xs">
@@ -134,6 +139,7 @@ export default function LoginSignup() {
           className="flex w-full flex-col items-center lg:w-1/2 lg:pl-12"
         >
           <h2 className="mb-8 text-[30px] font-bold">Sign up</h2>
+
           {signError && <p className="mb-4 text-red-600">{signError}</p>}
 
           <div className="mb-4 w-full max-w-xs">
