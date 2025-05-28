@@ -1,4 +1,4 @@
-// vite.config.js
+// vite.config.ts
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
@@ -8,18 +8,17 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      // cualquiera que empiece con /api...
       '/api': {
-        // lo mandamos directamente al index.php de tu API
         target: 'http://localhost/tfg/SafeUse/backend/api/public/index.php',
         changeOrigin: true,
-        // quitamos el prefijo /api para que index.php reciba solo el query string
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      }
-    }
+        // convierte "/api/loquesea" en "?route=api/loquesea"
+        rewrite: (path) =>
+          path.replace(/^\/api\/(.+)/, '?route=api/$1'),
+      },
+    },
   },
   build: {
     outDir: path.resolve(__dirname, 'dist'),
     emptyOutDir: true,
-  }
+  },
 })
