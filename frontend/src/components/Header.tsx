@@ -1,5 +1,5 @@
 // src/components/Header.tsx
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { NavLink, Link, useLocation } from "react-router-dom";
 import { ShoppingCart, Menu, X, User } from "lucide-react";
 import Button from "./PrimaryButton";

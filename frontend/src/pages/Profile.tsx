@@ -1,5 +1,5 @@
 // src/pages/Profile.tsx
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Pencil } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PrimaryButton from "../components/PrimaryButton";
