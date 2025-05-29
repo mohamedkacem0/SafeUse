@@ -1,5 +1,17 @@
 <?php
 
+/*
+// DESCOMENTAR PARA FUNCIONAR
+
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    exit(0);
+}
+    */
 // Carga manual sin Composer
 require_once __DIR__ . '/../app/core/Config.php';
 require_once __DIR__ . '/../app/core/DB.php';
@@ -22,12 +34,17 @@ require_once __DIR__ . '/../app/controller/SubstanceDetailController.php';
 require_once __DIR__ . '/../app/models/AdviceModel.php';
 require_once __DIR__ . '/../app/controller/AdviceController.php';
 
+//contacto
+require_once __DIR__ . '/../app/models/ContactModel.php';
+require_once __DIR__ . '/../app/controller/ContactController.php';
+
 use App\Controllers\UserController;
 use App\Controllers\SubstanceController;
 use App\Controllers\ShopController;
 // Añadido para detalles de sustancia
 use App\Controllers\SubstanceDetailController;
 use App\Controllers\AdviceController;
+use App\Controllers\ContactController;
 
 /*
  |---------------------------------------------------------
@@ -97,6 +114,16 @@ switch ($route) {
     case 'api/advices':
         AdviceController::index();
         break;
+
+        case 'api/contact':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            ContactController::store();
+        } else {
+            http_response_code(405);
+            echo json_encode(['error' => 'Method not allowed']);
+        }
+        break;
+
 
     default:
 

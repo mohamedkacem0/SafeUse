@@ -24,6 +24,29 @@ export default function Contact() {
     const form = e.currentTarget;
     const data = new FormData(form);
 
+    const payload = {
+    first_name: data.get('firstName'),
+     last_name:  data.get('lastName'),
+     email:      data.get('email'),
+     phone:      data.get('phone'),
+     message:    data.get('message'),
+   };
+   try {
+     const dbRes = await fetch(
+       'http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/contact',
+       {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify(payload),
+       }
+     );
+     if (!dbRes.ok) throw new Error('DB error');
+   } catch (err) {
+     console.error(err);
+     setStatus('error');
+     return;
+   }
+
     try {
       const res = await fetch("https://formspree.io/f/mnndklal", {
         method: "POST",
