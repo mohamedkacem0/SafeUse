@@ -143,8 +143,11 @@ switch ($route) {
         case 'api/cart/remove':
             CartController::remove();
             break;
-    default:
+        case 'api/cart/count': // Nueva ruta para obtener el contador del carrito
+            CartController::getCartCount();
+            break;
 
+    default:
         http_response_code(404);
         echo json_encode(['error' => 'Ruta no encontrada']);
 }
