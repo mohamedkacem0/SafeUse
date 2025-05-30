@@ -89,6 +89,10 @@ switch ($route) {
         }
         break;
 
+        case 'api/users':
+        UserController::users();
+        break;
+
     case 'api/register':
         UserController::register();
         break;
@@ -107,6 +111,8 @@ switch ($route) {
         UserController::uploadPhoto();
         break;
     case 'api/advice':
+
+        
         // Devuelve consejo individual o lista
         if (isset($_GET['id'])) {
             AdviceController::show((int) $_GET['id']);
