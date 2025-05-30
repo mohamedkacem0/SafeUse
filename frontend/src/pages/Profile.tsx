@@ -40,16 +40,22 @@ export default function Profile() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch("/api/profile", {
+        const res = await fetch("/api?route=api/profile", {
           method: "GET",
           credentials: "include",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache'
+          }
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const { user: u } = await res.json();
-        setUser(u);
+        const userData = await res.json();
+        console.log("Datos del perfil recibidos:", userData);
+        setUser(userData);
       } catch (err) {
-        console.error(err);
-        setError("No se pudieron cargar los datos de perfil.");
+        console.error("Error al cargar el perfil:", err);
+        setError("No se pudieron cargar los datos de perfil. Por favor, inicia sesión nuevamente.");
       } finally {
         setLoading(false);
       }
@@ -58,9 +64,20 @@ export default function Profile() {
 
   // Logout
   const handleLogout = async () => {
-    await fetch("/api/logout", { method: "POST", credentials: "include" });
-    localStorage.removeItem("user");
-    navigate("/");
+    try {
+      await fetch("/api?route=api/logout", { 
+        method: "POST", 
+        credentials: "include",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      });
+      localStorage.removeItem("user");
+      navigate("/");
+    } catch (err) {
+      console.error("Error al cerrar sesión:", err);
+    }
   };
 
   // Password Change Handler
