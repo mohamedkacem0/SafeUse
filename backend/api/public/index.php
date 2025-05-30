@@ -35,6 +35,10 @@ require_once __DIR__ . '/../app/controller/AdviceController.php';
 require_once __DIR__ . '/../app/models/ContactModel.php';
 require_once __DIR__ . '/../app/controller/ContactController.php';
 
+require_once __DIR__ . '/../app/models/CartModel.php';
+require_once __DIR__ . '/../app/controller/CartController.php';
+
+
 use App\Controllers\UserController;
 use App\Controllers\SubstanceController;
 use App\Controllers\ShopController;
@@ -42,6 +46,7 @@ use App\Controllers\ShopController;
 use App\Controllers\SubstanceDetailController;
 use App\Controllers\AdviceController;
 use App\Controllers\ContactController;
+use App\Controllers\CartController;
 
 /*
  |---------------------------------------------------------
@@ -126,7 +131,18 @@ switch ($route) {
         }
         break;
 
-
+        case 'api/cart':
+            CartController::index();
+            break;
+        case 'api/cart/add':
+            CartController::add();
+            break;
+        case 'api/cart/update':
+            CartController::update();
+            break;
+        case 'api/cart/remove':
+            CartController::remove();
+            break;
     default:
 
         http_response_code(404);
