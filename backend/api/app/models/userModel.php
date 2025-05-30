@@ -52,15 +52,17 @@ class UserModel {
      * @param int $id
      * @return array|null
      */
-    public static function findById(int $id): ?array {
-        $pdo = DB::getInstance()->conn();
-        $stmt = $pdo->prepare(
-            'SELECT ID_Usuario, Nombre, Correo, Telefono, `Dirección`, Tipo_Usuario
-             FROM usuarios
-             WHERE ID_Usuario = :id'
-        );
-        $stmt->execute(['id' => $id]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $user ?: null;
-    }
+
+public static function findById(int $id): ?array {
+    $pdo = DB::getInstance()->conn();
+    $stmt = $pdo->prepare(
+        'SELECT ID_Usuario, Nombre, Correo, Telefono, `Dirección`, Tipo_Usuario, foto_perfil
+         FROM usuarios
+         WHERE ID_Usuario = :id'
+    );
+    $stmt->execute(['id' => $id]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $user ?: null;
+}
+
 }
