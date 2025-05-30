@@ -16,7 +16,7 @@ export default function Contact() {
   const [status, setStatus] = useState<"idle" | "sending" | "error">("idle");
 
   const inputBase =
-    "w-full border-b border-gray-400 bg-transparent py-2 text-sm placeholder:text-gray-500 focus:outline-none focus:border-primary";
+    "w-full border border-gray-300 rounded-md bg-transparent px-3 py-2 text-base placeholder:text-gray-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors duration-200";
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -67,16 +67,18 @@ export default function Contact() {
   };
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-16">
-      <div className="border-t-[1px] border-[#111111]">
+    <section className="bg-gray-50 mx-auto max-w-6xl px-4 py-16">
+      {/* Slogan Section - Reverted */}
+      <div className="border-t border-gray-300">
         <p className="text-center text-[#111111] font-light text-[20px] md:text-[36px] py-[40px]">
           “We’d love to hear from you. Get in touch!”
         </p>
       </div>
 
-      <div className="overflow-hidden bg-[#335A2C] rounded-xl border border-gray-300 shadow-sm md:grid md:grid-cols-3 md:gap-8">
+      {/* Main Contact Box */}
+      <div className="mx-auto max-w-6xl overflow-hidden bg-[#335A2C] rounded-xl shadow-xl md:grid md:grid-cols-3 md:gap-0"> {/* Removed gap-8, panels will control their padding */}
         {/* Left panel */}
-        <aside className="flex flex-col gap-8 bg-primary px-8 py-10 text-white sm:px-10 md:col-span-1">
+        <aside className="flex flex-col gap-8 bg-primary px-8 py-10 text-white sm:px-10 md:col-span-1 md:rounded-l-xl">
           <header>
             <h2 className="text-2xl font-semibold">Contact Information</h2>
             <p className="mt-1 text-sm opacity-90">
@@ -84,39 +86,41 @@ export default function Contact() {
             </p>
           </header>
 
-          <ul className="space-y-6 text-sm">
+          <ul className="space-y-6 text-base">
             <li className="flex items-center gap-3">
-              <Phone className="h-5 w-5" /> <span>+696 969 696</span>
+              <Phone className="h-6 w-6" /> <span>+696 969 696</span>
             </li>
             <li className="flex items-center gap-3">
-              <Mail className="h-5 w-5" /> <span>SafeUse@gmail.com</span>
+              <Mail className="h-6 w-6" /> <span>SafeUse@gmail.com</span>
             </li>
             <li className="flex items-center gap-3">
-              <MapPin className="h-5 w-5" /> <span>Madrid</span>
+              <MapPin className="h-6 w-6" /> <span>Madrid</span>
             </li>
           </ul>
 
           <footer className="mt-auto flex gap-4 text-white/80">
             <a href="#" aria-label="Twitter" className="transition hover:opacity-100">
-              <Twitter className="h-5 w-5" />
+              <Twitter className="h-6 w-6" />
             </a>
             <a
               href="https://www.instagram.com/safeusetfg/"
               aria-label="Instagram"
               className="transition hover:opacity-100"
             >
-              <Instagram className="h-5 w-5" />
+              <Instagram className="h-6 w-6" />
             </a>
             <a href="#" aria-label="Discord" className="transition hover:opacity-100">
-              <MessageCircle className="h-5 w-5" />
+              <MessageCircle className="h-6 w-6" />
             </a>
           </footer>
         </aside>
 
         {/* Form or Error Message */}
-        <div className="md:col-span-2 md:px-12 md:py-10 p-8 bg-white">
+        <div className="md:col-span-2 md:px-12 md:py-10 p-8 bg-white md:rounded-r-xl">
           {status === "error" && (
-            <p className="text-red-600 mb-4">Error al enviar, inténtalo de nuevo.</p>
+            <p className="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded-md mb-6 text-sm">
+              Hubo un error al enviar tu mensaje. Por favor, inténtalo de nuevo más tarde.
+            </p>
           )}
           <form
             onSubmit={handleSubmit}
@@ -125,7 +129,7 @@ export default function Contact() {
             <input type="hidden" name="_subject" value="Nuevo mensaje de SafeUse" />
 
             <div>
-              <label htmlFor="firstName" className="text-xs font-semibold uppercase tracking-wide text-gray-700">
+              <label htmlFor="firstName" className="block mb-1.5 text-sm font-medium text-gray-700">
                 First Name
               </label>
               <input
@@ -138,7 +142,7 @@ export default function Contact() {
               />
             </div>
             <div>
-              <label htmlFor="lastName" className="text-xs font-semibold uppercase tracking-wide text-gray-700">
+              <label htmlFor="lastName" className="block mb-1.5 text-sm font-medium text-gray-700">
                 Last Name
               </label>
               <input
@@ -152,7 +156,7 @@ export default function Contact() {
             </div>
 
             <div>
-              <label htmlFor="email" className="text-xs font-semibold uppercase tracking-wide text-gray-700">
+              <label htmlFor="email" className="block mb-1.5 text-sm font-medium text-gray-700">
                 Email
               </label>
               <input
@@ -165,7 +169,7 @@ export default function Contact() {
               />
             </div>
             <div>
-              <label htmlFor="phone" className="text-xs font-semibold uppercase tracking-wide text-gray-700">
+              <label htmlFor="phone" className="block mb-1.5 text-sm font-medium text-gray-700">
                 Phone Number
               </label>
               <input
@@ -178,7 +182,7 @@ export default function Contact() {
             </div>
 
             <div className="sm:col-span-2">
-              <label htmlFor="message" className="text-xs font-semibold uppercase tracking-wide text-gray-700">
+              <label htmlFor="message" className="block mb-1.5 text-sm font-medium text-gray-700">
                 Message
               </label>
               <textarea
@@ -195,7 +199,7 @@ export default function Contact() {
               <button
                 type="submit"
                 disabled={status === "sending"}
-                className="rounded-full bg-[#335A2C] px-8 py-2 text-white transition hover:bg-neutral-800 disabled:opacity-50"
+                className="rounded-full bg-[#335A2C] px-8 py-2.5 text-white font-semibold transition-all duration-300 ease-out hover:bg-[#2A4A23] disabled:opacity-50 shadow-md hover:shadow-lg transform hover:scale-105"
               >
                 {status === "sending" ? "Enviando…" : "Send"}
               </button>

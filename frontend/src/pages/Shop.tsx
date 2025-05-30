@@ -76,10 +76,10 @@ export default function ShopPage() {
 
         <section className="flex flex-col items-center mt-10 p-6 gap-8 max-w-5xl mx-auto">
           {/* Buscador --------------------------------------------------------- */}
-          <div className="relative w-full max-w-md">
+          <div className="relative w-full max-w-md mb-8">
             <input
               type="text"
-              placeholder="Filter by test kit name"
+              placeholder="Filter by product"
               value={query}
               onChange={e => setQuery(e.target.value)}
               className="w-full border border-gray-400 rounded-[8px] py-2 pl-4 pr-12 font-lato focus:ring-2 focus:ring-blue-500 outline-none"

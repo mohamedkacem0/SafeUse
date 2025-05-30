@@ -83,7 +83,7 @@ export default function SubstancesPage() {
           </p>
         </div>
         <section className="flex flex-col items-center mt-10 p-6 gap-8 max-w-5xl mx-auto">
-          <div className="relative w-full max-w-md">
+          <div className="relative w-full max-w-md mb-8">
             <input
               type="text"
               placeholder="Filter by substance name"
