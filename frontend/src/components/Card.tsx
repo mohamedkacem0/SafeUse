@@ -22,13 +22,13 @@ const DrugCard: React.FC<DrugCardProps> = ({
 }) => {
   return (
     <div
-      className="w-[350px] border border-gray-300 rounded-[12px] flex flex-col items-center p-6 gap-2 shadow-sm cursor-pointer hover:shadow-lg transition"
+      className="w-[350px] bg-gradient-to-br from-white to-gray-100 rounded-[12px] flex flex-col items-center p-6 gap-4 shadow-lg cursor-pointer transition-all duration-300 ease-out hover:scale-105 hover:shadow-2xl border-t-4 border-t-[#44844D]"
       onClick={onCardClick}
     >
       <img
         src={imageSrc}
         alt={name}
-        className="w-[120px] h-[120px] object-contain mb-2"
+        className="w-[150px] h-[150px] object-contain mb-2 rounded-md"
       />
       <h3 className="font-lato font-bold text-[20px] leading-tight text-center">
         {name}

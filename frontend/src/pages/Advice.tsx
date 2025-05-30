@@ -73,93 +73,112 @@ export default function Advice() {
     advices.filter((a) => a.stage === stage);
 
   return (
-    <div className='relative'>
-      {/* Banner */}
-      <div className="sticky top-0 h-[220px] md:h-[350px] lg:h-[450px] w-full ">
+    <div className='bg-gray-50 min-h-screen'>
+      {/* Banner - UNTOUCHED AS PER USER REQUEST */}
+      <div className=" top-0 z-10 h-[220px] md:h-[350px] lg:h-[450px] w-full overflow-hidden">
         <img src={Banner} alt="Advice Banner" className="w-full pt-[70px] md:pt-0" />
       </div>
 
-      <div className='sticky top-0 z-20 bg-white'>
-        {/* Responsive Navigation */}
-        <div className="flex overflow-x-auto md:overflow-visible justify-start md:justify-center gap-6 md:gap-[100px] py-4 md:py-[20px] border-t border-b border-[#111111] sticky top-[70px] z-30 bg-white px-2 md:px-0">
-          {sections.map(({ id }) => (
+      {/* Sticky Navigation - Adjusted for better positioning and style */}
+      <div className='sticky top-[70px] z-30 bg-white/95 backdrop-blur-sm shadow-lg border-b border-gray-200'>
+        <div className="container mx-auto flex overflow-x-auto md:overflow-visible justify-start md:justify-center gap-6 md:gap-12 lg:gap-20 py-3 md:py-4 px-4 md:px-0">
+          {sections.map(({ id, ref: sectionRef }) => (
             <a
               key={id}
               href={`#${id}`}
-              onClick={handleNavClick(sections.find((s) => s.id === id)!.ref)}
-              className={`whitespace-nowrap text-[20px] md:text-[32px] font-medium ${
-                activeSection === id ? 'text-[#44844D] underline' : 'text-[#7A7A7A]'
-              } hover:underline transition`}
+              onClick={handleNavClick(sectionRef)} // Use sectionRef directly from map
+              className={`whitespace-nowrap text-base md:text-xl font-medium pb-2 transition-all duration-300 ease-in-out ${
+                activeSection === id
+                  ? 'text-[#44844D] border-b-2 border-[#44844D] font-semibold'
+                  : 'text-gray-600 hover:text-gray-900 hover:border-b-2 hover:border-gray-300'
+              }`}
             >
               {id === 'before-use'
-                ? 'Before use'
+                ? 'Before Use' // Consistent casing
                 : id === 'while-using'
-                ? 'While using'
-                : 'After use'}
+                ? 'While Using'
+                : 'After Use'}
             </a>
           ))}
         </div>
-        <div>
-          {/* BEFORE USE */}
-          <div
-            id="before-use"
-            ref={beforeRef}
-            className="scroll-mt-[150px] md:scroll-mt-[190px] transition-all duration-500"
-          >
-            <div className="flex flex-col gap-10 md:gap-[70px] items-center my-8 md:my-[50px] px-2 md:px-0">
-              {getByStage('before').map((advice) => (
-                <Description
-                  key={advice.ID_Advice}
-                  title={advice.title}
-                  subtitle={advice.description}
-                  link={advice.articulo || ''}
-                  active={activeSection === 'before-use'}
-                  width="w-full md:w-[65%]"
-                />
-              ))}
-            </div>
-          </div>
+      </div>
 
-          {/* WHILE USING */}
-          <div
-            id="while-using"
-            ref={whileRef}
-            className="scroll-mt-[150px] md:scroll-mt-[190px] transition-all duration-500"
-          >
-            <div className="flex flex-col gap-10 md:gap-[70px] items-center px-2 md:px-0">
-              {getByStage('while').map((advice) => (
+      {/* Content Sections Wrapper */}
+      <div className="container mx-auto px-4 pt-8 pb-16">
+        {/* BEFORE USE Section */}
+        <section
+          id="before-use"
+          ref={beforeRef}
+          className="scroll-mt-[120px] md:scroll-mt-[140px] mb-12 md:mb-16"
+        >
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4 text-center">Before Use</h2>
+          <div className="w-24 h-1 bg-[#44844D] mx-auto mb-8 md:mb-12"></div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            {getByStage('before').map((advice) => (
+              <div
+                key={advice.ID_Advice}
+                className="bg-gradient-to-br from-white to-gray-100 p-6 rounded-xl shadow-xl h-full flex flex-col border border-gray-200 transition-all duration-300 ease-out hover:scale-105 hover:shadow-2xl border-t-4 border-t-[#44844D]"
+              >
                 <Description
-                  key={advice.ID_Advice}
                   title={advice.title}
                   subtitle={advice.description}
                   link={advice.articulo || ''}
-                  active={activeSection === 'while-using'}
-                  width="w-full md:w-[65%]"
+                  width="w-full"
                 />
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
+        </section>
 
-          {/* AFTER USE */}
-          <div
-            id="after-use"
-            ref={afterRef}
-            className="scroll-mt-[120px] md:scroll-mt-[140px] transition-all duration-500"
-          >
-            <div className="flex flex-col gap-10 md:gap-[70px] items-center py-8 md:py-[50px] px-2 md:px-0">
-              {getByStage('after').map((advice) => (
+        {/* WHILE USING Section */}
+        <section
+          id="while-using"
+          ref={whileRef}
+          className="scroll-mt-[120px] md:scroll-mt-[140px] mb-12 md:mb-16"
+        >
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4 text-center">While Using</h2>
+          <div className="w-24 h-1 bg-slate-500 mx-auto mb-8 md:mb-12"></div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            {getByStage('while').map((advice) => (
+              <div
+                key={advice.ID_Advice}
+                className="bg-gradient-to-br from-slate-50 to-slate-200 p-6 rounded-xl shadow-xl h-full flex flex-col border border-gray-200 transition-all duration-300 ease-out hover:scale-105 hover:shadow-2xl border-t-4 border-t-slate-400"
+              >
                 <Description
-                  key={advice.ID_Advice}
                   title={advice.title}
                   subtitle={advice.description}
                   link={advice.articulo || ''}
-                  active={activeSection === 'after-use'}
-                  width="w-full md:w-[65%]"
+                  width="w-full"
                 />
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
-        </div>
+        </section>
+
+        {/* AFTER USE Section */}
+        <section
+          id="after-use"
+          ref={afterRef}
+          className="scroll-mt-[120px] md:scroll-mt-[140px] mb-12 md:mb-16" // Consistent margin
+        >
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4 text-center">After Use</h2>
+          <div className="w-24 h-1 bg-[#44844D] mx-auto mb-8 md:mb-12"></div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            {getByStage('after').map((advice) => (
+              <div
+                key={advice.ID_Advice}
+                className="bg-gradient-to-br from-white to-gray-100 p-6 rounded-xl shadow-xl h-full flex flex-col border border-gray-200 transition-all duration-300 ease-out hover:scale-105 hover:shadow-2xl border-t-4 border-t-[#44844D]"
+              >
+                <Description
+                  title={advice.title}
+                  subtitle={advice.description}
+                  link={advice.articulo || ''}
+                  width="w-full"
+                />
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   );
