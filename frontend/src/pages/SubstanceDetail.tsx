@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import Description from "../components/Description";
 
 // Mapeo de campos de la API a títulos legibles
@@ -75,6 +76,35 @@ export default function SubstanceDetail() {
     (key) => data[key] != null && data[key] !== ''
   );
 
+  const staggerContainerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
+    },
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 12,
+      },
+    },
+    hover: {
+      scale: 1.02,
+      boxShadow: "0px 10px 20px rgba(0,0,0,0.1)",
+      transition: { duration: 0.2 },
+    },
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 pt-[70px]">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
@@ -111,12 +141,19 @@ export default function SubstanceDetail() {
           </aside>
 
           {/* Content - Right Column */}
-          <main className="lg:w-3/4">
+          <motion.main 
+            className="lg:w-3/4"
+            variants={staggerContainerVariants}
+            initial="hidden"
+            animate="visible"
+          >
             {sections.map((key) => (
-              <section 
+              <motion.section 
                 id={key} 
                 key={key} 
                 className="bg-white p-6 sm:p-8 rounded-xl shadow-xl mb-8 scroll-mt-[86px] border-t-4 border-emerald-500"
+                variants={cardVariants}
+                whileHover="hover"
               >
                 {/* The Description component will render title and subtitle. 
                     We might need to adjust its internal styling later if it doesn't look good in a card. */}
@@ -126,9 +163,9 @@ export default function SubstanceDetail() {
                   link=""                    // link prop is not used, can be removed from Description component later
                   width="w-full"              // width prop might be redundant if card itself controls width
                 />
-              </section>
+              </motion.section>
             ))}
-          </main>
+          </motion.main>
         </div>
       </div>
     </div>
