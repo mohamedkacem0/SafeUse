@@ -19,10 +19,9 @@ export default function SubstanceDetail() {
   const [data, setData] = useState<Record<string, any> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const mainRef = useRef<HTMLDivElement>(null);
 
-  // Ajusta este valor para definir el espacio superior al hacer scroll
-  const SCROLL_OFFSET = 140; // en pixeles
+  // Offset for scrolling to sections, accounting for the sticky main navbar
+  const SCROLL_OFFSET = 86; // Approx 70px navbar + 16px padding
 
   useEffect(() => {
     async function fetchData() {
@@ -59,12 +58,11 @@ export default function SubstanceDetail() {
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, key: string) => {
     e.preventDefault();
-    const container = mainRef.current;
-    const section = container?.querySelector<HTMLElement>(`#${key}`);
-    if (container && section) {
-      const topPosition = section.offsetTop - SCROLL_OFFSET;
-      container.scrollTo({
-        top: topPosition >= 0 ? topPosition : 0,
+    const section = document.getElementById(key);
+    if (section) {
+      const topPosition = section.getBoundingClientRect().top + window.pageYOffset - SCROLL_OFFSET;
+      window.scrollTo({
+        top: topPosition,
         behavior: 'smooth'
       });
     }
@@ -78,42 +76,60 @@ export default function SubstanceDetail() {
   );
 
   return (
-    // contenedor principal con altura fija y overflow hidden
-    <div className="max-w-6xl mx-auto mt-[70px] p-[60px] h-[calc(100vh-70px)] overflow-hidden">
-      <div className="flex h-full">
-        {/* Columna fija: título + menú */}
-        <aside className="w-[220px] bg-white border-r border-gray-200 p-4 flex-shrink-0">
-          <h1 className="text-[24px] font-bold mb-6">{data.name}</h1>
-          <nav className="flex flex-col gap-3 text-[16px]">
-            {sections.map((key) => (
-              <a
-                key={key}
-                href={`#${key}`}
-                onClick={(e) => handleNavClick(e, key)}
-                className="hover:underline text-[#335A2C]"
-              >
-                {FIELD_TITLES[key]}
-              </a>
-            ))}
-          </nav>
-        </aside>
+    <div className="min-h-screen bg-slate-50 pt-[70px]">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        {/* Banner Section */}
+        <header className="mb-10 text-center">
+          <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-800 mb-4">{data.name}</h1>
+          {data.image && (
+            <img 
+              src={data.image} 
+              alt={data.name} 
+              className="max-w-md mx-auto rounded-lg shadow-lg object-cover max-h-[300px]"
+            />
+          )}
+        </header>
 
-        {/* Columna scrollable: contenido principal */}
-        <main
-          ref={mainRef}
-          className="flex-1 p-4 overflow-y-auto"
-        >
-          {sections.map((key) => (
-            <section id={key} key={key} className="mb-8">
-              <Description
-                title={FIELD_TITLES[key]}
-                subtitle={data[key]}
-                link=""
-                width="w-full"
-              />
-            </section>
-          ))}
-        </main>
+        <div className="flex flex-col lg:flex-row lg:gap-x-12">
+          {/* Sticky Navigation - Left Column */}
+          <aside className="lg:w-1/4 mb-8 lg:mb-0 lg:sticky lg:top-[86px] self-start">
+            <div className="bg-white p-6 rounded-xl shadow-xl border-t-4 border-emerald-500">
+              <h2 className="text-xl font-semibold text-gray-700 mb-5">Sections</h2>
+              <nav className="flex flex-col space-y-2">
+                {sections.map((key) => (
+                  <a
+                    key={key}
+                    href={`#${key}`}
+                    onClick={(e) => handleNavClick(e, key)}
+                    className="px-3 py-2 rounded-md text-gray-600 hover:bg-emerald-50 hover:text-emerald-700 transition-colors duration-150 font-medium"
+                  >
+                    {FIELD_TITLES[key]}
+                  </a>
+                ))}
+              </nav>
+            </div>
+          </aside>
+
+          {/* Content - Right Column */}
+          <main className="lg:w-3/4">
+            {sections.map((key) => (
+              <section 
+                id={key} 
+                key={key} 
+                className="bg-white p-6 sm:p-8 rounded-xl shadow-xl mb-8 scroll-mt-[86px] border-t-4 border-emerald-500"
+              >
+                {/* The Description component will render title and subtitle. 
+                    We might need to adjust its internal styling later if it doesn't look good in a card. */}
+                <Description
+                  title={FIELD_TITLES[key]} // This will be the card title
+                  subtitle={data[key]}       // This will be the card content
+                  link=""                    // link prop is not used, can be removed from Description component later
+                  width="w-full"              // width prop might be redundant if card itself controls width
+                />
+              </section>
+            ))}
+          </main>
+        </div>
       </div>
     </div>
   );
