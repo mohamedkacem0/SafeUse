@@ -55,7 +55,7 @@ class UserModel {
     public static function findById(int $id): ?array {
         $pdo = DB::getInstance()->conn();
         $stmt = $pdo->prepare(
-            'SELECT ID_Usuario, Nombre, Correo, Telefono, `Direccion`, Tipo_Usuario
+            'SELECT ID_Usuario, Nombre, Correo, Telefono, `Direccion`, Tipo_Usuario, created_at
              FROM usuarios
              WHERE ID_Usuario = :id'
         );
@@ -65,7 +65,7 @@ class UserModel {
     }
 
     /**
-     * Recupera todos los usuarios de la tabla.
+     * Recupera todos los usuarios de la tabla, incluyendo fecha de creación.
      * @return array Lista de usuarios.
      */
     public static function getAll(): array {
@@ -77,7 +77,8 @@ class UserModel {
                 Correo,
                 Telefono,
                 `Direccion` AS Direccion,
-                Tipo_Usuario AS Tipo_Usuario
+                Tipo_Usuario AS Tipo_Usuario,
+                created_at
             FROM usuarios
         ";
         $stmt = $pdo->query($sql);

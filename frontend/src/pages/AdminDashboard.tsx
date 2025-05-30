@@ -1,10 +1,10 @@
 // src/pages/AdminDashboard.tsx
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Card,
   CardHeader,
   CardContent,
-  CardTitle
+  CardTitle,
 } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -14,7 +14,7 @@ import {
   TableRow,
   TableHead,
   TableBody,
-  TableCell
+  TableCell,
 } from '../components/ui/table';
 import {
   LineChart,
@@ -22,16 +22,18 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  ResponsiveContainer
+  ResponsiveContainer,
 } from 'recharts';
-import { Users, Activity, AlertCircle } from 'lucide-react';
+import { Users, Package, FlaskConical } from 'lucide-react';
 
 interface AdminUser {
   ID_Usuario: number;
   Nombre: string;
   Correo: string;
   Tipo_Usuario: string;
-  // añade más campos si quieres
+  Direccion: string;
+  Telefono: string;
+  created_at: string;
 }
 
 const sampleChartData = [
@@ -39,34 +41,77 @@ const sampleChartData = [
   { date: '2025-02-01', users: 200 },
   { date: '2025-03-01', users: 150 },
   { date: '2025-04-01', users: 250 },
-  { date: '2025-05-01', users: 300 }
+  { date: '2025-05-01', users: 300 },
 ];
 
 export default function AdminDashboard() {
   const [filter, setFilter] = useState('');
   const [users, setUsers] = useState<AdminUser[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingUsers, setLoadingUsers] = useState(true);
 
-  // Fetch users from /api/users
+  const [productsCount, setProductsCount] = useState<number>(0);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+
+  const [substancesCount, setSubstancesCount] = useState<number>(0);
+  const [loadingSubstances, setLoadingSubstances] = useState(true);
+
+  // Fetch users
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch('/api/users', {
-          method: 'GET',
-          credentials: 'include'
-        });
+        const res = await fetch('/api/users', { method: 'GET', credentials: 'include' });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         setUsers(data.users);
       } catch (err) {
         console.error('Error fetching users:', err);
       } finally {
-        setLoading(false);
+        setLoadingUsers(false);
       }
     })();
   }, []);
 
-  const filteredUsers = users.filter(u =>
+  // Fetch total products
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch('/api/productos', { method: 'GET', credentials: 'include' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        let count = 0;
+        if (Array.isArray(data)) count = data.length;
+        else if (Array.isArray((data as any).productos)) count = (data as any).productos.length;
+        else if (typeof (data as any).total === 'number') count = (data as any).total;
+        setProductsCount(count);
+      } catch (err) {
+        console.error('Error fetching products:', err);
+      } finally {
+        setLoadingProducts(false);
+      }
+    })();
+  }, []);
+
+  // Fetch total substances
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch('/api/sustancias', { method: 'GET', credentials: 'include' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        let count = 0;
+        if (Array.isArray(data)) count = data.length;
+        else if (Array.isArray((data as any).sustancias)) count = (data as any).sustancias.length;
+        else if (typeof (data as any).total === 'number') count = (data as any).total;
+        setSubstancesCount(count);
+      } catch (err) {
+        console.error('Error fetching substances:', err);
+      } finally {
+        setLoadingSubstances(false);
+      }
+    })();
+  }, []);
+
+  const filteredUsers = users.filter((u) =>
     u.Nombre.toLowerCase().includes(filter.toLowerCase())
   );
 
@@ -82,7 +127,7 @@ export default function AdminDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {loading ? (
+            {loadingUsers ? (
               <p className="text-3xl font-bold">…</p>
             ) : (
               <p className="text-3xl font-bold">{users.length}</p>
@@ -93,26 +138,32 @@ export default function AdminDashboard() {
         <Card className="p-4">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <Activity size={20} />
-              <span>Active Sessions</span>
+              <Package size={20} />
+              <span>Total Products</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {/* Sustituye por fetch real si tienes endpoint */}
-            <p className="text-3xl font-bold">312</p>
+            {loadingProducts ? (
+              <p className="text-3xl font-bold">…</p>
+            ) : (
+              <p className="text-3xl font-bold">{productsCount}</p>
+            )}
           </CardContent>
         </Card>
 
         <Card className="p-4">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <AlertCircle size={20} />
-              <span>Incidents</span>
+              <FlaskConical size={20} />
+              <span>Total Substances</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {/* Sustituye por fetch real si tienes endpoint */}
-            <p className="text-3xl font-bold">5</p>
+            {loadingSubstances ? (
+              <p className="text-3xl font-bold">…</p>
+            ) : (
+              <p className="text-3xl font-bold">{substancesCount}</p>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -128,12 +179,7 @@ export default function AdminDashboard() {
               <XAxis dataKey="date" />
               <YAxis />
               <Tooltip />
-              <Line
-                type="monotone"
-                dataKey="users"
-                stroke="#3182ce"
-                strokeWidth={2}
-              />
+              <Line type="monotone" dataKey="users" stroke="#3182ce" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>
@@ -147,10 +193,10 @@ export default function AdminDashboard() {
             <Input
               placeholder="Search users..."
               value={filter}
-              onChange={e => setFilter(e.target.value)}
+              onChange={(e) => setFilter(e.target.value)}
             />
-            <Button onClick={() => {/* lógica de invitación */}}>
-              Invite User
+            <Button onClick={() => { /* lógica de invitación */ }}>
+              Filter
             </Button>
           </div>
         </CardHeader>
@@ -161,21 +207,23 @@ export default function AdminDashboard() {
                 <TableHead>Name</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Role</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>Direccion</TableHead>
+                <TableHead>Telefono</TableHead>
+                <TableHead>Created At</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredUsers.map(u => (
+              {filteredUsers.map((u) => (
                 <TableRow key={u.ID_Usuario}>
                   <TableCell>{u.Nombre}</TableCell>
                   <TableCell>{u.Correo}</TableCell>
                   <TableCell>{u.Tipo_Usuario}</TableCell>
-                  <TableCell>Active</TableCell>
+                  <TableCell>{u.Direccion}</TableCell>
+                  <TableCell>{u.Telefono}</TableCell>
+                  <TableCell>{new Date(u.created_at).toLocaleDateString()}</TableCell>
                   <TableCell>
-                    <Button onClick={() => {/* editar */}}>
-                      Edit
-                    </Button>
+                    <Button onClick={() => { /* editar */ }}>Edit</Button>
                   </TableCell>
                 </TableRow>
               ))}
