@@ -157,26 +157,28 @@ class UserController {
             return;
         }
 
-        Response::json(['user' => [
+        Response::json([
             'ID_Usuario'   => $user['ID_Usuario'],
             'Nombre'       => $user['Nombre'],
+            'Apellidos'    => $user['Apellidos'] ?? '',
             'Correo'       => $user['Correo'],
-            'Telefono'     => $user['Telefono'],
-            'Direccion'    => $user['Direccion'],
-            'Tipo_Usuario' => $user['Tipo_Usuario'],
-        ]]);
+            'Telefono'     => $user['Telefono'] ?? '',
+            'Direccion'    => $user['Direccion'] ?? '',
+            'Tipo_Usuario' => $user['Tipo_Usuario']
+        ]);
     }
 
     /**
      * Devuelve todos los usuarios.
      */
-    public static function users(): void {
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            Response::json(['error' => 'Método no permitido'], 405);
+    public static function users() {
+        session_start();
+        if (!isset($_SESSION['user'])) {
+            Response::json(['error' => 'No autorizado'], 401);
             return;
         }
 
         $users = UserModel::getAll();
-        Response::json(['users' => $users]);
+        Response::json($users);
     }
 }

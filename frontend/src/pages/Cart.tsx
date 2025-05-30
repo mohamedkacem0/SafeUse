@@ -1,6 +1,6 @@
 // src/pages/Cart.tsx
 import React, { useState, useEffect } from "react";
-import { Minus, Plus, Trash2 } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingCart, LogIn } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast, { Toaster } from 'react-hot-toast';
 import PrimaryButton from "../components/PrimaryButton";
@@ -23,6 +23,7 @@ export default function Cart() {
   // }, []);
   const [items, setItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState(false);
   const navigate = useNavigate();
 
   // Load cart items
@@ -30,9 +31,8 @@ export default function Cart() {
     fetch("/api?route=api/cart", { credentials: "include" })
       .then(res => {
         if (res.status === 401) {
-          alert("Please log in to view your cart.");
-          navigate("/login");
-          throw new Error("Not authenticated");
+          setAuthError(true);
+          return Promise.reject(new Error("Not authenticated"));
         }
         return res.json();
       })
@@ -80,10 +80,10 @@ export default function Cart() {
 
       if (!response.ok || !data.success) {
         if (response.status === 401) {
-            toast.error("Please log in to update your cart.");
-            navigate("/login");
+          setAuthError(true);
+          return;
         } else {
-            toast.error(data.message || "Error updating quantity.");
+          toast.error(data.message || "Error updating quantity.");
         }
         return;
       }
@@ -117,10 +117,10 @@ export default function Cart() {
 
       if (!response.ok || !data.success) {
         if (response.status === 401) {
-            toast.error("Please log in to modify your cart.");
-            navigate("/login");
+          setAuthError(true);
+          return;
         } else {
-            toast.error(data.message || "Error removing item.");
+          toast.error(data.message || "Error removing item.");
         }
         return;
       }
@@ -144,19 +144,85 @@ export default function Cart() {
       </div>
     );
   }
+
+  // Show login required view if user is not authenticated
+  if (authError) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <Toaster position="top-center" reverseOrder={false} />
+        <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full text-center">
+          <div className="flex justify-center mb-6">
+            <LogIn className="w-16 h-16 text-emerald-500" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-3">Login Required</h2>
+          <p className="text-gray-600 mb-6">Please log in to view your cart and manage your items.</p>
+          <div className="flex justify-center gap-4">
+            <NavLink 
+              to="/login" 
+              state={{ from: '/cart' }}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg transition-colors"
+            >
+              Go to Login
+            </NavLink>
+            <NavLink 
+              to="/shop" 
+              className="border border-gray-300 hover:bg-gray-50 text-gray-700 px-6 py-2 rounded-lg transition-colors"
+            >
+              Continue Shopping
+            </NavLink>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show empty cart message if cart is empty
   if (items.length === 0) {
     return (
       <>
         <Toaster position="top-center" reverseOrder={false} />
-      <section className="container mx-auto max-w-4xl px-6 mt-10 py-20 text-center">
-        <h1 className="mb-6 text-3xl font-bold">Your cart is empty</h1>
-        <NavLink to="/shop" className="w-full">
-          <PrimaryButton
-            text="Shop now"
-            className="w-full rounded-full bg-[#44844D] py-3 text-center text-lg font-semibold text-white hover:bg-[#44844D]/90"
-          />
-        </NavLink>
-      </section>
+        <motion.div 
+          className="flex flex-col items-center justify-center min-h-[calc(100vh-150px)] bg-slate-50 px-4 py-12 text-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0, y: -20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.4, ease: "easeOut" }}
+          >
+            <ShoppingCart className="w-28 h-28 md:w-36 md:h-36 text-emerald-400 mb-8" strokeWidth={1.5} />
+          </motion.div>
+          <motion.h1 
+            className="mb-3 text-2xl md:text-3xl font-semibold text-gray-700"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.4 }}
+          >
+            Your Cart is Empty
+          </motion.h1>
+          <motion.p 
+            className="mb-8 text-base md:text-lg text-gray-500 max-w-sm md:max-w-md"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.4 }}
+          >
+            Looks like you haven't added any products yet. Explore our collection and find something you'll love!
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.5, duration: 0.4 }}
+          >
+            <NavLink to="/shop" className="inline-block">
+              <PrimaryButton
+                text="Start Shopping"
+                className="rounded-lg bg-emerald-600 px-7 py-7 text-base md:text-lg font-medium text-white shadow-lg hover:bg-emerald-700 transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50"
+              />
+            </NavLink>
+          </motion.div>
+        </motion.div>
       </>
     );
   }

@@ -55,7 +55,7 @@ export default function Header() {
   return (
     <div className="fixed top-0 left-0 right-0 z-50 border-b-[1px] border-[#111111] bg-white">
       <div className="h-[70px] max-w-[1440px] mx-auto flex flex-row justify-between items-center px-4">
-        {/* Logo */}
+        {/*  */}
         <Link to="/" className="flex flex-row items-center">
           <img src={logo} alt="logo" className="w-10 h-10 mr-2" />
           <span className="font-lato font-bold text-[32px] md:text-[64px] leading-none tracking-normal">
@@ -63,7 +63,7 @@ export default function Header() {
           </span>
         </Link>
 
-        {/* Desktop Nav */}
+        {/* */}
         <nav className="hidden md:flex space-x-[30px] text-[20px] md:text-[24px] font-medium">
           <NavLink to="/sustancias" className={navLinkClasses}>
             Substances
@@ -79,7 +79,7 @@ export default function Header() {
           </NavLink>
         </nav>
 
-        {/* Desktop Right */}
+        {/**/}
         <div className="hidden md:flex flex-row items-center gap-[12px]">
           <NavLink to="/cart" aria-label="Cart" className="relative">
             <ShoppingCart />
@@ -100,7 +100,7 @@ export default function Header() {
           )}
         </div>
 
-        {/* Hamburger menu (mobile only) */}
+        {}
         <button
           className="md:hidden ml-2"
           onClick={() => setMenuOpen((open) => !open)}

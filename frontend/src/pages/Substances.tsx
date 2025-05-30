@@ -1,6 +1,7 @@
 import  { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
+import CatchyQuoteSection from "../components/CatchyQuoteSection";
 import DrugCard from "../components/Card";
 import PrimaryButton from "../components/PrimaryButton";
 import Banner from "../assets/images/substanceBanner4K.png";
@@ -77,11 +78,7 @@ export default function SubstancesPage() {
       </div>
 
       <div className="sticky top-0 z-10 bg-white">
-        <div className="border-t-[1px] border-b-[1px] border-black">
-          <p className="text-center text-black font-light text-[36px] py-[40px]">
-            "Take care of your mind and body."
-          </p>
-        </div>
+        <CatchyQuoteSection quote="Take care of your mind and body." ariaLabel="Quote about self-care" />
         <section className="flex flex-col items-center mt-10 p-6 gap-8 max-w-5xl mx-auto">
           <div className="relative w-full max-w-md mb-8">
             <input
