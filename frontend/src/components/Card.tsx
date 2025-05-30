@@ -9,6 +9,7 @@ interface DrugCardProps {
   onButtonClick?: () => void;
   onCardClick?: () => void;
   hideTitle?: boolean; // NUEVO
+  buttonDisabled?: boolean;
 }
 
 const DrugCard: React.FC<DrugCardProps> = ({
@@ -19,6 +20,7 @@ const DrugCard: React.FC<DrugCardProps> = ({
   onButtonClick,
   onCardClick,
   hideTitle = false,
+  buttonDisabled = false,
 }) => {
   return (
     <div
@@ -45,9 +47,10 @@ const DrugCard: React.FC<DrugCardProps> = ({
         onClick={e => e.stopPropagation()}
       >
         <PrimaryButton
-          className={`!bg-[#44844D] hover:scale-105 transition-all duration-300`}
+          className={`!bg-[#44844D] hover:scale-105 transition-all duration-300 ${buttonDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
           text={button}
           onClick={onButtonClick}
+          disabled={buttonDisabled}
         />
       </div>
     </div>

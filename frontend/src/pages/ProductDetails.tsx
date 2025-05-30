@@ -2,6 +2,7 @@ import  { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import PrimaryButton from "../components/PrimaryButton";
 import Description   from "../components/Description";
+import toast, { Toaster } from 'react-hot-toast';
 
 // --------- Tipos -----------------------------------------------------------
 interface Product {
@@ -24,6 +25,7 @@ export default function ProductDetailPage() {
   const [qty, setQty] = useState(1);
   const [mainIdx, setMainIdx] = useState(0); // imagen principal activa
   const [isAutoPlayActive, setIsAutoPlayActive] = useState(true);
+  const [addToCartStatus, setAddToCartStatus] = useState<'idle' | 'adding' | 'added'>('idle');
 
   // --- Fetch del producto --------------------------------------------------
   useEffect(() => {
@@ -54,6 +56,26 @@ export default function ProductDetailPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  // Listen for stock adjustments from other components (e.g., Cart.tsx)
+  useEffect(() => {
+    const handleStockAdjusted = (event: Event) => {
+      const customEvent = event as CustomEvent<{ productId: number; quantityChange: number }>;
+      const { productId: adjustedProductId, quantityChange } = customEvent.detail;
+
+      // Only update if the adjusted product is the one currently being viewed
+      if (product && product.id === adjustedProductId) {
+        setProduct(prevProduct =>
+          prevProduct ? { ...prevProduct, stock: Math.max(0, prevProduct.stock + quantityChange) } : null
+        );
+      }
+    };
+
+    window.addEventListener('productStockAdjusted', handleStockAdjusted);
+    return () => {
+      window.removeEventListener('productStockAdjusted', handleStockAdjusted);
+    };
+  }, [product]); // Dependency on 'product' to ensure 'product.id' is current in the closure
+
   // --- Auto-cycle gallery images -------------------------------------------
   useEffect(() => {
     if (!product || !product.gallery || product.gallery.length <= 1 || !isAutoPlayActive) {
@@ -72,9 +94,57 @@ export default function ProductDetailPage() {
   if (error)   return <p className="mt-24 text-center text-red-600">{error}</p>;
   if (!product) return null;
 
+  const handleAddToCart = async () => {
+    if (!product) return;
+
+    setAddToCartStatus('adding');
+    try {
+      const response = await fetch("/api?route=api/cart/add", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId: product.id, quantity: qty }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        if (response.status === 401) { // Specific check for unauthorized
+            toast.error('Please log in to add items to your cart.');
+            navigate("/login"); // Optionally navigate to login
+        } else {
+            toast.error(data.message || 'Failed to add product. Please try again.');
+        }
+        setAddToCartStatus('idle');
+        return;
+      }
+
+      toast.success(data.message || `${qty} × ${product.name} added to cart!`);
+      setProduct(prevProduct => 
+        prevProduct ? { ...prevProduct, stock: prevProduct.stock - qty } : null
+      );
+      window.dispatchEvent(new CustomEvent('cartUpdated'));
+      setAddToCartStatus('added');
+      
+      setTimeout(() => {
+        setAddToCartStatus('idle');
+      }, 2000);
+
+    } catch (err: any) {
+      console.error("Error adding to cart:", err);
+      toast.error(err.message || "Could not add product to cart.");
+      setAddToCartStatus('idle');
+    }
+  };
+
   // --- Render --------------------------------------------------------------
+  let buttonText = "Add to cart";
+  if (addToCartStatus === 'adding') buttonText = "Adding...";
+  if (addToCartStatus === 'added') buttonText = "Added!";
+
   return (
     <div className="min-h-screen bg-slate-50 pt-[70px]">
+      <Toaster position="top-center" reverseOrder={false} />
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         <button 
           className="mb-6 text-emerald-600 hover:text-emerald-800 font-medium inline-flex items-center group transition-colors duration-150"
@@ -147,10 +217,10 @@ export default function ProductDetailPage() {
             </div>
 
             <PrimaryButton
-              text="Add to cart"
+              text={buttonText}
               className="w-full !bg-emerald-600 hover:!bg-emerald-700 text-white font-semibold py-3 text-base rounded-lg shadow-md hover:shadow-lg transition-all duration-200 ease-in-out active:scale-[0.98] disabled:opacity-50"
-              onClick={() => alert(`Added ${qty} × ${product.name} to cart`)}
-              disabled={product.stock === 0}
+              onClick={handleAddToCart}
+              disabled={product.stock === 0 || addToCartStatus === 'adding' || addToCartStatus === 'added'}
             />
             {/* Placeholder for other actions like 'Add to wishlist' if needed */}
           </div>

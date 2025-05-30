@@ -8,6 +8,7 @@ import logo from "../assets/logo/logo.svg";
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [user, setUser] = useState<{ ID_Usuario: number; Nombre: string; Correo: string; Tipo_Usuario: string } | null>(null);
+  const [cartItemCount, setCartItemCount] = useState<number>(0);
   const navLinkClasses = "block md:inline px-4 py-2 md:p-0";
   const location = useLocation();
 
@@ -15,6 +16,38 @@ export default function Header() {
   useEffect(() => {
     const stored = localStorage.getItem("user");
     setUser(stored ? JSON.parse(stored) : null);
+
+    // Fetch cart item count
+    const fetchCartCount = async () => {
+      try {
+        const response = await fetch('/api?route=api/cart/count', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setCartItemCount(data.count || 0);
+        } else {
+          // console.error('Failed to fetch cart count');
+          setCartItemCount(0); // Reset or handle error appropriately
+        }
+      } catch (error) {
+        // console.error('Error fetching cart count:', error);
+        setCartItemCount(0);
+      }
+    };
+
+    fetchCartCount();
+
+    // Listen for custom cart update events
+    const handleCartUpdate = () => fetchCartCount();
+    window.addEventListener('cartUpdated', handleCartUpdate);
+
+    return () => {
+      window.removeEventListener('cartUpdated', handleCartUpdate);
+    };
   }, [location.pathname]);
 
   if (location.pathname === "/politica-de-cookies") return null;
@@ -48,8 +81,13 @@ export default function Header() {
 
         {/* Desktop Right */}
         <div className="hidden md:flex flex-row items-center gap-[12px]">
-          <NavLink to="/cart" aria-label="Cart">
+          <NavLink to="/cart" aria-label="Cart" className="relative">
             <ShoppingCart />
+            {cartItemCount > 0 && (
+              <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white">
+                {cartItemCount}
+              </span>
+            )}
           </NavLink>
           {user ? (
             <NavLink to="/profile" aria-label="Profile">
@@ -110,7 +148,7 @@ export default function Header() {
               onClick={() => setMenuOpen(false)}
             >
               <span className="flex items-center gap-2">
-                Cart<ShoppingCart />
+                Cart <span className="relative"><ShoppingCart className="inline-block" />{cartItemCount > 0 && <span className="absolute -top-1 -right-2 ml-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white">{cartItemCount}</span>}</span>
               </span>
             </NavLink>
             {user ? (

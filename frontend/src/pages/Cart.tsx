@@ -1,6 +1,8 @@
 // src/pages/Cart.tsx
 import React, { useState, useEffect } from "react";
 import { Minus, Plus, Trash2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import toast, { Toaster } from 'react-hot-toast';
 import PrimaryButton from "../components/PrimaryButton";
 import { NavLink, useNavigate } from "react-router-dom";
 
@@ -13,6 +15,12 @@ interface CartItem {
 }
 
 export default function Cart() {
+  // useEffect(() => {
+  //   document.body.classList.add('bg-slate-50');
+  //   return () => {
+  //     document.body.classList.remove('bg-slate-50');
+  //   };
+  // }, []);
   const [items, setItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -45,6 +53,12 @@ export default function Cart() {
   }, [navigate]);
 
   const totalUnits = items.reduce((sum, it) => sum + it.quantity, 0);
+
+  const cartItemVariants = {
+    initial: { opacity: 0, y: 20, scale: 0.95 },
+    animate: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.3, ease: "easeOut" } },
+    exit: { opacity: 0, x: -50, scale: 0.9, transition: { duration: 0.2, ease: "easeIn" } },
+  };
   const subtotal = items.reduce((sum, it) => sum + it.price * it.quantity, 0);
 
   // Update quantity
@@ -52,54 +66,88 @@ export default function Cart() {
     const item = items.find(i => i.id === id);
     if (!item) return;
     const newQty = Math.max(1, item.quantity + delta);
+    // If newQty is the same as current, do nothing (e.g., trying to decrease from 1)
+    if (newQty === item.quantity && delta < 0) return; 
 
     try {
-      const res = await fetch("/api?route=api/cart/update", {
+      const response = await fetch("/api?route=api/cart/update", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ productId: id, quantity: newQty }),
       });
-      if (res.status === 401) {
-        alert("Please log in to update your cart.");
-        navigate("/login");
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        if (response.status === 401) {
+            toast.error("Please log in to update your cart.");
+            navigate("/login");
+        } else {
+            toast.error(data.message || "Error updating quantity.");
+        }
         return;
       }
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
       setItems(prev =>
         prev.map(i => (i.id === id ? { ...i, quantity: newQty } : i))
       );
+      toast.success(data.message || "Quantity updated!");
+      window.dispatchEvent(new CustomEvent('cartUpdated'));
+      // Dispatch stock adjustment event: quantityChange is negative of delta because if delta is +1 (added to cart), stock decreases by 1.
+      window.dispatchEvent(new CustomEvent('productStockAdjusted', { detail: { productId: id, quantityChange: -delta } }));
     } catch (err) {
+      toast.error("Error updating cart.");
       console.error("Error updating cart:", err);
     }
   };
 
   // Remove item
   const remove = async (id: number) => {
+    const itemToRemove = items.find(i => i.id === id);
+    if (!itemToRemove) return;
+
     try {
-      const res = await fetch("/api?route=api/cart/remove", {
+      const response = await fetch("/api?route=api/cart/remove", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ productId: id }),
       });
-      if (res.status === 401) {
-        alert("Please log in to modify your cart.");
-        navigate("/login");
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        if (response.status === 401) {
+            toast.error("Please log in to modify your cart.");
+            navigate("/login");
+        } else {
+            toast.error(data.message || "Error removing item.");
+        }
         return;
       }
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
       setItems(prev => prev.filter(i => i.id !== id));
+      toast.success(data.message || "Item removed!");
+      window.dispatchEvent(new CustomEvent('cartUpdated'));
+      // Dispatch stock adjustment event: quantityChange is the quantity of the item removed (positive, as it's returned to stock)
+      window.dispatchEvent(new CustomEvent('productStockAdjusted', { detail: { productId: id, quantityChange: itemToRemove.quantity } }));
     } catch (err) {
+      toast.error("Error removing item.");
       console.error("Error removing item:", err);
     }
   };
 
   if (loading) {
-    return <div className="p-8 text-center">Cargando carrito…</div>;
+    return (
+      <div className="p-8 text-center">
+        <Toaster position="top-center" reverseOrder={false} />
+        Cargando carrito…
+      </div>
+    );
   }
   if (items.length === 0) {
     return (
+      <>
+        <Toaster position="top-center" reverseOrder={false} />
       <section className="container mx-auto max-w-4xl px-6 mt-10 py-20 text-center">
         <h1 className="mb-6 text-3xl font-bold">Your cart is empty</h1>
         <NavLink to="/shop" className="w-full">
@@ -109,11 +157,14 @@ export default function Cart() {
           />
         </NavLink>
       </section>
+      </>
     );
   }
 
   return (
-    <section className="container mx-auto max-w-6xl px-4 py-16">
+    <section className="bg-slate-50 min-h-screen py-12 sm:py-16">
+      <Toaster position="top-center" reverseOrder={false} />
+    <div className="container mx-auto max-w-6xl px-4">
       <h1 className="mb-10 mt-10 text-4xl font-extrabold lg:text-5xl">
         Your cart has {totalUnits} {totalUnits === 1 ? "item" : "items"}
       </h1>
@@ -121,55 +172,62 @@ export default function Cart() {
       <div className="grid gap-12 lg:grid-cols-[2fr_1fr]">
         {/* Item list */}
         <div className="space-y-6">
+            <AnimatePresence initial={false}>
           {items.map(item => (
-            <article
+            <motion.article
+              layout
+              variants={cartItemVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
               key={item.id}
-              className="flex items-center gap-6 rounded-xl border border-gray-300 bg-white p-4 shadow-sm"
+              className="flex flex-col sm:flex-row items-center gap-6 rounded-xl border border-gray-200 bg-white p-4 sm:p-6 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.01]"
             >
               <img
                 src={item.image}
                 alt={item.name}
-                className="h-24 w-24 rounded-lg object-contain"
+                className="h-28 w-28 sm:h-32 sm:w-32 rounded-lg object-contain flex-shrink-0"
               />
-              <div className="flex-1">
+              <div className="flex-1 text-center sm:text-left">
                 <h2 className="text-lg font-semibold">{item.name}</h2>
                 <p className="text-sm text-gray-600">
                   € {item.price.toFixed(2)}
                 </p>
-                <div className="mt-2 inline-flex items-center gap-2">
+                <div className="mt-3 inline-flex items-center rounded-md bg-slate-100 p-0.5">
                   <button
                     onClick={() => updateQty(item.id, -1)}
-                    className="rounded-full border p-1 hover:bg-gray-100"
+                    className="rounded-md p-2 text-slate-600 hover:bg-white hover:text-slate-800 transition-colors disabled:opacity-50"
                   >
                     <Minus className="h-4 w-4" />
                   </button>
-                  <span className="w-8 text-center">{item.quantity}</span>
+                  <span className="w-10 text-center font-medium text-slate-700">{item.quantity}</span>
                   <button
                     onClick={() => updateQty(item.id, 1)}
-                    className="rounded-full border p-1 hover:bg-gray-100"
+                    className="rounded-md p-2 text-slate-600 hover:bg-white hover:text-slate-800 transition-colors"
                   >
                     <Plus className="h-4 w-4" />
                   </button>
                 </div>
               </div>
 
-              <div className="flex flex-col items-end gap-2">
+              <div className="flex flex-col items-center sm:items-end gap-2 mt-4 sm:mt-0">
                 <p className="font-semibold">
                   € {(item.price * item.quantity).toFixed(2)}
                 </p>
                 <button
                   onClick={() => remove(item.id)}
-                  className="flex items-center gap-1 text-sm text-red-600 hover:underline"
+                  className="flex items-center gap-1.5 text-sm text-red-500 hover:text-red-700 hover:underline transition-colors"
                 >
                   <Trash2 className="h-4 w-4" /> Remove
                 </button>
               </div>
-            </article>
+            </motion.article>
           ))}
+          </AnimatePresence>
         </div>
 
         {/* Summary */}
-        <aside className="rounded-xl border border-gray-300 bg-white p-6 shadow-sm lg:sticky lg:top-24">
+        <aside className="rounded-xl border border-gray-200 bg-white p-6 shadow-lg lg:sticky lg:top-28">
           <h2 className="mb-6 text-2xl font-semibold">Order summary</h2>
           <div className="mb-4 flex justify-between text-sm">
             <span>Subtotal</span>
@@ -191,6 +249,7 @@ export default function Cart() {
           </NavLink>
         </aside>
       </div>
-    </section>
+    </div>
+  </section>
   );
 }

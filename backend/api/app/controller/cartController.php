@@ -35,8 +35,12 @@ class CartController {
             Response::json(['error'=>'productId requerido'], 400);
             return;
         }
-        CartModel::addItem($_SESSION['user']['ID_Usuario'], $pid, $qty);
-        Response::json(['success'=>true]);
+        try {
+            CartModel::addItem($_SESSION['user']['ID_Usuario'], $pid, $qty);
+            Response::json(['success' => true, 'message' => 'Product added to cart']);
+        } catch (\Exception $e) {
+            Response::json(['success' => false, 'message' => $e->getMessage()], 400); // Or 409 for conflict/stock issue
+        }
     }
 
     // POST /api?route=api/cart/update
@@ -57,8 +61,12 @@ class CartController {
             Response::json(['error'=>'productId requerido'], 400);
             return;
         }
-        CartModel::updateItem($_SESSION['user']['ID_Usuario'], $pid, $qty);
-        Response::json(['success'=>true]);
+        try {
+            CartModel::updateItem($_SESSION['user']['ID_Usuario'], $pid, $qty);
+            Response::json(['success' => true, 'message' => 'Cart updated']);
+        } catch (\Exception $e) {
+            Response::json(['success' => false, 'message' => $e->getMessage()], 400);
+        }
     }
 
     // POST /api?route=api/cart/remove
@@ -78,7 +86,23 @@ class CartController {
             Response::json(['error'=>'productId requerido'], 400);
             return;
         }
-        CartModel::removeItem($_SESSION['user']['ID_Usuario'], $pid);
-        Response::json(['success'=>true]);
+        try {
+            CartModel::removeItem($_SESSION['user']['ID_Usuario'], $pid);
+            Response::json(['success' => true, 'message' => 'Product removed from cart']);
+        } catch (\Exception $e) {
+            Response::json(['success' => false, 'message' => $e->getMessage()], 400);
+        }
+    }
+
+    // GET /api?route=api/cart/count
+    public static function getCartCount(): void {
+        session_start();
+        if (empty($_SESSION['user']['ID_Usuario'])) {
+            Response::json(['count' => 0]); // Return 0 if not authenticated, or could be an error
+            return;
+        }
+        $uid = (int)$_SESSION['user']['ID_Usuario'];
+        $count = CartModel::getCartItemCountByUser($uid);
+        Response::json(['count' => $count]);
     }
 }

@@ -5,6 +5,7 @@ import DrugCard from "../components/Card";
 import PrimaryButton from "../components/PrimaryButton";
 import Banner from "../assets/images/shop4K.png";
 import { useNavigate } from "react-router-dom";
+import toast, { Toaster } from 'react-hot-toast';
 
 interface Product {
   id: number;
@@ -22,6 +23,7 @@ export default function ShopPage() {
   const [query, setQuery] = useState("");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const navigate = useNavigate();
+  const [buttonStatus, setButtonStatus] = useState<Record<number, 'idle' | 'adding' | 'added'>>({});
 
   // Load products
   useEffect(() => {
@@ -41,6 +43,24 @@ export default function ShopPage() {
       .catch(err => console.error("Error loading products:", err));
   }, []);
 
+  // Listen for stock adjustments from other components (e.g., Cart.tsx)
+  useEffect(() => {
+    const handleStockAdjusted = (event: Event) => {
+      const customEvent = event as CustomEvent<{ productId: number; quantityChange: number }>;
+      const { productId, quantityChange } = customEvent.detail;
+      setProducts(prevProducts =>
+        prevProducts.map(p =>
+          p.id === productId ? { ...p, stock: Math.max(0, p.stock + quantityChange) } : p // Ensure stock doesn't go below 0
+        )
+      );
+    };
+
+    window.addEventListener('productStockAdjusted', handleStockAdjusted);
+    return () => {
+      window.removeEventListener('productStockAdjusted', handleStockAdjusted);
+    };
+  }, []); // Empty dependency array ensures this runs once on mount and cleans up on unmount
+
   // Filter logic
   const filtered = products.filter(p =>
     p.name.toLowerCase().includes(query.toLowerCase())
@@ -53,30 +73,57 @@ export default function ShopPage() {
     setVisibleCount(prev => Math.min(prev + PAGE_SIZE, filtered.length));
 
   // Add to cart
-  const handleAddToCart = async (productId: number) => {
+  const handleAddToCart = async (productId: number, productName: string, quantity: number = 1) => {
+    setButtonStatus(prev => ({ ...prev, [productId]: 'adding' }));
+
     try {
-      const res = await fetch("/api?route=api/cart/add", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId, quantity: 1 }),
+      const response = await fetch(`/api?route=api/cart/add`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ productId, quantity }),
       });
-      if (res.status === 401) {
-        // Not authenticated
-        alert("Please log in to add items to your cart.");
-        navigate("/login");
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        if (response.status === 401) { // Specific check for unauthorized
+          toast.error('Please log in to add items to your cart.');
+        } else {
+          toast.error(data.message || 'Failed to add product. Please try again.');
+        }
+        setButtonStatus(prev => ({ ...prev, [productId]: 'idle' }));
         return;
       }
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      alert("Producto añadido al carrito");
-    } catch (err) {
-      console.error("Error al añadir al carrito:", err);
-      alert("No se pudo añadir el producto");
+
+      toast.success(data.message || `${productName} added to cart!`);
+      setButtonStatus(prev => ({ ...prev, [productId]: 'added' }));
+
+      // Locally update product stock
+      setProducts(prevProducts =>
+        prevProducts.map(p =>
+          p.id === productId ? { ...p, stock: p.stock - quantity } : p
+        )
+      );
+
+      // Dispatch event to update cart icon
+      window.dispatchEvent(new CustomEvent('cartUpdated'));
+
+      setTimeout(() => {
+        setButtonStatus(prev => ({ ...prev, [productId]: 'idle' }));
+      }, 2000);
+
+    } catch (error) {
+      console.error('Add to cart error:', error);
+      toast.error('An unexpected error occurred. Please try again.');
+      setButtonStatus(prev => ({ ...prev, [productId]: 'idle' }));
     }
   };
 
   return (
     <div>
+      <Toaster position="top-center" reverseOrder={false} />
       {/* Banner */}
       <div className="sticky top-0 z-10 h-[450px] w-full overflow-hidden">
         <img src={Banner} alt="Shop Banner" className="w-full object-cover" />
@@ -105,18 +152,36 @@ export default function ShopPage() {
 
           {/* Products */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-[100px]">
-            {filtered.slice(0, visibleCount).map(product => (
+            {filtered.slice(0, visibleCount).map(product => {
+              const currentStatus = buttonStatus[product.id] || 'idle';
+              let buttonText = "Add to cart";
+              let isDisabled = false;
+
+              if (product.stock === 0) {
+                buttonText = "Out of stock";
+                isDisabled = true;
+              } else if (currentStatus === 'adding') {
+                buttonText = "Adding...";
+                isDisabled = true;
+              } else if (currentStatus === 'added') {
+                buttonText = "Added!";
+                isDisabled = true;
+              }
+
+              return (
               <DrugCard
                 key={product.id}
                 imageSrc={product.imageSrc}
                 name={product.name}
                 title={product.description}
                 formula={`€${product.price.toFixed(2)}`}
-                button="Add to cart"
-                onButtonClick={() => handleAddToCart(product.id)}
+                button={buttonText}
+                onButtonClick={() => handleAddToCart(product.id, product.name)}
+                buttonDisabled={isDisabled} // New prop
+                onCardClick={() => navigate(`/shop/${product.id}`)} // Corrected navigation
                 hideTitle={true}
               />
-            ))}
+            );})}
           </div>
 
           {/* Load more / no results */}
