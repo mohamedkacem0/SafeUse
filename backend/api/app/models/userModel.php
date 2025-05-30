@@ -14,7 +14,7 @@ class UserModel {
     public static function findByEmail(string $email): ?array {
         $pdo = DB::getInstance()->conn();
         $stmt = $pdo->prepare(
-            'SELECT ID_Usuario, Nombre, Correo, `Contraseña`, Telefono, `Dirección`, Tipo_Usuario, created_at
+            'SELECT ID_Usuario, Nombre, Correo, `Contraseña`, Telefono, `Direccion`, Tipo_Usuario, created_at
              FROM usuarios
              WHERE Correo = :email'
         );
@@ -32,7 +32,7 @@ class UserModel {
         $pdo = DB::getInstance()->conn();
         $stmt = $pdo->prepare(
             'INSERT INTO usuarios
-             (Nombre, Correo, `Contraseña`, Telefono, `Dirección`, Tipo_Usuario)
+             (Nombre, Correo, `Contraseña`, Telefono, `Direccion`, Tipo_Usuario)
              VALUES
              (:nombre, :correo, :contraseña, :telefono, :direccion, :tipo_usuario)'
         );
@@ -52,17 +52,35 @@ class UserModel {
      * @param int $id
      * @return array|null
      */
+    public static function findById(int $id): ?array {
+        $pdo = DB::getInstance()->conn();
+        $stmt = $pdo->prepare(
+            'SELECT ID_Usuario, Nombre, Correo, Telefono, `Direccion`, Tipo_Usuario
+             FROM usuarios
+             WHERE ID_Usuario = :id'
+        );
+        $stmt->execute(['id' => $id]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $user ?: null;
+    }
 
-public static function findById(int $id): ?array {
-    $pdo = DB::getInstance()->conn();
-    $stmt = $pdo->prepare(
-        'SELECT ID_Usuario, Nombre, Correo, Telefono, `Dirección`, Tipo_Usuario, foto_perfil
-         FROM usuarios
-         WHERE ID_Usuario = :id'
-    );
-    $stmt->execute(['id' => $id]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-    return $user ?: null;
-}
-
+    /**
+     * Recupera todos los usuarios de la tabla.
+     * @return array Lista de usuarios.
+     */
+    public static function getAll(): array {
+        $pdo = DB::getInstance()->conn();
+        $sql = "
+            SELECT
+                ID_Usuario,
+                Nombre,
+                Correo,
+                Telefono,
+                `Direccion` AS Direccion,
+                Tipo_Usuario AS Tipo_Usuario
+            FROM usuarios
+        ";
+        $stmt = $pdo->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
