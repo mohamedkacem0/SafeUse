@@ -1,5 +1,5 @@
 // src/pages/Profile.tsx
-import React, { useState, useEffect, useRef, ChangeEvent } from "react";
+import React, { useState, useEffect } from "react";
 import { Pencil, Check, X as CloseIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PrimaryButton from "../components/PrimaryButton";
@@ -17,14 +17,20 @@ interface UserProfile {
 type EditableField = "Nombre" | "Correo" | "Telefono" | "Direccion" | null;
 
 export default function Profile() {
+  const enhancedInputClass = "w-full rounded-md border border-gray-300 bg-transparent p-2 text-sm placeholder:text-gray-500 focus:border-sky-500 focus:ring-2 focus:ring-sky-500 focus:ring-offset-1 focus:outline-none transition-all duration-300 ease-in-out";
+
   const navigate = useNavigate();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  // State for Change Password Form
+  const [showChangePasswordForm, setShowChangePasswordForm] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [passwordChangeError, setPasswordChangeError] = useState<string | null>(null);
+  const [passwordChangeSuccess, setPasswordChangeSuccess] = useState<string | null>(null);
 
   // Inline editing state
   const [editing, setEditing] = useState<EditableField>(null);
@@ -41,7 +47,6 @@ export default function Profile() {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const { user: u } = await res.json();
         setUser(u);
-        if (u.foto_perfil) setPreviewUrl(u.foto_perfil);
       } catch (err) {
         console.error(err);
         setError("No se pudieron cargar los datos de perfil.");
@@ -58,32 +63,42 @@ export default function Profile() {
     navigate("/");
   };
 
-  // Photo upload helpers
-  const triggerFileInput = () => fileInputRef.current?.click();
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] ?? null;
-    if (file) {
-      setSelectedFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => setPreviewUrl(reader.result as string);
-      reader.readAsDataURL(file);
+  // Password Change Handler
+  const handleChangePassword = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setPasswordChangeError(null);
+    setPasswordChangeSuccess(null);
+
+    if (newPassword !== confirmNewPassword) {
+      setPasswordChangeError("New passwords do not match.");
+      return;
     }
-  };
-  const handleImageUpload = async () => {
-    if (!selectedFile) return;
-    const formData = new FormData();
-    formData.append("foto", selectedFile);
-    const res = await fetch("/api/upload-photo", {
-      method: "POST",
-      credentials: "include",
-      body: formData,
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const { foto_perfil: newUrl } = await res.json();
-    setUser(u => u ? { ...u, foto_perfil: newUrl } : u);
-    setPreviewUrl(newUrl);
-    setSelectedFile(null);
-    alert("Foto de perfil actualizada.");
+    if (!currentPassword || !newPassword) {
+      setPasswordChangeError("All password fields are required.");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword, newPassword }),
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setPasswordChangeError(data.error || "Failed to change password.");
+      } else {
+        setPasswordChangeSuccess("Password changed successfully!");
+        setShowChangePasswordForm(false);
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmNewPassword("");
+      }
+    } catch (err) {
+      console.error(err);
+      setPasswordChangeError("An unexpected error occurred. Please try again.");
+    }
   };
 
   // Inline edit helpers
@@ -121,32 +136,33 @@ export default function Profile() {
 
   const renderField = (
     label: string,
-    field: EditableField,
+    fieldKey: keyof UserProfile, // Changed 'field' to 'fieldKey' for clarity with UserProfile keys
     type: string = "text"
   ) => (
-    <div className="flex justify-between items-center border-b px-4 py-4">
-      <span className="text-gray-500">{label}</span>
-      <div className="flex items-center gap-2">
-        {editing === field ? (
+    <div className="flex flex-col sm:flex-row justify-between sm:items-center py-4">
+      <span className="text-gray-600 font-medium mb-1 sm:mb-0">{label}</span>
+      <div className="flex items-center gap-2 mt-1 sm:mt-0">
+        {editing === fieldKey ? (
           <>
             <input
               type={type}
               value={draftValue}
               onChange={e => setDraftValue(e.target.value)}
-              className="border px-2 py-1 rounded"
+              className={`${enhancedInputClass} py-1.5 flex-grow`}
+              autoFocus
             />
-            <button onClick={saveEdit}>
-              <Check className="text-green-600" />
+            <button onClick={saveEdit} title="Save changes" className="p-1.5 rounded-md hover:bg-green-100">
+              <Check className="text-green-600 h-5 w-5" />
             </button>
-            <button onClick={cancelEdit}>
-              <CloseIcon className="text-red-600" />
+            <button onClick={cancelEdit} title="Cancel edit" className="p-1.5 rounded-md hover:bg-red-100">
+              <CloseIcon className="text-red-600 h-5 w-5" />
             </button>
           </>
         ) : (
           <>
-            <span className="text-gray-700">{user[field] || ""}</span>
-            <button onClick={() => startEdit(field)}>
-              <Pencil className="text-gray-400 cursor-pointer" />
+            <span className="text-gray-800">{user[fieldKey] || "Not set"}</span>
+            <button onClick={() => startEdit(fieldKey as EditableField)} title={`Edit ${label}`} className="p-1.5 rounded-md hover:bg-gray-100">
+              <Pencil className="text-gray-500 hover:text-sky-600 cursor-pointer h-4 w-4" />
             </button>
           </>
         )}
@@ -154,77 +170,133 @@ export default function Profile() {
     </div>
   );
 
+  // Main content structure for user details
+  const userDetailsContent = (
+    <div className="bg-white p-6 sm:p-8 rounded-xl shadow-xl mt-10 w-full divide-y divide-gray-200 border-t-4 border-emerald-500">
+      {renderField("Full Name", "Nombre")}
+      {renderField("Email Address", "Correo", "email")}
+      {renderField("Phone Number", "Telefono", "tel")}
+      {renderField("Address", "Direccion")}
+    </div>
+  );
+
   return (
-    <div className="max-w-2xl mx-auto pt-12 pb-8 flex flex-col items-center">
-      <h1 className="text-[56px] font-bold mb-8 w-full text-left">Profile</h1>
+    <div className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+      <div className="max-w-2xl w-full">
+      <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-800 mb-10 text-center sm:text-left mt-10">Your Profile</h1>
 
-      {/* Hidden file input */}
-      <input
-        type="file"
-        ref={fileInputRef}
-        accept="image/*"
-        className="hidden"
-        onChange={handleFileChange}
-      />
+      {/* User Info Fields Card */}
+      {userDetailsContent}
 
-      {/* Avatar */}
-      <div className="relative flex flex-col items-center mb-6">
-        <div className="w-[140px] h-[140px] rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
-          {previewUrl ? (
-            <img
-              src={previewUrl}
-              alt="Avatar"
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <span className="text-gray-400 text-[80px]">
-              <svg
-                width="80"
-                height="80"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <circle cx="12" cy="8" r="4" strokeWidth="2" />
-                <path d="M4 20c0-4 4-7 8-7s8 3 8 7" strokeWidth="2" />
-              </svg>
-            </span>
-          )}
-        </div>
-        <button
-          onClick={triggerFileInput}
-          className="absolute bottom-2 right-2 bg-white rounded-full p-2 border border-gray-300 hover:bg-gray-100"
-        >
-          <Pencil size={20} className="text-gray-400" />
-        </button>
-      </div>
-      {selectedFile && (
+      {/* My Orders Button */}
+      <div className="mt-10 w-full max-w-md mx-auto">
         <PrimaryButton
-          text="Guardar foto"
-          onClick={handleImageUpload}
-          className="mb-6"
+          text="My Orders"
+          onClick={() => navigate('/my-orders')} // Assuming '/my-orders' is the route for orders
+          className="w-full !bg-emerald-600 hover:!bg-emerald-700 text-white font-semibold py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 ease-in-out active:scale-[0.98]"
         />
+      </div>
+
+      {/* Change Password Section */}
+      <div className="mt-10 w-full max-w-md mx-auto">
+        <PrimaryButton
+          text={showChangePasswordForm ? "Cancel Change Password" : "Change Password"}
+          onClick={() => {
+            setShowChangePasswordForm(!showChangePasswordForm);
+            setPasswordChangeError(null);
+            setPasswordChangeSuccess(null);
+            // Clear fields if canceling
+            if (showChangePasswordForm) {
+                setCurrentPassword("");
+                setNewPassword("");
+                setConfirmNewPassword("");
+            }
+          }}
+          className={`w-full font-semibold py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 ease-in-out active:scale-[0.98] ${
+            showChangePasswordForm
+              ? "!bg-amber-500 hover:!bg-amber-600 text-white"
+              : "!bg-emerald-600 hover:!bg-emerald-700 text-white"
+          }`}
+        />
+      </div>
+
+      {showChangePasswordForm && (
+        <div className="mt-6 mb-4 w-full max-w-md mx-auto bg-white p-6 sm:p-8 rounded-xl shadow-xl">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Change Your Password</h2>
+          <form onSubmit={handleChangePassword} className="space-y-6">
+            <div>
+              <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                Current Password
+              </label>
+              <input
+                id="currentPassword"
+                name="currentPassword"
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                className={enhancedInputClass}
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                New Password
+              </label>
+              <input
+                id="newPassword"
+                name="newPassword"
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className={enhancedInputClass}
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="confirmNewPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                Confirm New Password
+              </label>
+              <input
+                id="confirmNewPassword"
+                name="confirmNewPassword"
+                type="password"
+                value={confirmNewPassword}
+                onChange={(e) => setConfirmNewPassword(e.target.value)}
+                className={enhancedInputClass}
+                required
+              />
+            </div>
+
+            {passwordChangeError && (
+              <p className="text-sm text-red-600 text-center p-2 bg-red-50 rounded-md">{passwordChangeError}</p>
+            )}
+            {passwordChangeSuccess && (
+              <p className="text-sm text-green-600 text-center p-2 bg-green-50 rounded-md">{passwordChangeSuccess}</p>
+            )}
+
+            <div>
+              <PrimaryButton
+                type="submit"
+                text="Update Password"
+                className="w-full !bg-emerald-600 hover:!bg-emerald-700 text-white font-semibold py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 ease-in-out active:scale-[0.98]"
+              />
+            </div>
+          </form>
+        </div>
       )}
 
-      {/* User fields */}
-      <div className="w-full bg-white rounded-xl">
-        {renderField("Name", "Nombre")}
-        {renderField("Email", "Correo", "email")}
-        {renderField("Mobile number", "Telefono", "tel")}
-        {renderField("Address", "Direccion")}
-      </div>
-
-      {/* Logout */}
-      <div className="flex flex-col items-center mt-10">
-        <a href="#" className="text-xs underline text-gray-600 mb-4">
+      {/* Logout Button */}
+      <div className="mt-12 w-full max-w-xs mx-auto">
+        {/* <a href="#" className="text-sm text-sky-600 hover:underline text-center block mb-4">
           Change your password
-        </a>
+        </a> */}
         <PrimaryButton
           text="Logout"
-          className="w-[120px]"
           onClick={handleLogout}
+          className="w-full !bg-red-600 hover:!bg-red-700 text-white font-semibold py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 ease-in-out active:scale-[0.98]"
         />
       </div>
-    </div>
+      </div> {/* Closes max-w-2xl w-full */}
+    </div>   /* Closes min-h-screen */
   );
 }
