@@ -23,11 +23,9 @@ export const router = createBrowserRouter([
       { path: '/PrivacyPolicy', element: <Pages.PrivacyPolicy /> },
       { path: '/cart', element: <Pages.Cart /> },
       { path: '/Checkout', element: <Pages.Checkout /> },
-      { path: '/AdminDashboard', element: <Pages.AdminDashboard /> },
-
-
-
+      
 
     ],
   },
+  { path: '/AdminDashboard', element: <Pages.AdminDashboard /> },
 ]);
