@@ -128,14 +128,28 @@ switch ($route) {
         AdviceController::index();
         break;
 
-        case 'api/contact':
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            ContactController::store();
-        } else {
-            http_response_code(405);
-            echo json_encode(['error' => 'Method not allowed']);
+            // … el resto de tu switch …
+
+    case 'api/contact':
+        switch ($_SERVER['REQUEST_METHOD']) {
+            case 'GET':
+                // Lista todas las consultas
+                ContactController::index();
+                break;
+
+            case 'POST':
+                // Crea una nueva y devuelve todo el registro
+                ContactController::store();
+                break;
+
+            default:
+                http_response_code(405);
+                echo json_encode(['error' => 'Method not allowed']);
         }
         break;
+
+    // … sigue el resto de rutas …
+
 
         case 'api/cart':
             CartController::index();
