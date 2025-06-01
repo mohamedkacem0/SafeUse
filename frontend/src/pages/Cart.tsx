@@ -1,10 +1,20 @@
 // src/pages/Cart.tsx
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Minus, Plus, Trash2, ShoppingCart, LogIn } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast, { Toaster } from 'react-hot-toast';
 import PrimaryButton from "../components/PrimaryButton";
 import { NavLink, useNavigate } from "react-router-dom";
+
+// Define an interface for the raw API response item
+interface ApiCartItemResponse {
+  product_id: number;
+  Nombre: string;
+  Precio: string; // Assuming Precio is a string from API
+  quantity: number;
+  Imagen_Principal: string;
+  // Add other fields if your API returns more
+}
 
 interface CartItem {
   id: number;
@@ -36,7 +46,7 @@ export default function Cart() {
         }
         return res.json();
       })
-      .then((data: any[]) => {
+      .then((data: ApiCartItemResponse[]) => {
         const parsed: CartItem[] = data.map(i => ({
           id: i.product_id,
           name: i.Nombre,
@@ -60,6 +70,7 @@ export default function Cart() {
     exit: { opacity: 0, x: -50, scale: 0.9, transition: { duration: 0.2, ease: "easeIn" } },
   };
   const subtotal = items.reduce((sum, it) => sum + it.price * it.quantity, 0);
+  const orderTotal = subtotal * 1.21; // Calculate the actual total including VAT
 
   // Update quantity
   const updateQty = async (id: number, delta: number) => {
@@ -307,7 +318,11 @@ export default function Cart() {
             <span>Total</span>
             <span>€ {(subtotal * 1.21).toFixed(2)}</span>
           </div>
-          <NavLink to="/checkout" className="w-full">
+          <NavLink 
+            to="/checkout" 
+            state={{ orderTotal: orderTotal }} // Pass the total price in state
+            className="w-full"
+          >
             <PrimaryButton
               text="Checkout"
               className="w-full rounded-full bg-[#335A2C] py-3 text-center text-lg font-semibold text-white hover:bg-[#335A2C]/90"
