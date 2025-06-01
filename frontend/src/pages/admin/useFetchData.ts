@@ -9,7 +9,8 @@ interface FetchResult<T> {
 
 export function useFetchData<T>(
   url: string,
-  transform?: (json: any) => T
+  transform?: (json: any) => T,
+  deps: any[] = [] // Permite dependencias externas como [refresh]
 ): FetchResult<T> {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
@@ -26,7 +27,10 @@ export function useFetchData<T>(
         return transform ? transform(json) : (json as T);
       })
       .then((result) => {
-        if (isMounted) setData(result);
+        if (isMounted) {
+          setData(result);
+          setError(null);
+        }
       })
       .catch((err) => {
         if (isMounted) setError(err as Error);
@@ -38,7 +42,7 @@ export function useFetchData<T>(
     return () => {
       isMounted = false;
     };
-  }, [url]);
+  }, [url, ...deps]);
 
   return { data, loading, error };
 }

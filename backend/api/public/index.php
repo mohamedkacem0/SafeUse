@@ -1,7 +1,7 @@
 <?php
-
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Origin: http://localhost:5173');
+header('Access-Control-Allow-Credentials: true');
+header('Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
 
@@ -95,6 +95,15 @@ switch ($route) {
 
         case 'api/users':
         UserController::users();
+        break;
+
+    case 'api/users/delete':
+        // Solo permite DELETE y espera el id en el body JSON
+        if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+            UserController::deleteUser();
+        } else {
+            Response::json(['error' => 'Método no permitido'], 405);
+        }
         break;
 
     case 'api/register':

@@ -184,6 +184,7 @@ class UserController {
      * Actualiza el perfil del usuario autenticado.
      * Espera JSON: { "Nombre": "nuevo valor", "Telefono": "nuevo valor", ... }
      */
+
     /**
      * Actualiza el perfil del usuario autenticado.
      * Espera JSON: { "Nombre": "nuevo valor", "Telefono": "nuevo valor", "Direccion": "nuevo valor" }
@@ -268,4 +269,52 @@ class UserController {
             Response::json(['error' => 'Failed to update profile in database'], 500);
         }
     }
+    /**
+ * Elimina un usuario por ID (solo admin).
+ * Espera DELETE a /api/users/delete con JSON: { "id": 5 }
+ */
+public static function deleteUser(): void {
+    if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
+        Response::json(['error' => 'Método no permitido'], 405);
+        return;
+    }
+
+    session_start();
+    if (empty($_SESSION['user']) || ($_SESSION['user']['Tipo_Usuario'] ?? '') !== 'admin') {
+        Response::json(['error' => 'No autorizado'], 403);
+        return;
+    }
+
+    // Obtener el ID del usuario a eliminar desde el body JSON
+    $data = json_decode(file_get_contents('php://input'), true);
+    $id = isset($data['id']) ? (int)$data['id'] : 0;
+
+    if ($id <= 0) {
+        Response::json(['error' => 'ID inválido'], 400);
+        return;
+    }
+
+    // No permitir que un admin se elimine a sí mismo
+    if ($id === (int)$_SESSION['user']['ID_Usuario']) {
+        Response::json(['error' => 'No puedes eliminar tu propio usuario'], 403);
+        return;
+    }
+
+    $targetUser = UserModel::findById($id);
+    if (!$targetUser) {
+        Response::json(['error' => 'Usuario no encontrado'], 404);
+        return;
+    }
+
+    $success = UserModel::delete($id);
+    if ($success) {
+        Response::json([
+            'success' => true,
+            'message' => "Usuario ID $id eliminado correctamente."
+        ]);
+    } else {
+        Response::json(['error' => 'No se pudo eliminar el usuario'], 500);
+    }
+}
+
 }

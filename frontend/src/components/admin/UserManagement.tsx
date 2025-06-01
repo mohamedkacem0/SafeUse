@@ -1,5 +1,5 @@
 // src/components/Admin/UserManagement.tsx
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useFetchData } from '../../pages/admin/useFetchData';
 import {
   Card,
@@ -17,11 +17,12 @@ import {
   TableBody,
   TableCell,
 } from '../ui/table';
-import { Edit3 } from 'lucide-react';
+import { Edit3, Trash2 } from 'lucide-react';
 
 // Función para formatear fechas al estilo "dd/MM/yyyy, hh:mm"
 function formatDate(dateStr: string) {
-  const date = new Date(dateStr);
+  // Se reemplaza el espacio por 'T' para mayor compatibilidad
+  const date = new Date(dateStr.replace(' ', 'T'));
   return date.toLocaleString('es-ES', {
     day: '2-digit',
     month: '2-digit',
@@ -31,7 +32,7 @@ function formatDate(dateStr: string) {
   });
 }
 
-// Definimos la “forma” que usará nuestra tabla
+// Definimos la forma que usará nuestra tabla
 interface UserRow {
   ID_Usuario: number;
   Nombre: string;
@@ -43,45 +44,32 @@ interface UserRow {
 }
 
 export default function UserManagement() {
-  // 1) Traemos la data cruda de la API
-  //    Suponemos que la API hace GET a /api/users y devuelve un array de objetos,
-  //    cada uno con (al menos) id, name, email, role, address, phone, created_at.
+  // 1) Estado para refrescar la lista tras eliminar un usuario
+  const [refresh, setRefresh] = useState(0);
+
+  // 2) Traemos la data cruda de la API (el hook se recarga al cambiar "refresh")
   const {
     data: usersData,
     loading: loadingUsers,
     error: usersError,
   } = useFetchData<UserRow[]>('/api/users', (json) => {
-    // json podría ser un array directo o un objeto { users: [...] }
     const rawArray: any[] = Array.isArray(json)
       ? json
       : Array.isArray((json as any).users)
       ? (json as any).users
       : [];
-
-    // Mapeamos cada item a un objeto UserRow
     return rawArray.map((item) => ({
-      // Cogemos el ID que venga en “id” o “ID_Usuario” o similar
-      ID_Usuario:
-        item.ID_Usuario ??
-        item.id ??
-        item.userId ??
-        0,
-      // Para el nombre: primero “Nombre” si existe, sino “name”
+      ID_Usuario: item.ID_Usuario ?? item.id ?? item.userId ?? 0,
       Nombre: item.Nombre ?? item.name ?? '',
-      // Email: “Correo” o “email”
       Correo: item.Correo ?? item.email ?? '',
-      // Tipo de usuario: “Tipo_Usuario” o “role”
       Tipo_Usuario: item.Tipo_Usuario ?? item.role ?? '',
-      // Dirección: “Direccion” o “address”
       Direccion: item.Direccion ?? item.address ?? '',
-      // Teléfono: “Telefono” o “phone”
       Telefono: item.Telefono ?? item.phone ?? '',
-      // created_at: suponemos que la API devuelve “created_at”
       created_at: item.created_at ?? item.createdAt ?? '',
     }));
   });
 
-  // 2) Mantenemos los usuarios ya normalizados
+  // 2) Normalizamos la lista de usuarios
   const users: UserRow[] = usersData ?? [];
 
   // 3) Estado y lógica de filtro
@@ -89,17 +77,37 @@ export default function UserManagement() {
   const filteredUsers = useMemo(() => {
     const term = filter.trim().toLowerCase();
     if (!term) return users;
-    return users.filter((u) =>
-      u.Nombre.toLowerCase().includes(term)
-    );
+    return users.filter((u) => u.Nombre.toLowerCase().includes(term));
   }, [users, filter]);
 
-  // 4) Handler para “Editar” (ahora solo hace console.log)
+  // 4) Handler para editar usuario (puedes reemplazar con navegación)
   const handleEdit = useCallback((id: number) => {
     console.log('Editar usuario:', id);
-    // Si quisieras navegar a "/admin/users/{id}/edit", por ejemplo:
-    // router.push(`/admin/users/${id}/edit`);
+    // Por ejemplo, redirigir a `/admin/users/${id}/edit`
   }, []);
+
+  // 5) Handler para eliminar usuario
+  const handleDelete = useCallback((id: number) => {
+    if (!window.confirm('¿Estás seguro de querer eliminar este usuario?')) return;
+    fetch('http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/users/delete', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ id }), // Aquí se pasa el ID_Usuario
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          setRefresh((r) => r + 1);
+          window.location.reload();
+        } else {
+          alert(data.error || 'No se pudo eliminar el usuario');
+        }
+      })
+      .catch(() => {
+        alert('Error al eliminar el usuario');
+      });
+  }, [refresh]);
 
   return (
     <Card>
@@ -111,7 +119,7 @@ export default function UserManagement() {
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
           />
-          <Button onClick={() => { /* podrías aplicar algo más aquí */ }}>
+          <Button onClick={() => { /* Acción extra si es necesario */ }}>
             Filter
           </Button>
         </div>
@@ -167,6 +175,14 @@ export default function UserManagement() {
                       onClick={() => handleEdit(u.ID_Usuario)}
                     >
                       <Edit3 size={16} />
+                    </Button>
+                    <Button
+                      aria-label={`Eliminar usuario ${u.Nombre}`}
+                      onClick={() => handleDelete(u.ID_Usuario)} // Aquí se pasa el ID_Usuario
+                      variant="outline"
+                      className="ml-2"
+                    >
+                      <Trash2 size={16} />
                     </Button>
                   </TableCell>
                 </TableRow>
