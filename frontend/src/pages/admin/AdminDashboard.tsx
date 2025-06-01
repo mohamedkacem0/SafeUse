@@ -16,6 +16,8 @@ import {
 import UserManagement from '../../components/admin/UserManagement';
 import SubstancesManagement from '../../components/admin/SubstancesManagement';
 import ProductManagement from '../../components/admin/ProductManagement';
+import ContactSubmissions from '../../components/admin/ContactSubmissions';
+import AdviceManagement from '../../components/admin/AdviceManagement';
 
 export default function AdminDashboard() {
   // Fetch users (for total count)
@@ -23,9 +25,18 @@ export default function AdminDashboard() {
     data: usersData,
     loading: loadingUsers,
     error: usersError,
-  } = useFetchData<{ users: any[] }>('/api/users', (json) => ({
-    users: Array.isArray(json.users) ? json.users : [],
-  }));
+  } = useFetchData<{ users: any[] }>('/api/users', (json) => {
+    // Si la API devuelve un array directo: json es array
+    if (Array.isArray(json)) {
+      return { users: json };
+    }
+    // Si la API devuelve { users: [...] }
+    if (Array.isArray((json as any).users)) {
+      return { users: (json as any).users };
+    }
+    // Por defecto, devolvemos array vacío
+    return { users: [] };
+  });
   const usersCount = usersData?.users.length ?? 0;
 
   // Fetch total products count
@@ -172,6 +183,12 @@ export default function AdminDashboard() {
 
       {/* Product Management Component */}
       <ProductManagement />
+
+      {/* Contact Submissions Component */}
+      <ContactSubmissions />
+
+      {/* Advice Management Component */}
+      <AdviceManagement />
     </div>
   );
 }
