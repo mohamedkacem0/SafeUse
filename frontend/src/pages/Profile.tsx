@@ -40,7 +40,7 @@ export default function Profile() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch("api/profile", {
+        const res = await fetch("/api/profile", { // Use absolute path for consistency
           method: "GET",
           credentials: "include",
           headers: {
@@ -156,13 +156,21 @@ export default function Profile() {
       }
       
       const responseData = await res.json();
-      if (responseData.success && responseData.user) {
-        setUser(responseData.user); // Update user state with fresh data from backend
+      if (responseData.success && responseData.user && typeof responseData.user === 'object' && responseData.user !== null) {
+        // Ensure responseData.user is a valid-looking object before updating state
+        setUser(responseData.user as UserProfile); 
         setError(null); // Clear any previous general errors
       } else {
-        // If backend didn't confirm success or send back user, revert or handle
-        // This case might indicate an issue with the backend response structure
-        throw new Error(responseData.error || 'Update successful but no user data returned.');
+        // If backend didn't confirm success or send back a valid user object, throw an error
+        let errorMessage = 'Failed to update profile.';
+        if (responseData.error) {
+          errorMessage = responseData.error;
+        } else if (!responseData.success) {
+          errorMessage = 'Profile update was not successful according to the server.';
+        } else {
+          errorMessage = 'Profile update response from server was missing user data or was malformed.';
+        }
+        throw new Error(errorMessage);
       }
 
       setEditing(null); // Exit editing mode on success
