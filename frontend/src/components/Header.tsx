@@ -34,7 +34,7 @@ export default function Header() {
           setCartItemCount(0); // Reset or handle error appropriately
         }
       } catch (error) {
-        // console.error('Error fetching cart count:', error);
+        console.error('Error fetching cart count:', error);
         setCartItemCount(0);
       }
     };
