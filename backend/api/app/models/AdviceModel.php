@@ -15,7 +15,7 @@ class AdviceModel
     {
         $pdo = DB::getInstance()->conn();
         $stmt = $pdo->query(
-            'SELECT ID_Advice, title, description, articulo, stage
+            'SELECT ID_Advice, title, description, articulo, stage, created_at, updated_at
              FROM advice'
         );
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -31,7 +31,7 @@ class AdviceModel
     {
         $pdo = DB::getInstance()->conn();
         $stmt = $pdo->prepare(
-            'SELECT ID_Advice, title, description, articulo, stage
+            'SELECT ID_Advice, title, description, articulo, stage, created_at, updated_at
              FROM advice
              WHERE ID_Advice = :id'
         );
