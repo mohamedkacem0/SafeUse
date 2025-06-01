@@ -1,16 +1,15 @@
-import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useState, useEffect, useCallback } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   CreditCard,
   ShoppingCart,
   ShieldCheck,
-  // Loader2, // For loading state - Removed as unused (lint ID: 392a7433-e1c5-4040-bba2-454afd433ee5)
 } from "lucide-react";
 
 import PrimaryButton from "../components/PrimaryButton";
 
 // Stripe imports
-import { loadStripe } from '@stripe/stripe-js'; // Removed StripeError as it's unused
+import { loadStripe, PaymentIntent } from '@stripe/stripe-js';
 import {
   Elements,
   CardElement,
@@ -23,19 +22,46 @@ interface User {
   Nombre: string;
 }
 
+interface Product {
+  id: string | number;
+  name: string;
+  price: number;
+  quantity: number;
+  image?: string;
+  // Add other properties your product objects might have
+}
+
 // Initialize Stripe outside of the component render to avoid
 // recreating the Stripe object on every render.
 // Replace with your actual publishable key
 const stripePromise = loadStripe("pk_test_51RVEeLRsCw1rPgQ1kFV5WKJTolyxv34OHCwa8pYCTBoGKawMpRj4qk0cPW5ELFWW88zlmQO3H383OtlDHs3gIoGR00DOXUfYXH");
 
+// Define an interface for shipping address details
+interface ShippingAddressDetails {
+  firstName: string;
+  lastName: string;
+  addressLine1: string;
+  city: string;
+  postalCode: string;
+  country: string;
+}
+
 // New CheckoutForm component
-const CheckoutForm = ({ orderTotal, userName, initialCardName }: { orderTotal: number, userName: string | null, initialCardName: string }) => {
+const CheckoutForm = ({ orderTotal, userName, initialCardName, onPaymentSuccess }: { orderTotal: number, userName: string | null, initialCardName: string, onPaymentSuccess: (paymentIntent: PaymentIntent, shippingDetails: ShippingAddressDetails) => void }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [paymentSuccess, setPaymentSuccess] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
   const [cardName, setCardName] = useState(initialCardName); // Separate state for card name
+
+  // State for shipping details
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [addressLine1, setAddressLine1] = useState('');
+  const [city, setCity] = useState('');
+  const [postalCode, setPostalCode] = useState('');
+  const [country, setCountry] = useState('');
 
   useEffect(() => {
     setCardName(initialCardName);
@@ -46,6 +72,13 @@ const CheckoutForm = ({ orderTotal, userName, initialCardName }: { orderTotal: n
     setProcessing(true);
     setPaymentError(null);
     setPaymentSuccess(null);
+
+    // Validate shipping details
+    if (!firstName || !lastName || !addressLine1 || !city || !postalCode || !country) {
+      setPaymentError("Please fill in all required shipping details.");
+      setProcessing(false);
+      return;
+    }
 
     if (!stripe || !elements) {
       // Stripe.js has not yet loaded.
@@ -111,15 +144,21 @@ const CheckoutForm = ({ orderTotal, userName, initialCardName }: { orderTotal: n
         setProcessing(false);
       } else if (paymentIntent?.status === 'succeeded') {
         setPaymentSuccess(`Payment successful! Your transaction ID is: ${paymentIntent.id}`);
-        // TODO: Redirect to an order confirmation page or clear cart, etc.
-        // Example: navigate('/order-confirmation', { state: { orderId: paymentIntent.id } });
-        console.log('Payment Succeeded:', paymentIntent);
+        const shippingDetails: ShippingAddressDetails = {
+          firstName,
+          lastName,
+          addressLine1,
+          city,
+          postalCode,
+          country,
+        };
+        onPaymentSuccess(paymentIntent, shippingDetails);
         setProcessing(false);
       } else {
         setPaymentError(`Payment status: ${paymentIntent?.status}. Please contact support.`);
         setProcessing(false);
       }
-    } catch (err) { // Removed 'any' type, will use instanceof check
+    } catch (err) { 
       console.error("Payment submission error:", err);
       const errorMessage = err instanceof Error ? err.message : "An error occurred during payment processing. Please check console for details.";
       setPaymentError(errorMessage);
@@ -150,6 +189,42 @@ const CheckoutForm = ({ orderTotal, userName, initialCardName }: { orderTotal: n
   const labelClass = "block mb-1.5 text-xs font-medium text-gray-700";
 
   return (
+    <> {/* Added fragment to wrap shipping and payment sections */}
+      {/* Shipping Details Section */}
+      <div className="mb-8">
+        <h3 className="text-xl font-semibold text-gray-800 mb-4">Shipping Details</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="firstName" className={labelClass}>First Name</label>
+            <input id="firstName" name="firstName" type="text" required className={inputClass} value={firstName} onChange={(e) => setFirstName(e.target.value)} disabled={processing} />
+          </div>
+          <div>
+            <label htmlFor="lastName" className={labelClass}>Last Name</label>
+            <input id="lastName" name="lastName" type="text" required className={inputClass} value={lastName} onChange={(e) => setLastName(e.target.value)} disabled={processing} />
+          </div>
+          <div className="md:col-span-2">
+            <label htmlFor="addressLine1" className={labelClass}>Address</label>
+            <input id="addressLine1" name="addressLine1" type="text" required className={inputClass} value={addressLine1} onChange={(e) => setAddressLine1(e.target.value)} disabled={processing} />
+          </div>
+          <div>
+            <label htmlFor="city" className={labelClass}>City</label>
+            <input id="city" name="city" type="text" required className={inputClass} value={city} onChange={(e) => setCity(e.target.value)} disabled={processing} />
+          </div>
+          <div>
+            <label htmlFor="postalCode" className={labelClass}>Postal Code</label>
+            <input id="postalCode" name="postalCode" type="text" required className={inputClass} value={postalCode} onChange={(e) => setPostalCode(e.target.value)} disabled={processing} />
+          </div>
+          <div className="md:col-span-2">
+            <label htmlFor="country" className={labelClass}>Country</label>
+            <input id="country" name="country" type="text" required className={inputClass} value={country} onChange={(e) => setCountry(e.target.value)} disabled={processing} />
+          </div>
+        </div>
+      </div>
+
+      {/* Payment Details Section */}
+      <h3 className="text-xl font-semibold text-gray-800 mb-4">Payment Information</h3>
+      {/* End of Shipping Details Section */}
+
     <form onSubmit={handleSubmit}>
       <div className="space-y-5">
         <div>
@@ -182,17 +257,20 @@ const CheckoutForm = ({ orderTotal, userName, initialCardName }: { orderTotal: n
         className="w-full mt-8 rounded-lg bg-sky-600 py-3.5 text-base font-semibold text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-slate-50 transition-all duration-200 ease-in-out shadow-md hover:shadow-lg active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
       />
     </form>
+    </> /* Closing fragment */
   );
 };
 
 export default function Checkout() {
+  const navigate = useNavigate();
   const location = useLocation();
 
-  
   // Removed form state for card number, exp, cvc as CardElement handles them
   const [cardHolderName, setCardHolderName] = useState('');
   const [userName, setUserName] = useState<string | null>(null);
+  const [currentCartItems, setCurrentCartItems] = useState<Product[]>([]); 
   const [currentOrderTotal, setCurrentOrderTotal] = useState<number>(0);
+
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -212,11 +290,40 @@ export default function Checkout() {
   }, [cardHolderName]); 
 
   useEffect(() => {
-    const initialTotal = location.state?.orderTotal || 0;
-    setCurrentOrderTotal(initialTotal);
+    // Initialize from location state (passed from cart page or previous step)
+    const {
+      cardName = '',
+      userName: initialUserName = null,
+      cartItems = [], // Expect cartItems from location.state
+      orderTotal = 0,
+    } = location.state || {};
+
+    console.log('Checkout.tsx useEffect - location.state:', location.state); // DEBUG LINE
+    setCardHolderName(cardName);
+    setUserName(initialUserName);
+    setCurrentCartItems(cartItems as Product[]); // Populate cart items
+    setCurrentOrderTotal(orderTotal);
   }, [location.state]);
 
-  
+  const handlePaymentSuccess = useCallback((paymentIntent: PaymentIntent, shippingDetails: ShippingAddressDetails) => {
+    console.log('Payment successful!', paymentIntent);
+    console.log('Checkout.tsx: Navigating to confirmation with items:', currentCartItems); // DEBUG LINE
+    navigate('/order-confirmation', { 
+      state: { 
+        orderId: paymentIntent.id,
+        items: currentCartItems, // Pass the cart items
+        total: currentOrderTotal,
+        paymentDate: new Date().toISOString(),
+        shippingAddress: {
+          name: `${shippingDetails.firstName} ${shippingDetails.lastName}`,
+          address: shippingDetails.addressLine1,
+          city: shippingDetails.city,
+          postalCode: shippingDetails.postalCode,
+          country: shippingDetails.country,
+        },
+      } 
+    });
+  }, [navigate, currentCartItems, currentOrderTotal]);
 
   // If Stripe promise is not loaded or key is missing, show an error or loading state
   if (!stripePromise || stripePromise.toString().includes("pk_test_51RVEeLRsCw1rPgQ1kFV5WKJTolyxv34OHCwa8pYCTBoGKawMpRj4qk0cPW5ELFWW88zlmQO3H383OtlDHs3gIoGR00DOXUfYXH")) {
@@ -250,7 +357,7 @@ export default function Checkout() {
                 Payment Details
               </h2>
 
-              <CheckoutForm orderTotal={currentOrderTotal} userName={userName} initialCardName={cardHolderName} />
+              <CheckoutForm orderTotal={currentOrderTotal} userName={userName} initialCardName={cardHolderName} onPaymentSuccess={handlePaymentSuccess} />
             </div>
 
             {/* Order summary Card */}

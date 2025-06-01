@@ -320,7 +320,7 @@ export default function Cart() {
           </div>
           <NavLink 
             to="/checkout" 
-            state={{ orderTotal: orderTotal }} // Pass the total price in state
+            state={{ orderTotal: orderTotal, cartItems: items }} // Pass total price AND cart items in state
             className="w-full"
           >
             <PrimaryButton
