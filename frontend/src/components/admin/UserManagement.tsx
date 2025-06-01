@@ -67,7 +67,7 @@ export default function UserManagement() {
       Telefono: item.Telefono ?? item.phone ?? '',
       created_at: item.created_at ?? item.createdAt ?? '',
     }));
-  }, [refresh]);
+  });
 
   // 2) Normalizamos la lista de usuarios
   const users: UserRow[] = usersData ?? [];
