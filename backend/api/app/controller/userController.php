@@ -179,4 +179,61 @@ class UserController {
         $users = UserModel::getAll();
         Response::json(['users' => $users]);
     }
+
+    /**
+     * Actualiza el perfil del usuario autenticado.
+     * Espera JSON: { "Nombre": "nuevo valor", "Telefono": "nuevo valor", ... }
+     */
+    public static function updateProfile(): void {
+        if ($_SERVER['REQUEST_METHOD'] !== 'PUT') {
+            Response::json(['error' => 'Método no permitido'], 405);
+            return;
+        }
+
+        session_start();
+        if (empty($_SESSION['user']['ID_Usuario'])) {
+            Response::json(['error' => 'No autenticado'], 401);
+            return;
+        }
+
+        $userId = (int)$_SESSION['user']['ID_Usuario'];
+        $inputData = json_decode(file_get_contents('php://input'), true);
+
+        if (!$inputData) {
+            Response::json(['error' => 'Payload no válido o vacío'], 400);
+            return;
+        }
+
+        $updateData = [];
+        // Sanitizar y validar los datos de entrada
+        // Solo se procesarán los campos permitidos definidos en el modelo o aquí
+        $allowedFieldsFromFrontend = ['Nombre', 'Telefono', 'Direccion']; // Estos son los 'editing' keys de Profile.tsx
+
+        foreach ($allowedFieldsFromFrontend as $field) {
+            if (isset($inputData[$field])) {
+                // Aplicar sanitización específica si es necesario
+                // Por ejemplo, para 'Nombre', 'Telefono', 'Direccion'
+                $updateData[$field] = filter_var($inputData[$field], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            }
+        }
+
+        if (empty($updateData)) {
+            Response::json(['error' => 'No hay datos válidos para actualizar'], 400);
+            return;
+        }
+
+        if (UserModel::update($userId, $updateData)) {
+            // Actualizar la sesión con los nuevos datos
+            foreach ($updateData as $key => $value) {
+                if (array_key_exists($key, $_SESSION['user'])) {
+                    $_SESSION['user'][$key] = $value;
+                }
+            }
+            // Devolver el usuario actualizado completo para consistencia en el frontend
+            $updatedUser = UserModel::findById($userId);
+            Response::json(['success' => true, 'user' => $updatedUser]);
+        } else {
+            Response::json(['error' => 'Error al actualizar el perfil'], 500);
+        }
+    }
 }

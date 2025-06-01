@@ -6,8 +6,6 @@ import {
   ShieldCheck,
   // Loader2, // For loading state - Removed as unused (lint ID: 392a7433-e1c5-4040-bba2-454afd433ee5)
 } from "lucide-react";
-import { FaPaypal } from 'react-icons/fa';
-import clsx from "clsx";
 
 import PrimaryButton from "../components/PrimaryButton";
 
@@ -28,7 +26,7 @@ interface User {
 // Initialize Stripe outside of the component render to avoid
 // recreating the Stripe object on every render.
 // Replace with your actual publishable key
-const stripePromise = loadStripe("YOUR_STRIPE_PUBLISHABLE_KEY");
+const stripePromise = loadStripe("pk_test_51RVEeLRsCw1rPgQ1kFV5WKJTolyxv34OHCwa8pYCTBoGKawMpRj4qk0cPW5ELFWW88zlmQO3H383OtlDHs3gIoGR00DOXUfYXH");
 
 // New CheckoutForm component
 const CheckoutForm = ({ orderTotal, userName, initialCardName }: { orderTotal: number, userName: string | null, initialCardName: string }) => {
@@ -84,10 +82,13 @@ const CheckoutForm = ({ orderTotal, userName, initialCardName }: { orderTotal: n
         }),
       });
 
+      console.log('Response from /api/create-payment-intent:', response);
       const paymentIntentResult = await response.json();
+      console.log('PaymentIntentResult from backend:', paymentIntentResult);
 
       if (!response.ok || paymentIntentResult.error || !paymentIntentResult.clientSecret) {
         setPaymentError(paymentIntentResult.error?.message || 'Failed to initialize payment. Please try again.');
+        console.error('Error initializing payment:', paymentIntentResult.error?.message || 'Response not OK or missing clientSecret.');
         setProcessing(false);
         return;
       }
@@ -176,11 +177,9 @@ const CheckoutForm = ({ orderTotal, userName, initialCardName }: { orderTotal: n
 
       <PrimaryButton
         type="submit"
-        disabled={!stripe || processing || !!paymentSuccess} // Disable if processing or successful
+        disabled={!stripe || processing || !!paymentSuccess} 
         text={processing ? 'Processing...' : (paymentSuccess ? 'Payment Successful!' : 'Pay Securely')}
         className="w-full mt-8 rounded-lg bg-sky-600 py-3.5 text-base font-semibold text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-slate-50 transition-all duration-200 ease-in-out shadow-md hover:shadow-lg active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
-        // Icon and iconClassName props removed temporarily to fix lint error f7409e2f-f514-490f-a2df-0c58886ba268
-        // We can revisit PrimaryButton's icon handling later.
       />
     </form>
   );
@@ -188,12 +187,12 @@ const CheckoutForm = ({ orderTotal, userName, initialCardName }: { orderTotal: n
 
 export default function Checkout() {
   const location = useLocation();
-  const passedOrderTotal = location.state?.orderTotal || 0;
 
-  const [method, setMethod] = useState<'card' | 'paypal'>('card');
+  
   // Removed form state for card number, exp, cvc as CardElement handles them
   const [cardHolderName, setCardHolderName] = useState('');
   const [userName, setUserName] = useState<string | null>(null);
+  const [currentOrderTotal, setCurrentOrderTotal] = useState<number>(0);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -202,7 +201,7 @@ export default function Checkout() {
         const userData: User = JSON.parse(storedUser);
         if (userData && userData.Nombre) {
           setUserName(userData.Nombre);
-          if (!cardHolderName) { // Only pre-fill if cardHolderName is not already set (e.g. by user typing)
+          if (!cardHolderName) { 
             setCardHolderName(userData.Nombre);
           }
         }
@@ -210,19 +209,17 @@ export default function Checkout() {
         console.error("Error parsing user data from localStorage:", error);
       }
     }
-  }, [cardHolderName]); // Depend on cardHolderName to allow user edits to persist
+  }, [cardHolderName]); 
 
-  const orderTotal = passedOrderTotal;
-  const orderSubtotal = orderTotal / 1.21;
+  useEffect(() => {
+    const initialTotal = location.state?.orderTotal || 0;
+    setCurrentOrderTotal(initialTotal);
+  }, [location.state]);
 
-  const paymentOptions = [
-    { id: 'card', label: 'Credit/Debit Card', icon: CreditCard },
-    { id: 'paypal', label: 'PayPal', icon: FaPaypal },
-  ] as const;
+  
 
   // If Stripe promise is not loaded or key is missing, show an error or loading state
-  if (!stripePromise || stripePromise.toString().includes("YOUR_STRIPE_PUBLISHABLE_KEY")) {
-    // Basic check, you might want a more robust way to ensure key is set
+  if (!stripePromise || stripePromise.toString().includes("pk_test_51RVEeLRsCw1rPgQ1kFV5WKJTolyxv34OHCwa8pYCTBoGKawMpRj4qk0cPW5ELFWW88zlmQO3H383OtlDHs3gIoGR00DOXUfYXH")) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-slate-50 text-red-600 p-8">
         Stripe is not configured correctly. Please provide a valid publishable key.
@@ -231,7 +228,7 @@ export default function Checkout() {
   }
 
   return (
-    <Elements stripe={stripePromise}>
+      <Elements stripe={stripePromise}>
       <section className="bg-slate-50 min-h-screen py-12 sm:py-16">
         <div className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <header className="text-center mb-10">
@@ -245,7 +242,7 @@ export default function Checkout() {
             )}
           </header>
 
-          <div className="grid gap-8 lg:grid-cols-2 lg:gap-12"> {/* Removed form tag here, it's in CheckoutForm */}
+          <div className="grid gap-8 lg:grid-cols-2 lg:gap-12"> 
             {/* Payment details Card */}
             <div className="bg-white p-6 sm:p-8 rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300">
               <h2 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
@@ -253,43 +250,11 @@ export default function Checkout() {
                 Payment Details
               </h2>
 
-              {/* Tabs */}
-              <div className="mb-8 flex border-b border-gray-200">
-                {paymentOptions.map((opt) => (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    onClick={() => setMethod(opt.id)}
-                    className={clsx(
-                      'flex items-center gap-2.5 px-4 py-3 text-sm font-medium -mb-px border-b-2 transition-all duration-200 ease-in-out',
-                      method === opt.id
-                        ? 'border-sky-500 text-sky-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
-                    )}
-                  >
-                    <opt.icon className="h-5 w-5" /> {opt.label}
-                  </button>
-                ))}
-              </div>
-
-              {method === 'card' && (
-                <CheckoutForm orderTotal={orderTotal} userName={userName} initialCardName={cardHolderName} />
-              )}
-
-              {method === 'paypal' && (
-                <div className="rounded-md border border-blue-300 bg-blue-50 p-4 text-sm text-blue-700 flex items-start">
-                  <FaPaypal className="h-6 w-6 mr-3 text-blue-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    PayPal integration is not yet implemented in this example.
-                    <br />
-                    You would typically redirect to PayPal or use PayPal's SDK here.
-                  </div>
-                </div>
-              )}
+              <CheckoutForm orderTotal={currentOrderTotal} userName={userName} initialCardName={cardHolderName} />
             </div>
 
             {/* Order summary Card */}
-            <aside className="bg-white p-6 sm:p-8 rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 lg:sticky lg:top-24 self-start">
+            <aside className="bg-white p-6 sm:p-8 rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 self-start">
               <h2 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
                 <ShoppingCart className="w-6 h-6 mr-3 text-sky-600" />
                 Order Summary
@@ -297,31 +262,22 @@ export default function Checkout() {
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal</span>
-                  <span>€ {orderSubtotal.toFixed(2)}</span>
+                  <span>€ {currentOrderTotal > 0 ? (currentOrderTotal / 1.21).toFixed(2) : '0.00'}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>VAT (21%)</span>
-                  <span>€ {(orderSubtotal * 0.21).toFixed(2)}</span>
+                  <span>€ {currentOrderTotal > 0 ? (currentOrderTotal - (currentOrderTotal / 1.21)).toFixed(2) : '0.00'}</span>
                 </div>
                 <hr className="my-3 border-gray-200" />
                 <div className="flex justify-between text-lg font-bold text-gray-800">
                   <span>Total</span>
-                  <span>€ {orderTotal.toFixed(2)}</span>
+                  <span>€ {currentOrderTotal.toFixed(2)}</span>
                 </div>
               </div>
-              {method === 'card' && ( /* Conditionally show Stripe's pay button or a placeholder */
-                <p className="mt-4 text-xs text-gray-500 text-center">
+              <p className="mt-4 text-xs text-gray-500 text-center">
                   <ShieldCheck className="inline w-3.5 h-3.5 mr-1 text-green-600" />
                   All card transactions are secure and encrypted via Stripe.
                 </p>
-              )}
-              {method === 'paypal' && (
-                <PrimaryButton
-                  text={'Continue to PayPal (Not Implemented)'}
-                  disabled={true}
-                  className="w-full mt-8 rounded-lg bg-yellow-500 py-3.5 text-base font-semibold text-white hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-slate-50 transition-all duration-200 ease-in-out shadow-md hover:shadow-lg active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
-                />
-              )}
             </aside>
           </div>
         </div>
