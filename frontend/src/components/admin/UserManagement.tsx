@@ -89,16 +89,17 @@ export default function UserManagement() {
   // 5) Handler para eliminar usuario
   const handleDelete = useCallback((id: number) => {
     if (!window.confirm('¿Estás seguro de querer eliminar este usuario?')) return;
-    fetch('/api/users/delete?route=api/users/delete', {
-      method: 'DELETE', // O "POST" si el backend lo requiere
+    fetch('http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/users/delete', {
+      method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include', // Asegúrate de enviar la cookie de sesión
-      body: JSON.stringify({ id }),
+      credentials: 'include',
+      body: JSON.stringify({ id }), // Aquí se pasa el ID_Usuario
     })
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
           setRefresh((r) => r + 1);
+          window.location.reload();
         } else {
           alert(data.error || 'No se pudo eliminar el usuario');
         }
@@ -106,7 +107,7 @@ export default function UserManagement() {
       .catch(() => {
         alert('Error al eliminar el usuario');
       });
-  }, []);
+  }, [refresh]);
 
   return (
     <Card>
@@ -177,7 +178,7 @@ export default function UserManagement() {
                     </Button>
                     <Button
                       aria-label={`Eliminar usuario ${u.Nombre}`}
-                      onClick={() => handleDelete(u.ID_Usuario)}
+                      onClick={() => handleDelete(u.ID_Usuario)} // Aquí se pasa el ID_Usuario
                       variant="outline"
                       className="ml-2"
                     >

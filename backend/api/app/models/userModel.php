@@ -119,4 +119,20 @@ class UserModel {
             return false;
         }
     }
+
+    /**
+     * Elimina un usuario por su ID.
+     * @param int $id
+     * @return bool True si se eliminó, false si no.
+     */
+    public static function delete(int $id): bool {
+        $pdo = DB::getInstance()->conn();
+        try {
+            $stmt = $pdo->prepare('DELETE FROM usuarios WHERE ID_Usuario = :id');
+            return $stmt->execute(['id' => $id]);
+        } catch (\PDOException $e) {
+            // Opcional: Loggear el error $e->getMessage()
+            return false;
+        }
+    }
 }
