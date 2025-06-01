@@ -184,5 +184,88 @@ class UserController {
      * Actualiza el perfil del usuario autenticado.
      * Espera JSON: { "Nombre": "nuevo valor", "Telefono": "nuevo valor", ... }
      */
-   
+    /**
+     * Actualiza el perfil del usuario autenticado.
+     * Espera JSON: { "Nombre": "nuevo valor", "Telefono": "nuevo valor", "Direccion": "nuevo valor" }
+     */
+    public static function updateProfile(): void {
+        if ($_SERVER['REQUEST_METHOD'] !== 'PUT') {
+            Response::json(['error' => 'Method not allowed for profile update'], 405);
+            return;
+        }
+
+        session_start();
+        if (empty($_SESSION['user']['ID_Usuario'])) {
+            Response::json(['error' => 'Not authenticated'], 401);
+            return;
+        }
+
+        $userId = (int) $_SESSION['user']['ID_Usuario'];
+        $data = json_decode(file_get_contents('php://input'), true);
+
+        if (!$data) {
+            Response::json(['error' => 'Invalid payload'], 400);
+            return;
+        }
+
+        // Fields that can be updated
+        $allowedFields = ['Nombre', 'Telefono', 'Direccion'];
+        $updateData = [];
+        $loggableChanges = [];
+
+        foreach ($allowedFields as $field) {
+            if (isset($data[$field])) {
+                // Sanitize input - adjust sanitization as per field type
+                $sanitizedValue = filter_var(trim($data[$field]), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                if ($field === 'Telefono' && !preg_match('/^[\d\s\+\-()]*$/', $sanitizedValue)) {
+                    Response::json(['error' => 'Invalid phone number format for ' . $field], 400);
+                    return;
+                }
+                if (empty($sanitizedValue) && in_array($field, ['Nombre'])) { // Example: Nombre cannot be empty
+                     Response::json(['error' => $field . ' cannot be empty'], 400);
+                     return;
+                }
+                $updateData[$field] = $sanitizedValue;
+                $loggableChanges[$field] = $sanitizedValue; // For logging or session update
+            }
+        }
+
+        if (empty($updateData)) {
+            Response::json(['error' => 'No data provided for update'], 400);
+            return;
+        }
+
+        $success = UserModel::update($userId, $updateData);
+
+        if ($success) {
+            // Fetch the full updated user profile to return
+            $updatedUser = UserModel::findById($userId);
+            if (!$updatedUser) {
+                 // This should ideally not happen if update was successful and user exists
+                Response::json(['error' => 'Failed to retrieve updated profile, user may have been deleted'], 404);
+                return;
+            }
+
+            // Update session with changed data that is stored in session
+            if (isset($updateData['Nombre'])) {
+                $_SESSION['user']['Nombre'] = $updateData['Nombre'];
+            }
+            // Add other session fields if necessary, e.g., $_SESSION['user']['Email'] if it were updatable and in session
+
+            Response::json([
+                'success' => true,
+                'message' => 'Profile updated successfully.',
+                'user' => [
+                    'ID_Usuario'   => $updatedUser['ID_Usuario'],
+                    'Nombre'       => $updatedUser['Nombre'],
+                    'Correo'       => $updatedUser['Correo'], // Correo is not updatable here, but good to return full profile
+                    'Telefono'     => $updatedUser['Telefono'],
+                    'Direccion'    => $updatedUser['Direccion'],
+                    'Tipo_Usuario' => $updatedUser['Tipo_Usuario'],
+                ]
+            ]);
+        } else {
+            Response::json(['error' => 'Failed to update profile in database'], 500);
+        }
+    }
 }
