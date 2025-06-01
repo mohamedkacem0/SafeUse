@@ -44,10 +44,10 @@ interface UserRow {
 }
 
 export default function UserManagement() {
-  // Estado para refrescar la lista tras eliminar un usuario
+  // 1) Estado para refrescar la lista tras eliminar un usuario
   const [refresh, setRefresh] = useState(0);
 
-  // 1) Traemos la data cruda de la API (el hook se recarga al cambiar "refresh")
+  // 2) Traemos la data cruda de la API (el hook se recarga al cambiar "refresh")
   const {
     data: usersData,
     loading: loadingUsers,
