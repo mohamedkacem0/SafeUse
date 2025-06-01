@@ -2,6 +2,8 @@
 import { createBrowserRouter } from 'react-router-dom';
 import AppLayout from './layouts/AppLayout';
 import * as Pages from './pages';
+import OrderConfirmation from './pages/OrderConfirmation'; // Added import
+import MyOrders from './pages/MyOrders'; // Import the MyOrders page
 
 export const router = createBrowserRouter([
   {
@@ -23,7 +25,8 @@ export const router = createBrowserRouter([
       { path: '/PrivacyPolicy', element: <Pages.PrivacyPolicy /> },
       { path: '/cart', element: <Pages.Cart /> },
       { path: '/Checkout', element: <Pages.Checkout /> },
-      
+      { path: '/order-confirmation', element: <OrderConfirmation /> }, // Added new route
+      { path: '/my-orders', element: <MyOrders /> }, // Route for My Orders page
 
     ],
   },

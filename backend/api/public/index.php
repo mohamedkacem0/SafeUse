@@ -120,9 +120,7 @@ switch ($route) {
             App\Core\Response::json(['error' => 'Método no permitido para /api/profile'], 405);
         }
         break;
-    case 'api/upload-photo':
-        UserController::uploadPhoto();
-        break;
+   
     case 'api/advice':
 
         
