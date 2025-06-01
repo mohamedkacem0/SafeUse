@@ -84,4 +84,39 @@ class UserModel {
         $stmt = $pdo->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    /**
+     * Actualiza los datos de un usuario por ID.
+     * @param int $id
+     * @param array $data Campos a actualizar (ej: ['Nombre' => 'Nuevo Nombre'])
+     * @return bool True si la actualización fue exitosa, false en caso contrario.
+     */
+    public static function update(int $id, array $data): bool {
+        $pdo = DB::getInstance()->conn();
+        
+        $allowedFields = ['Nombre', 'Telefono', 'Direccion']; // Campos que se pueden editar
+        $setClauses = [];
+        $params = ['id' => $id];
+
+        foreach ($data as $key => $value) {
+            if (in_array($key, $allowedFields)) {
+                $setClauses[] = "`$key` = :$key"; // Usar backticks para nombres de columna
+                $params[$key] = $value;
+            }
+        }
+
+        if (empty($setClauses)) {
+            return false; // No hay campos válidos para actualizar o datos vacíos
+        }
+
+        $sql = "UPDATE usuarios SET " . implode(', ', $setClauses) . " WHERE ID_Usuario = :id";
+        
+        try {
+            $stmt = $pdo->prepare($sql);
+            return $stmt->execute($params);
+        } catch (\PDOException $e) {
+            // Opcional: Loggear el error $e->getMessage()
+            return false;
+        }
+    }
 }

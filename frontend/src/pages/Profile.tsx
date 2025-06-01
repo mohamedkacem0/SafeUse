@@ -40,7 +40,7 @@ export default function Profile() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch("/api?route=api/profile", {
+        const res = await fetch("api/profile", {
           method: "GET",
           credentials: "include",
           headers: {
@@ -52,7 +52,7 @@ export default function Profile() {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const userData = await res.json();
         console.log("Datos del perfil recibidos:", userData);
-        setUser(userData);
+        setUser(userData.user);
       } catch (err) {
         console.error("Error al cargar el perfil:", err);
         setError("No se pudieron cargar los datos de perfil. Por favor, inicia sesión nuevamente.");
@@ -129,18 +129,50 @@ export default function Profile() {
     setDraftValue("");
   };
   const saveEdit = async () => {
-    if (!user || !editing) return;
-    const payload: any = { [editing]: draftValue };
-    const res = await fetch("/api/update-profile", {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const { user: updated } = await res.json();
-    setUser(updated);
-    setEditing(null);
+    if (!editing || !user) return;
+
+    const originalUser = { ...user }; // Store original for potential revert
+
+    // Optimistic UI update
+    setUser(prevUser => ({
+      ...prevUser!,
+      [editing]: draftValue,
+    }));
+
+    try {
+      const res = await fetch(`/api/profile`, { 
+        method: "PUT",                        
+        headers: {
+          "Content-Type": "application/json",
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ [editing]: draftValue }),
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ error: `HTTP ${res.status} - ${res.statusText}` }));
+        throw new Error(errorData.error || `Failed to update ${editing}`);
+      }
+      
+      const responseData = await res.json();
+      if (responseData.success && responseData.user) {
+        setUser(responseData.user); // Update user state with fresh data from backend
+        setError(null); // Clear any previous general errors
+      } else {
+        // If backend didn't confirm success or send back user, revert or handle
+        // This case might indicate an issue with the backend response structure
+        throw new Error(responseData.error || 'Update successful but no user data returned.');
+      }
+
+      setEditing(null); // Exit editing mode on success
+    } catch (err: any) {
+      setUser(originalUser); // Revert optimistic update on error
+      setError(`Error updating ${editing}: ${err.message}`);
+      console.error(`Error updating ${editing}:`, err);
+      // Optionally, keep editing mode active for user to retry or cancel
+      // setEditing(null); 
+    }
   };
 
   if (loading) return <div className="p-8 text-center">Cargando perfil…</div>;

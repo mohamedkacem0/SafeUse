@@ -38,6 +38,7 @@ require_once __DIR__ . '/../app/controller/ContactController.php';
 require_once __DIR__ . '/../app/models/CartModel.php';
 require_once __DIR__ . '/../app/controller/CartController.php';
 
+require_once __DIR__ . '/../app/controller/PaymentController.php';
 
 use App\Controllers\UserController;
 use App\Controllers\SubstanceController;
@@ -47,6 +48,9 @@ use App\Controllers\SubstanceDetailController;
 use App\Controllers\AdviceController;
 use App\Controllers\ContactController;
 use App\Controllers\CartController;
+use App\Controller\PaymentController; // Corregido de App\Controllers a App\Controller
+
+use App\Core\Response;
 
 /*
  |---------------------------------------------------------
@@ -105,7 +109,16 @@ switch ($route) {
         UserController::logout();
         break;
 
-    case 'api/profile':  UserController::profile();
+    case 'api/profile':
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            UserController::profile();
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+            UserController::updateProfile();
+        } else {
+            // Use the Response class if available and appropriate, otherwise plain json_encode
+            // Assuming Response class is available as per UserController
+            App\Core\Response::json(['error' => 'Método no permitido para /api/profile'], 405);
+        }
         break;
     case 'api/upload-photo':
         UserController::uploadPhoto();
@@ -120,9 +133,6 @@ switch ($route) {
             AdviceController::index();
         }
         break;
-        case 'api/update-profile':
-            UserController::updateProfile();
-            break;
         
     case 'api/advices':
         AdviceController::index();
@@ -167,7 +177,11 @@ switch ($route) {
             CartController::getCartCount();
             break;
 
+    case 'api/create-payment-intent': // Nueva ruta
+        PaymentController::createPaymentIntent();
+        break;
+
     default:
-        http_response_code(404);
-        echo json_encode(['error' => 'Ruta no encontrada']);
+        Response::json(['error' => 'Route not found'], 404);
+        break;
 }
