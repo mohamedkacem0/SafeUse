@@ -94,13 +94,13 @@ class UserModel {
     public static function update(int $id, array $data): bool {
         $pdo = DB::getInstance()->conn();
         
-        $allowedFields = ['Nombre', 'Telefono', 'Direccion']; // Campos que se pueden editar
+        $allowedFields = ['Nombre', 'Correo', 'Telefono', 'Direccion']; // Ahora incluye Correo
         $setClauses = [];
         $params = ['id' => $id];
 
         foreach ($data as $key => $value) {
             if (in_array($key, $allowedFields)) {
-                $setClauses[] = "`$key` = :$key"; // Usar backticks para nombres de columna
+                $setClauses[] = "`$key` = :$key";
                 $params[$key] = $value;
             }
         }

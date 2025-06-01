@@ -316,5 +316,44 @@ public static function deleteUser(): void {
         Response::json(['error' => 'No se pudo eliminar el usuario'], 500);
     }
 }
+public static function updateUserByAdmin(): void {
+    if ($_SERVER['REQUEST_METHOD'] !== 'PUT') {
+        Response::json(['error' => 'Método no permitido'], 405);
+        return;
+    }
 
+    session_start();
+    if (empty($_SESSION['user']) || ($_SESSION['user']['Tipo_Usuario'] ?? '') !== 'admin') {
+        Response::json(['error' => 'No autorizado'], 403);
+        return;
+    }
+
+    $data = json_decode(file_get_contents('php://input'), true);
+    $id = isset($data['id']) ? (int)$data['id'] : 0;
+    if ($id <= 0) {
+        Response::json(['error' => 'ID inválido'], 400);
+        return;
+    }
+
+    // Campos permitidos
+    $allowedFields = ['Nombre', 'Correo', 'Telefono', 'Direccion'];
+    $updateData = [];
+    foreach ($allowedFields as $field) {
+        if (isset($data[$field])) {
+            $updateData[$field] = filter_var(trim($data[$field]), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        }
+    }
+    if (empty($updateData)) {
+        Response::json(['error' => 'No hay datos para actualizar'], 400);
+        return;
+    }
+
+    $success = UserModel::update($id, $updateData);
+    if ($success) {
+        $updatedUser = UserModel::findById($id);
+        Response::json(['success' => true, 'user' => $updatedUser]);
+    } else {
+        Response::json(['error' => 'No se pudo actualizar el usuario'], 500);
+    }
+}
 }

@@ -1,7 +1,7 @@
 <?php
 header('Access-Control-Allow-Origin: http://localhost:5173');
 header('Access-Control-Allow-Credentials: true');
-header('Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS'); // <-- Asegúrate de que PUT está aquí
 header('Access-Control-Allow-Headers: Content-Type');
 
 
@@ -186,6 +186,10 @@ switch ($route) {
 
     case 'api/create-payment-intent': // Nueva ruta
         PaymentController::createPaymentIntent();
+        break;
+
+    case 'api/users/update':
+        UserController::updateUserByAdmin();
         break;
 
     default:

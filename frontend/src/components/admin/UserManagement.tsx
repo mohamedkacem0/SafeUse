@@ -46,6 +46,9 @@ interface UserRow {
 export default function UserManagement() {
   // 1) Estado para refrescar la lista tras eliminar un usuario
   const [refresh, setRefresh] = useState(0);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editValues, setEditValues] = useState<Partial<UserRow>>({});
+  const [editError, setEditError] = useState<string | null>(null);
 
   // 2) Traemos la data cruda de la API (el hook se recarga al cambiar "refresh")
   const {
@@ -80,11 +83,52 @@ export default function UserManagement() {
     return users.filter((u) => u.Nombre.toLowerCase().includes(term));
   }, [users, filter]);
 
-  // 4) Handler para editar usuario (puedes reemplazar con navegación)
+  // Handler para iniciar edición
   const handleEdit = useCallback((id: number) => {
-    console.log('Editar usuario:', id);
-    // Por ejemplo, redirigir a `/admin/users/${id}/edit`
-  }, []);
+    const user = users.find(u => u.ID_Usuario === id);
+    if (user) {
+      setEditingId(id);
+      setEditValues({
+        Nombre: user.Nombre,
+        Telefono: user.Telefono,
+        Direccion: user.Direccion,
+        Correo: user.Correo, // Añadido para editar el correo
+      });
+      setEditError(null);
+    }
+  }, [users]);
+
+  // Handler para cancelar edición
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setEditValues({});
+    setEditError(null);
+  };
+
+  // Handler para guardar cambios
+  const handleSaveEdit = async () => {
+    if (!editingId) return;
+    try {
+      const res = await fetch(`http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/profile`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(editValues),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setEditingId(null);
+        setEditValues({});
+        setEditError(null);
+        setRefresh(r => r + 1);
+        window.location.reload(); 
+      } else {
+        setEditError(data.error || 'No se pudo actualizar el usuario');
+      }
+    } catch {
+      setEditError('Error al actualizar el usuario');
+    }
+  };
 
   // 5) Handler para eliminar usuario
   const handleDelete = useCallback((id: number) => {
@@ -163,27 +207,70 @@ export default function UserManagement() {
               filteredUsers.map((u) => (
                 <TableRow key={u.ID_Usuario}>
                   <TableCell>{u.ID_Usuario}</TableCell>
-                  <TableCell>{u.Nombre}</TableCell>
-                  <TableCell>{u.Correo}</TableCell>
+                  <TableCell>
+                    {editingId === u.ID_Usuario ? (
+                      <input
+                        value={editValues.Nombre ?? ''}
+                        onChange={e => setEditValues(v => ({ ...v, Nombre: e.target.value }))}
+                        className="border px-2 py-1"
+                      />
+                    ) : u.Nombre}
+                  </TableCell>
+                  <TableCell>
+                    {editingId === u.ID_Usuario ? (
+                      <input
+                        value={editValues.Correo ?? ''}
+                        onChange={e => setEditValues(v => ({ ...v, Correo: e.target.value }))}
+                        className="border px-2 py-1"
+                        type="email"
+                      />
+                    ) : u.Correo}
+                  </TableCell>
                   <TableCell>{u.Tipo_Usuario}</TableCell>
-                  <TableCell>{u.Direccion}</TableCell>
-                  <TableCell>{u.Telefono}</TableCell>
+                  <TableCell>
+                    {editingId === u.ID_Usuario ? (
+                      <input
+                        value={editValues.Direccion ?? ''}
+                        onChange={e => setEditValues(v => ({ ...v, Direccion: e.target.value }))}
+                        className="border px-2 py-1"
+                      />
+                    ) : u.Direccion}
+                  </TableCell>
+                  <TableCell>
+                    {editingId === u.ID_Usuario ? (
+                      <input
+                        value={editValues.Telefono ?? ''}
+                        onChange={e => setEditValues(v => ({ ...v, Telefono: e.target.value }))}
+                        className="border px-2 py-1"
+                      />
+                    ) : u.Telefono}
+                  </TableCell>
                   <TableCell>{formatDate(u.created_at)}</TableCell>
                   <TableCell>
-                    <Button
-                      aria-label={`Editar usuario ${u.Nombre}`}
-                      onClick={() => handleEdit(u.ID_Usuario)}
-                    >
-                      <Edit3 size={16} />
-                    </Button>
-                    <Button
-                      aria-label={`Eliminar usuario ${u.Nombre}`}
-                      onClick={() => handleDelete(u.ID_Usuario)} // Aquí se pasa el ID_Usuario
-                      variant="outline"
-                      className="ml-2"
-                    >
-                      <Trash2 size={16} />
-                    </Button>
+                    {editingId === u.ID_Usuario ? (
+                      <>
+                        <Button onClick={handleSaveEdit} variant="default" className="mr-2">Guardar</Button>
+                        <Button onClick={handleCancelEdit} variant="outline">Cancelar</Button>
+                        {editError && <div className="text-red-500 text-xs">{editError}</div>}
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          aria-label={`Editar usuario ${u.Nombre}`}
+                          onClick={() => handleEdit(u.ID_Usuario)}
+                        >
+                          <Edit3 size={16} />
+                        </Button>
+                        <Button
+                          aria-label={`Eliminar usuario ${u.Nombre}`}
+                          onClick={() => handleDelete(u.ID_Usuario)}
+                          variant="outline"
+                          className="ml-2"
+                        >
+                          <Trash2 size={16} />
+                        </Button>
+                      </>
+                    )}
                   </TableCell>
                 </TableRow>
               ))
