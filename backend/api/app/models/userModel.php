@@ -34,15 +34,15 @@ class UserModel {
             'INSERT INTO usuarios
              (Nombre, Correo, `Contraseña`, Telefono, `Direccion`, Tipo_Usuario)
              VALUES
-             (:nombre, :correo, :contraseña, :telefono, :direccion, :tipo_usuario)'
+             (:nombre, :correo, :hashed_password, :telefono, :direccion, :tipo_usuario)'
         );
         $stmt->execute([
-            'nombre'       => $data['nombre'],
-            'correo'       => $data['correo'],
-            'contraseña'   => $data['contraseña'],
-            'telefono'     => $data['telefono'],
-            'direccion'    => $data['direccion'],
-            'tipo_usuario' => $data['tipo_usuario'],
+            'nombre'          => $data['nombre'],
+            'correo'          => $data['correo'],
+            'hashed_password' => $data['contraseña'], // Key changed, value source is the same
+            'telefono'        => $data['telefono'],
+            'direccion'       => $data['direccion'],
+            'tipo_usuario'    => $data['tipo_usuario'],
         ]);
         return (int)$pdo->lastInsertId();
     }
@@ -55,7 +55,7 @@ class UserModel {
     public static function findById(int $id): ?array {
         $pdo = DB::getInstance()->conn();
         $stmt = $pdo->prepare(
-            'SELECT ID_Usuario, Nombre, Correo, Telefono, `Direccion`, Tipo_Usuario, created_at
+            'SELECT ID_Usuario, Nombre, Correo, `Contraseña`, Telefono, `Direccion`, Tipo_Usuario, created_at
              FROM usuarios
              WHERE ID_Usuario = :id'
         );
@@ -132,6 +132,26 @@ class UserModel {
             return $stmt->execute(['id' => $id]);
         } catch (\PDOException $e) {
             // Opcional: Loggear el error $e->getMessage()
+            return false;
+        }
+    }
+
+    /**
+     * Actualiza la contraseña de un usuario por ID.
+     * @param int $userId
+     * @param string $newPasswordHash
+     * @return bool True si la actualización fue exitosa, false en caso contrario.
+     */
+    public static function updatePassword(int $userId, string $newPasswordHash): bool {
+        $pdo = DB::getInstance()->conn();
+        $sql = "UPDATE usuarios SET `Contraseña` = :password WHERE ID_Usuario = :id";
+        
+        try {
+            $stmt = $pdo->prepare($sql);
+            return $stmt->execute(['password' => $newPasswordHash, 'id' => $userId]);
+        } catch (\PDOException $e) {
+            // Opcional: Loggear el error $e->getMessage()
+            error_log('Error updating password for user ' . $userId . ': ' . $e->getMessage());
             return false;
         }
     }
