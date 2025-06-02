@@ -40,17 +40,26 @@ class SubstanceDetailModel
     {
         $pdo = DB::getInstance()->conn();
         $stmt = $pdo->prepare(
-            'SELECT ID_Sustancia,
-                    descripcion,
-                    metodos_consumo,
-                    efectos_deseados,
-                    composicion,
-                    riesgos,
-                    interaccion_otras_sustancias,
-                    reduccion_riesgos,
-                    legislacion
-             FROM detalles_sustancia
-             WHERE ID_Sustancia = :id'
+            'SELECT 
+                s.ID_Sustancia, 
+                s.Nombre, 
+                s.Imagen, 
+                s.Titulo, 
+                s.Formula, 
+                ds.descripcion, 
+                ds.metodos_consumo, 
+                ds.efectos_deseados, 
+                ds.composicion, 
+                ds.riesgos, 
+                ds.interaccion_otras_sustancias, 
+                ds.reduccion_riesgos, 
+                ds.legislacion
+             FROM 
+                sustancias s
+             LEFT JOIN 
+                detalles_sustancia ds ON s.ID_Sustancia = ds.ID_Sustancia
+             WHERE 
+                s.ID_Sustancia = :id'
         );
         $stmt->execute([':id' => $id]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);

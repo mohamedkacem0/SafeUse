@@ -42,7 +42,12 @@ require_once __DIR__ . '/../app/controller/PaymentController.php';
 require_once __DIR__ . '/../app/models/orderModel.php'; // Added for OrderModel
 require_once __DIR__ . '/../app/controller/orderController.php'; // Added for OrderController
 
+// Admin Substance Management
+require_once __DIR__ . '/../app/models/admin/adminSubstanceModel.php';
+require_once __DIR__ . '/../app/controller/admin/adminSubstanceController.php';
+
 use App\Controllers\UserController;
+use App\Controllers\Admin\AdminSubstanceController;
 use App\Controllers\SubstanceController;
 use App\Controllers\ShopController;
 // Añadido para detalles de sustancia
@@ -222,7 +227,15 @@ switch ($route) {
         UserController::updateUserByAdmin();
         break;
 
+    case 'api/admin/substances/add':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            AdminSubstanceController::addSubstance();
+        } else {
+            App\Core\Response::json(['error' => 'Method not allowed. Use POST for adding substances.'], 405);
+        }
+        break;
+
     default:
-        Response::json(['error' => 'Route not found'], 404);
+        App\Core\Response::json(['error' => 'Ruta no encontrada'], 404);
         break;
 }
