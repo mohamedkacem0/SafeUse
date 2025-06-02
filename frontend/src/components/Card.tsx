@@ -24,7 +24,7 @@ const DrugCard: React.FC<DrugCardProps> = ({
 }) => {
   return (
     <div
-      className="w-[350px] bg-gradient-to-br from-white to-gray-100 rounded-[12px] flex flex-col items-center p-6 gap-4 shadow-lg cursor-pointer transition-all duration-300 ease-out hover:scale-105 hover:shadow-2xl border-t-4 border-t-[#44844D]"
+      className="w-[350px] bg-gradient-to-br from-white to-gray-100 rounded-[12px] flex flex-col items-center p-6 gap-4 shadow-lg cursor-pointer transition-all duration-300 ease-out hover:scale-105 hover:shadow-2xl border-t-4 border-t-[#44844D] hover:border-t-emerald-500"
       onClick={onCardClick}
     >
       <img
