@@ -19,9 +19,7 @@ import {
 } from '../ui/table';
 import { Edit3, Trash2 } from 'lucide-react';
 
-// Función para formatear fechas al estilo "dd/MM/yyyy, hh:mm"
 function formatDate(dateStr: string) {
-  // Se reemplaza el espacio por 'T' para mayor compatibilidad
   const date = new Date(dateStr.replace(' ', 'T'));
   return date.toLocaleString('es-ES', {
     day: '2-digit',
@@ -32,7 +30,6 @@ function formatDate(dateStr: string) {
   });
 }
 
-// Definimos la forma que usará nuestra tabla
 interface UserRow {
   ID_Usuario: number;
   Nombre: string;
@@ -44,13 +41,11 @@ interface UserRow {
 }
 
 export default function UserManagement() {
-  // 1) Estado para refrescar la lista tras eliminar un usuario
   const [refresh, setRefresh] = useState(0);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editValues, setEditValues] = useState<Partial<UserRow>>({});
   const [editError, setEditError] = useState<string | null>(null);
 
-  // 2) Traemos la data cruda de la API (el hook se recarga al cambiar "refresh")
   const {
     data: usersData,
     loading: loadingUsers,
@@ -72,10 +67,8 @@ export default function UserManagement() {
     }));
   });
 
-  // 2) Normalizamos la lista de usuarios
   const users: UserRow[] = usersData ?? [];
 
-  // 3) Estado y lógica de filtro
   const [filter, setFilter] = useState('');
   const filteredUsers = useMemo(() => {
     const term = filter.trim().toLowerCase();
@@ -83,7 +76,6 @@ export default function UserManagement() {
     return users.filter((u) => u.Nombre.toLowerCase().includes(term));
   }, [users, filter]);
 
-  // Handler para iniciar edición
   const handleEdit = useCallback((id: number) => {
     const user = users.find(u => u.ID_Usuario === id);
     if (user) {
@@ -92,29 +84,39 @@ export default function UserManagement() {
         Nombre: user.Nombre,
         Telefono: user.Telefono,
         Direccion: user.Direccion,
-        Correo: user.Correo, // Añadido para editar el correo
+        Correo: user.Correo,
       });
       setEditError(null);
     }
   }, [users]);
 
-  // Handler para cancelar edición
   const handleCancelEdit = () => {
     setEditingId(null);
     setEditValues({});
     setEditError(null);
   };
 
-  // Handler para guardar cambios
   const handleSaveEdit = async () => {
-    if (!editingId) return;
+    if (editingId === null) return;
+
+    const payload = {
+      id: editingId,
+      Nombre: editValues.Nombre ?? '',
+      Correo: editValues.Correo ?? '',
+      Direccion: editValues.Direccion ?? '',
+      Telefono: editValues.Telefono ?? '',
+    };
+
     try {
-      const res = await fetch(`http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/profile`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(editValues),
-      });
+      const res = await fetch(
+        "http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/users/updateUserByAdmin",
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(payload),
+        }
+      );
       const data = await res.json();
       if (data.success) {
         setEditingId(null);
@@ -123,27 +125,29 @@ export default function UserManagement() {
         setRefresh(r => r + 1);
         window.location.reload(); 
       } else {
-        setEditError(data.error || 'No se pudo actualizar el usuario');
+        setEditError(data.error || "No se pudo actualizar el usuario");
       }
     } catch {
-      setEditError('Error al actualizar el usuario');
+      setEditError("Error al actualizar el usuario");
     }
   };
 
-  // 5) Handler para eliminar usuario
   const handleDelete = useCallback((id: number) => {
     if (!window.confirm('¿Estás seguro de querer eliminar este usuario?')) return;
-    fetch('http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/users/delete', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ id }), // Aquí se pasa el ID_Usuario
-    })
+    fetch(
+      'http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/users/delete',
+      {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ id }),
+      }
+    )
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
           setRefresh((r) => r + 1);
-          window.location.reload();
+          window.location.reload(); 
         } else {
           alert(data.error || 'No se pudo eliminar el usuario');
         }
@@ -249,9 +253,15 @@ export default function UserManagement() {
                   <TableCell>
                     {editingId === u.ID_Usuario ? (
                       <>
-                        <Button onClick={handleSaveEdit} variant="default" className="mr-2">Guardar</Button>
-                        <Button onClick={handleCancelEdit} variant="outline">Cancelar</Button>
-                        {editError && <div className="text-red-500 text-xs">{editError}</div>}
+                        <Button onClick={handleSaveEdit} variant="default" className="mr-2">
+                          Guardar
+                        </Button>
+                        <Button onClick={handleCancelEdit} variant="outline">
+                          Cancelar
+                        </Button>
+                        {editError && (
+                          <div className="text-red-500 text-xs">{editError}</div>
+                        )}
                       </>
                     ) : (
                       <>
