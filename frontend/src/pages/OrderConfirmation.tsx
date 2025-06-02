@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import Navbar from '../components/NavigationList'; // Corrected import path
 import Footer from '../components/Footer';
@@ -44,6 +44,56 @@ const OrderConfirmation: React.FC = () => {
 
   console.log('OrderConfirmation.tsx: Received state:', state); // DEBUG LINE
   console.log('OrderConfirmation.tsx: Received items:', state?.items); // DEBUG LINE
+
+  const [isOrderCreationAttempted, setIsOrderCreationAttempted] = useState(false);
+
+  useEffect(() => {
+    const createOrderInBackend = async () => {
+      if (state && state.shippingAddress && !isOrderCreationAttempted) {
+        const { address, city, postalCode } = state.shippingAddress;
+        // The backend expects 'address', 'city', and 'postalCode'
+        // Ensure your LocationState.shippingAddress matches these or adapt as needed.
+        // For example, if state.shippingAddress.address is the full street, use that.
+        // If it's split into street, number, etc., combine them appropriately for 'address'.
+
+        setIsOrderCreationAttempted(true); // Set flag to prevent duplicate calls
+
+        // Assuming state.shippingAddress.address is the street address line
+        const payload = {
+          address: address, // e.g., "123 Main St"
+          city: city,       // e.g., "Anytown"
+          postalCode: postalCode // e.g., "12345"
+        };
+
+        try {
+          const response = await fetch('http://localhost/TFG/SafeUse/backend/api/public/index.php?route=api/order/create', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+            credentials: 'include', // Include if your backend session requires cookies and CORS is configured for it
+          });
+
+          const responseData = await response.json();
+
+          if (response.ok) {
+            console.log('Order created successfully in backend:', responseData);
+            // Optionally, you could update the displayed orderId if the backend returns a new one
+            // or store it, or simply confirm it's done.
+          } else {
+            console.error('Failed to create order in backend:', responseData.error || 'Unknown error');
+            // Handle error, e.g., show a message to the user
+          }
+        } catch (error) {
+          console.error('Error calling create order API:', error);
+          // Handle network error, e.g., show a message to the user
+        }
+      }
+    };
+
+    createOrderInBackend();
+  }, [state]); // Dependency array ensures this runs when state changes (typically once on mount with state)
 
   if (!state) {
     return (

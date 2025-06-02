@@ -14,7 +14,7 @@ export default function LegalTerms() {
     },
     {
       heading: '4. Age Restriction',
-      body: `You must be at least 18 years old (or the age of majority in your jurisdiction) to create an account or submit content. By using the Service, you represent and warrant that you meet this requirement.`,
+      body: `You must be at least 18 years old (or the age of majority in your jurisdiction) to create an account or submit content. By using the Service, you represent and warrant that you meet this requirement.`,
     },
     {
       heading: '5. Prohibited Conduct',
@@ -42,28 +42,39 @@ export default function LegalTerms() {
     },
     {
       heading: '11. Contact',
-      body: `For questions about these Terms, email SafeUse@gmail.com or write to SafeUse — Calle Ficticia 42, 28000 Madrid, Spain.`,
+      body: `For questions about these Terms, email SafeUse@gmail.com or write to SafeUse — Calle Ficticia 42, 28000 Madrid, Spain.`,
     },
   ];
 
   return (
-    <section className="container mx-auto max-w-4xl px-6 py-16 text-neutral-900">
-      <h1 className="mb-10 text-center mt-10 text-4xl font-extrabold lg:text-5xl">
-        Terms of Service
-      </h1>
+    <div className="min-h-screen bg-gray-50 py-8 sm:py-12 mt-10">
+      {/* If you have a global Navbar, it would typically be outside or part of a layout component */}
+      {/* <Navbar /> */}
+      <main className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+        <h1 className="mb-10 text-center mt-6 sm:mt-0 text-3xl sm:text-4xl font-extrabold tracking-tight text-neutral-800 lg:text-5xl">
+          Terms of Service
+        </h1>
 
-      {sections.map((s, i) => (
-        <article key={i} className="mb-8 space-y-4">
-          <h2 className="text-xl font-semibold lg:text-2xl">{s.heading}</h2>
-          <p className="text-sm leading-relaxed lg:text-base">{s.body}</p>
-        </article>
-      ))}
+        <div className="space-y-8">
+          {sections.map((section, index) => (
+            <article 
+              key={index} 
+              className="bg-white p-6 rounded-xl shadow-xl border border-gray-200"
+            >
+              <h2 className="text-xl font-semibold text-neutral-700 lg:text-2xl mb-3">{section.heading}</h2>
+              <p className="text-sm leading-relaxed text-gray-600 lg:text-base whitespace-pre-line">{section.body}</p>
+            </article>
+          ))}
+        </div>
 
-      <div className="mt-16 text-center">
-        <p className="text-xs text-gray-500">
-          Last updated: May 19, 2025
-        </p>
-      </div>
-    </section>
+        <div className="mt-12 md:mt-16 text-center">
+          <p className="text-xs text-gray-500">
+            Last updated: May 19, 2025
+          </p>
+        </div>
+      </main>
+      {/* If you have a global Footer, it would typically be outside or part of a layout component */}
+      {/* <Footer /> */}
+    </div>
   );
 }
