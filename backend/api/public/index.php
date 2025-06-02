@@ -1,248 +1,132 @@
 <?php
-header('Access-Control-Allow-Origin: http://localhost:5173');
+// ----------------------------------------------------------------------------
+// CORS y preflight
+// ----------------------------------------------------------------------------
+header('Access-Control-Allow-Origin: http://localhost:5173'); // <- Cambia al puerto/origen de tu React
 header('Access-Control-Allow-Credentials: true');
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS'); // <-- Asegúrate de que PUT está aquí
-header('Access-Control-Allow-Headers: Content-Type');
-
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
     exit(0);
 }
 
-// Carga manual sin Composer
-require_once __DIR__ . '/../app/core/Config.php';
-require_once __DIR__ . '/../app/core/DB.php';
-require_once __DIR__ . '/../app/core/Response.php';
+// ----------------------------------------------------------------------------
+// Carga manual de dependencias (sin Composer)
+// ----------------------------------------------------------------------------
+require_once __DIR__ . '/../app/core/config.php';
+require_once __DIR__ . '/../app/core/db.php';
+require_once __DIR__ . '/../app/core/response.php';
 
+// Modelos públicos
+require_once __DIR__ . '/../app/models/ContactModel.php';
+require_once __DIR__ . '/../app/models/AdviceModel.php';
+require_once __DIR__ . '/../app/models/cartModel.php';
+require_once __DIR__ . '/../app/models/orderModel.php';
+require_once __DIR__ . '/../app/models/shopModel.php';
 require_once __DIR__ . '/../app/models/SubstanceModel.php';
-require_once __DIR__ . '/../app/controller/substancecontroller.php';
-
-require_once __DIR__ . '/../app/models/ShopModel.php';
-require_once __DIR__ . '/../app/controller/shopcontroller.php';
-
+require_once __DIR__ . '/../app/models/SubstanceDetailModel.php';
 require_once __DIR__ . '/../app/models/userModel.php';
+
+// Controladores públicos
+require_once __DIR__ . '/../app/controller/ContactController.php';
+require_once __DIR__ . '/../app/controller/AdviceController.php';
+require_once __DIR__ . '/../app/controller/cartController.php';
+require_once __DIR__ . '/../app/controller/orderController.php';
+require_once __DIR__ . '/../app/controller/PaymentController.php';
+require_once __DIR__ . '/../app/controller/shopController.php';
+require_once __DIR__ . '/../app/controller/substancecontroller.php';
+require_once __DIR__ . '/../app/controller/SubstanceDetailController.php';
 require_once __DIR__ . '/../app/controller/userController.php';
 
-// Añadido para detalles de sustancia
-require_once __DIR__ . '/../app/models/SubstanceDetailModel.php';
-require_once __DIR__ . '/../app/controller/SubstanceDetailController.php';
-
-// Añadido para consejos de sustancias
-require_once __DIR__ . '/../app/models/AdviceModel.php';
-require_once __DIR__ . '/../app/controller/AdviceController.php';
-
-//contacto
-require_once __DIR__ . '/../app/models/ContactModel.php';
-require_once __DIR__ . '/../app/controller/ContactController.php';
-
-require_once __DIR__ . '/../app/models/CartModel.php';
-require_once __DIR__ . '/../app/controller/CartController.php';
-
-require_once __DIR__ . '/../app/controller/PaymentController.php';
-require_once __DIR__ . '/../app/models/orderModel.php'; // Added for OrderModel
-require_once __DIR__ . '/../app/controller/orderController.php'; // Added for OrderController
-
-// Admin Substance Management
+// Modelos admin
+require_once __DIR__ . '/../app/models/admin/AdminContactModel.php';
 require_once __DIR__ . '/../app/models/admin/adminSubstanceModel.php';
-require_once __DIR__ . '/../app/controller/admin/adminSubstanceController.php';
-
-// Añade los requires para el modelo y controlador de admin user:
 require_once __DIR__ . '/../app/models/admin/adminUserModel.php';
+
+// Controladores admin
+require_once __DIR__ . '/../app/controller/admin/AdminContactController.php';
+require_once __DIR__ . '/../app/controller/admin/adminSubstanceController.php';
 require_once __DIR__ . '/../app/controller/admin/adminUserController.php';
 
-use App\Controllers\UserController;
-use App\Controllers\Admin\AdminSubstanceController;
-use App\Controllers\SubstanceController;
-use App\Controllers\ShopController;
-// Añadido para detalles de sustancia
-use App\Controllers\SubstanceDetailController;
-use App\Controllers\AdviceController;
 use App\Controllers\ContactController;
-use App\Controllers\CartController;
-use App\Controller\PaymentController; // Corregido de App\Controllers a App\Controller
-use App\Controllers\OrderController; // Added for OrderController
-use App\Controllers\Admin\AdminUserController; // Added for AdminUserController
-
+use App\Controllers\Admin\AdminContactController;
+use App\Controllers\Admin\AdminSubstanceController;
+use App\Controllers\Admin\AdminUserController;
 use App\Core\Response;
 
-/*
- |---------------------------------------------------------
- |  Router sencillo:
- |  http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/...
- |---------------------------------------------------------
-*/
+// ----------------------------------------------------------------------------
+// Router sencillo
+// URL base: http://localhost/tfg/SafeUse/backend/api/public/index.php?route=...
+// ----------------------------------------------------------------------------
 $route = $_GET['route'] ?? '';
 
-switch ($route) {
-    case 'api/sustancias':
-        SubstanceController::index();
-        break;
+// Si la ruta viene como “api/admin/contact/123”, la desglosamos en base e id
+if (preg_match('#^api/admin/contact/(\d+)$#', $route, $matches)) {
+    $routeBase = 'api/admin/contact';
+    $routeId   = (int)$matches[1];
+} else {
+    $routeBase = $route;
+    $routeId   = null;
+}
 
-    case 'api/detalles_sustancias':
-        // Lista todos los detalles de sustancias
-        SubstanceDetailController::index();
-        break;
-
-    case 'api/sustancia':
-        // Muestra detalle de una sustancia por ID
-        if (isset($_GET['id'])) {
-            SubstanceDetailController::show((int) $_GET['id']);
-        } else {
-            http_response_code(400);
-            echo json_encode(['error' => 'Falta el parámetro ID']);
-        }
-        break;
-
-    case 'api/productos':
-        ShopController::index();
-        break;
-
-    case 'api/producto':
-        if (isset($_GET['id'])) {
-            ShopController::show((int) $_GET['id']);
-        } else {
-            http_response_code(400);
-            echo json_encode(['error' => 'Falta el parámetro ID']);
-        }
-        break;
-
-        case 'api/users':
-        UserController::users();
-        break;
-
-    case 'api/users/delete':
-        // Solo permite DELETE y espera el id en el body JSON
-        if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-            UserController::deleteUser();
-        } else {
-            Response::json(['error' => 'Método no permitido'], 405);
-        }
-        break;
-
-    case 'api/register':
-        UserController::register();
-        break;
-
-    case 'api/login':
-        UserController::login();
-        break;
-
-    case 'api/logout':
-        UserController::logout();
-        break;
-
-    case 'api/profile':
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            UserController::profile();
-        } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-            UserController::updateProfile();
-        } else {
-            // Use the Response class if available and appropriate, otherwise plain json_encode
-            // Assuming Response class is available as per UserController
-            App\Core\Response::json(['error' => 'Método no permitido para /api/profile'], 405);
-        }
-        break;
-
-    case 'api/change-password':
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            UserController::changePassword();
-        } else {
-            App\Core\Response::json(['error' => 'Method not allowed. Use POST for changing password.'], 405);
-        }
-        break;
-   
-    case 'api/advice':
-
-        
-        // Devuelve consejo individual o lista
-        if (isset($_GET['id'])) {
-            AdviceController::show((int) $_GET['id']);
-        } else {
-            AdviceController::index();
-        }
-        break;
-        
-    case 'api/advices':
-        AdviceController::index();
-        break;
-
-            // … el resto de tu switch …
-
+switch ($routeBase) {
+    // ----------------------------------------
+    // Rutas públicas de “contact”
+    // ----------------------------------------
     case 'api/contact':
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            ContactController::index();
+        }
+        elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            ContactController::store();
+        }
+        else {
+            http_response_code(405);
+            echo json_encode(['error' => 'Método no permitido para /api/contact']);
+        }
+        break;
+
+    // ----------------------------------------
+    // Rutas de ADMIN para “contact”
+    // ----------------------------------------
+    // GET  /api/admin/contact       -> lista todas (index)
+    // PUT  /api/admin/contact/{id}  -> updateChecked
+    // DELETE /api/admin/contact/{id} -> destroy
+    case 'api/admin/contact':
+        // Si vinieron con “/123”, asignamos $_GET['id']
+        if ($routeId) {
+            $_GET['id'] = $routeId;
+        }
+
         switch ($_SERVER['REQUEST_METHOD']) {
             case 'GET':
-                // Lista todas las consultas
-                ContactController::index();
+                AdminContactController::index();
                 break;
 
-            case 'POST':
-                // Crea una nueva y devuelve todo el registro
-                ContactController::store();
+            case 'PUT':
+                AdminContactController::updateChecked();
+                break;
+
+            case 'DELETE':
+                AdminContactController::destroy();
                 break;
 
             default:
                 http_response_code(405);
-                echo json_encode(['error' => 'Method not allowed']);
+                echo json_encode(['error' => 'Método no permitido para /api/admin/contact']);
         }
         break;
 
-    // … sigue el resto de rutas …
-
-
-        case 'api/cart':
-            CartController::index();
-            break;
-        case 'api/cart/add':
-            CartController::add();
-            break;
-        case 'api/cart/update':
-            CartController::update();
-            break;
-        case 'api/cart/remove':
-            CartController::remove();
-            break;
-        case 'api/cart/count': // Nueva ruta para obtener el contador del carrito
-            CartController::getCartCount();
-            break;
-
-    case 'api/create-payment-intent': // Nueva ruta
-        PaymentController::createPaymentIntent();
-        break;
-
-    case 'api/admin/users/addUser': // Ruta para añadir un usuario por parte del admin
-        // Solo permite POST y espera los datos en el body JSON
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            AdminUserController::addUser();
-        } else {
-            App\Core\Response::json(['error' => 'Método no permitido. Use POST para crear usuarios.'], 405);
-        }
-        break;
-
-    case 'api/users/updateUserByAdmin':
-        UserController::updateUserByAdmin();
-        break;
-
-    case 'api/order/create': // Added for creating an order
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            OrderController::create();
-        } else {
-            Response::json(['error' => 'Method not allowed. Use POST for creating orders.'], 405);
-        }
-        break;
-
-    case 'api/orders/history': // Added for fetching user order history
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            OrderController::getUserOrders();
-        } else {
-            Response::json(['error' => 'Method not allowed. Use GET for fetching order history.'], 405);
-        }
-        break;
-
+    // ----------------------------------------
+    // Rutas de admin sustancias (por ejemplo)
+    // ----------------------------------------
     case 'api/admin/substances/add':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             AdminSubstanceController::addSubstance();
         } else {
-            App\Core\Response::json(['error' => 'Method not allowed. Use POST for adding substances.'], 405);
+            Response::json(['error' => 'Método no permitido. Use POST para añadir sustancias.'], 405);
         }
         break;
 
@@ -250,7 +134,7 @@ switch ($route) {
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             AdminSubstanceController::listBasic();
         } else {
-            App\Core\Response::json(['error' => 'Method not allowed. Use GET for listing basic substances.'], 405);
+            Response::json(['error' => 'Método no permitido. Use GET para listar sustancias básicas.'], 405);
         }
         break;
 
@@ -258,7 +142,7 @@ switch ($route) {
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             AdminSubstanceController::listDetails();
         } else {
-            App\Core\Response::json(['error' => 'Method not allowed. Use GET for listing detailed substances.'], 405);
+            Response::json(['error' => 'Método no permitido. Use GET para listar detalles de sustancias.'], 405);
         }
         break;
 
@@ -266,11 +150,115 @@ switch ($route) {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             AdminSubstanceController::updateSubstance();
         } else {
-            App\Core\Response::json(['error' => 'Method not allowed. Use POST for updating substances.'], 405);
+            Response::json(['error' => 'Método no permitido. Use POST para actualizar sustancias.'], 405);
         }
         break;
 
+    // ----------------------------------------
+    // Rutas de admin usuarios
+    // ----------------------------------------
+    case 'api/admin/users/addUser':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            AdminUserController::addUser();
+        } else {
+            Response::json(['error' => 'Método no permitido. Use POST para crear usuarios.'], 405);
+        }
+        break;
+
+    // ----------------------------------------
+    // OTRAS RUTAS PÚBLICAS (ejemplos)
+    // ----------------------------------------
+     case 'api/sustancias':
+         SubstanceController::index();
+         break;
+    
+     case 'api/productos':
+         ShopController::index();
+         break;
+    
+     case 'api/register':
+         UserController::register();
+         break;
+    
+     case 'api/login':
+         UserController::login();
+         break;
+    
+     case 'api/logout':
+         UserController::logout();
+         break;
+    
+     case 'api/profile':
+         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+             UserController::profile();
+         } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+             UserController::updateProfile();
+         } else {
+             Response::json(['error' => 'Método no permitido para /api/profile'], 405);
+         }
+         break;
+    
+     case 'api/change-password':
+         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+             UserController::changePassword();
+         } else {
+             Response::json(['error' => 'Método no permitido. Use POST para cambiar contraseña.'], 405);
+         }
+         break;
+    
+     case 'api/advice':
+         if (isset($_GET['id'])) {
+             AdviceController::show((int) $_GET['id']);
+         } else {
+             AdviceController::index();
+         }
+         break;
+    
+     case 'api/advices':
+         AdviceController::index();
+         break;
+    
+     case 'api/cart':
+         CartController::index();
+         break;
+    
+     case 'api/cart/add':
+         CartController::add();
+         break;
+    
+     case 'api/cart/update':
+         CartController::update();
+         break;
+    
+     case 'api/cart/remove':
+         CartController::remove();
+         break;
+    
+     case 'api/cart/count':
+         CartController::getCartCount();
+         break;
+    
+     case 'api/create-payment-intent':
+         PaymentController::createPaymentIntent();
+         break;
+    
+     case 'api/order/create':
+         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+             OrderController::create();
+         } else {
+             Response::json(['error' => 'Método no permitido. Use POST para crear órdenes.'], 405);
+         }
+         break;
+    
+     case 'api/orders/history':
+         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+             OrderController::getUserOrders();
+         } else {
+             Response::json(['error' => 'Método no permitido. Use GET para historial de órdenes.'], 405);
+         }
+         break;
+
     default:
-        App\Core\Response::json(['error' => 'Ruta no encontrada.'], 404);
+        Response::json(['error' => 'Ruta no encontrada.'], 404);
         break;
 }
