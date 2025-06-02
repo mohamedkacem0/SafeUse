@@ -3,9 +3,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { useFetchData } from '../../pages/admin/useFetchData';
 import {
   Card,
-  CardHeader,
   CardContent,
-  CardTitle,
 } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -55,18 +53,92 @@ interface SubstanceMerged {
   legislacion: string | null;
 }
 
-function formatDate(dateStr: string) {
-  const date = new Date(dateStr);
-  return date.toLocaleString('es-ES', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
-
 export default function SubstancesManagement() {
+  // State for the "Add New Substance" form
+  const [newSubstanceName, setNewSubstanceName] = useState('');
+  const [newSubstanceImage, setNewSubstanceImage] = useState<File | null>(null);
+  const [newSubstanceTitle, setNewSubstanceTitle] = useState('');
+  const [newSubstanceFormula, setNewSubstanceFormula] = useState('');
+  const [descripcion, setDescripcion] = useState('');
+  const [metodosConsumo, setMetodosConsumo] = useState('');
+  const [efectosDeseados, setEfectosDeseados] = useState('');
+  const [composicion, setComposicion] = useState('');
+  const [riesgos, setRiesgos] = useState('');
+  const [interaccionOtrasSustancias, setInteraccionOtrasSustancias] = useState('');
+  const [reduccionRiesgos, setReduccionRiesgos] = useState('');
+  const [legislacion, setLegislacion] = useState('');
+
+  const [isAdding, setIsAdding] = useState(false);
+  const [addError, setAddError] = useState<string | null>(null);
+  const [addSuccess, setAddSuccess] = useState<string | null>(null);
+  const [isFormVisible, setIsFormVisible] = useState(false); // State to control form visibility
+
+  // Function to handle form submission
+  const handleAddSubstance = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setIsAdding(true);
+    setAddError(null);
+    setAddSuccess(null);
+
+    if (!newSubstanceName || !newSubstanceImage || !newSubstanceTitle || !newSubstanceFormula) { // Check if newSubstanceImage is null
+      setAddError('All fields are required.');
+      setIsAdding(false);
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('Nombre', newSubstanceName);
+      formData.append('Titulo', newSubstanceTitle);
+      formData.append('Formula', newSubstanceFormula);
+      if (newSubstanceImage) {
+        formData.append('Imagen', newSubstanceImage);
+      }
+      formData.append('descripcion', descripcion);
+      formData.append('metodos_consumo', metodosConsumo);
+      formData.append('efectos_deseados', efectosDeseados);
+      formData.append('composicion', composicion);
+      formData.append('riesgos', riesgos);
+      formData.append('interaccion_otras_sustancias', interaccionOtrasSustancias);
+      formData.append('reduccion_riesgos', reduccionRiesgos);
+      formData.append('legislacion', legislacion);
+
+      const response = await fetch('/api/admin/substances/add', {
+        method: 'POST',
+        // headers: { 'Content-Type': 'application/json', } // REMOVED: Browser sets it for FormData
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to add substance');
+      }
+
+      setAddSuccess(`Substance "${newSubstanceName}" added successfully! ID: ${result.substanceId}`);
+      // Clear form
+      setNewSubstanceName('');
+      setNewSubstanceImage(null);
+      setNewSubstanceTitle('');
+      setNewSubstanceFormula('');
+      setDescripcion('');
+      setMetodosConsumo('');
+      setEfectosDeseados('');
+      setComposicion('');
+      setRiesgos('');
+      setInteraccionOtrasSustancias('');
+      setReduccionRiesgos('');
+      setLegislacion('');
+      // TODO: Optionally, refresh the substances list here or notify parent for a refetch.
+      setIsFormVisible(false); // Hide the form after successful submission
+      window.location.reload(); // Reload the page to see the new substance in the list
+    } catch (error) {
+      setAddError(error instanceof Error ? error.message : 'An unknown error occurred.');
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
   // 1) Fetch lista básica de sustancias
   const {
     data: basicListData,
@@ -171,7 +243,114 @@ export default function SubstancesManagement() {
     <Card>
       {/* Search bar y título en la misma línea */}
       <CardContent>
-        <div className="flex items-center justify-between mb-4">
+        {/* Button to toggle form visibility */}
+        <div className="mb-4">
+          <Button onClick={() => setIsFormVisible(prev => !prev)} className="mb-4">
+            {isFormVisible ? 'Hide New Substance Form' : 'Add New Substance'}
+          </Button>
+        </div>
+
+        {/* Conditionally rendered "Add New Substance" Form Section */}
+        {isFormVisible && (
+          <div className="mb-6 border-b pb-6">
+        <h3 className="text-lg font-semibold mb-3">Add New Substance</h3>
+        <form onSubmit={handleAddSubstance} className="space-y-4">
+          <div>
+            <label htmlFor="newSubstanceName" className="block text-sm font-medium text-gray-700">Name</label>
+            <Input
+              id="newSubstanceName"
+              type="text"
+              value={newSubstanceName}
+              onChange={(e) => setNewSubstanceName(e.target.value)}
+              placeholder="e.g., Cannabis"
+              required
+              className="mt-1 block w-full"
+            />
+          </div>
+          <div>
+            <label htmlFor="newSubstanceImage" className="block text-sm font-medium text-gray-700">Image File</label>
+            <Input
+              id="newSubstanceImage"
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  setNewSubstanceImage(e.target.files[0]);
+                } else {
+                  setNewSubstanceImage(null);
+                }
+              }}
+              required
+              className="mt-1 block w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+            />
+          </div>
+          <div>
+            <label htmlFor="newSubstanceTitle" className="block text-sm font-medium text-gray-700">Title</label>
+            <Input
+              id="newSubstanceTitle"
+              type="text"
+              value={newSubstanceTitle}
+              onChange={(e) => setNewSubstanceTitle(e.target.value)}
+              placeholder="e.g., Marijuana, Hierba"
+              required
+              className="mt-1 block w-full"
+            />
+          </div>
+          <div>
+            <label htmlFor="newSubstanceFormula" className="block text-sm font-medium text-gray-700">Formula</label>
+            <Input
+              id="newSubstanceFormula"
+              type="text"
+              value={newSubstanceFormula}
+              onChange={(e) => setNewSubstanceFormula(e.target.value)}
+              placeholder="e.g., THC (C₂₁H₃₀O₂)"
+              required
+              className="mt-1 block w-full"
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="descripcion" className="block text-gray-700 text-sm font-bold mb-2">Descripción:</label>
+            <textarea id="descripcion" value={descripcion} onChange={(e) => setDescripcion(e.target.value)} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" rows={3}></textarea>
+          </div>
+          <div className="mb-4">
+            <label htmlFor="metodosConsumo" className="block text-gray-700 text-sm font-bold mb-2">Métodos de Consumo:</label>
+            <textarea id="metodosConsumo" value={metodosConsumo} onChange={(e) => setMetodosConsumo(e.target.value)} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" rows={3}></textarea>
+          </div>
+          <div className="mb-4">
+            <label htmlFor="efectosDeseados" className="block text-gray-700 text-sm font-bold mb-2">Efectos Deseados:</label>
+            <textarea id="efectosDeseados" value={efectosDeseados} onChange={(e) => setEfectosDeseados(e.target.value)} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" rows={3}></textarea>
+          </div>
+          <div className="mb-4">
+            <label htmlFor="composicion" className="block text-gray-700 text-sm font-bold mb-2">Composición:</label>
+            <textarea id="composicion" value={composicion} onChange={(e) => setComposicion(e.target.value)} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" rows={3}></textarea>
+          </div>
+          <div className="mb-4">
+            <label htmlFor="riesgos" className="block text-gray-700 text-sm font-bold mb-2">Riesgos:</label>
+            <textarea id="riesgos" value={riesgos} onChange={(e) => setRiesgos(e.target.value)} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" rows={3}></textarea>
+          </div>
+          <div className="mb-4">
+            <label htmlFor="interaccionOtrasSustancias" className="block text-gray-700 text-sm font-bold mb-2">Interacción con Otras Sustancias:</label>
+            <textarea id="interaccionOtrasSustancias" value={interaccionOtrasSustancias} onChange={(e) => setInteraccionOtrasSustancias(e.target.value)} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" rows={3}></textarea>
+          </div>
+          <div className="mb-4">
+            <label htmlFor="reduccionRiesgos" className="block text-gray-700 text-sm font-bold mb-2">Reducción de Riesgos:</label>
+            <textarea id="reduccionRiesgos" value={reduccionRiesgos} onChange={(e) => setReduccionRiesgos(e.target.value)} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" rows={3}></textarea>
+          </div>
+          <div className="mb-6">
+            <label htmlFor="legislacion" className="block text-gray-700 text-sm font-bold mb-2">Legislación:</label>
+            <textarea id="legislacion" value={legislacion} onChange={(e) => setLegislacion(e.target.value)} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" rows={3}></textarea>
+          </div>
+          <Button type="submit" disabled={isAdding} className="w-full sm:w-auto">
+            {isAdding ? 'Adding...' : 'Add Substance'}
+          </Button>
+          {addSuccess && <p className="text-green-600 mt-2 text-sm">{addSuccess}</p>}
+          {addError && <p className="text-red-600 mt-2 text-sm">{addError}</p>}
+        </form>
+          </div>
+        )} {/* End of isFormVisible conditional rendering */}
+
+      {/* EXISTING: Filter and Table Section */}
+      <div className="flex items-center justify-between mb-4">
           <span className="text-[20px] font-semibold">Substance Management</span>
           <div className="flex items-center space-x-2">
             <Input
