@@ -72,6 +72,7 @@ class ContactModel
               email,
               phone,
               message,
+              checked,
               created_at
             FROM contact_submissions
             ORDER BY created_at DESC
