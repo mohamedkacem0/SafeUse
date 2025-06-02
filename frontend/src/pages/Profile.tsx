@@ -217,10 +217,17 @@ export default function Profile() {
           </>
         ) : (
           <>
-            <span className="text-gray-800">{user[fieldKey] || "Not set"}</span>
-            <button onClick={() => startEdit(fieldKey as EditableField)} title={`Edit ${label}`} className="p-1.5 rounded-md hover:bg-gray-100">
-              <Pencil className="text-gray-500 hover:text-sky-600 cursor-pointer h-4 w-4" />
+            <span className="text-gray-800">{user[fieldKey] || "N/A"}</span>
+          {/* Only show edit button if fieldKey is not 'Correo' */}
+          {fieldKey !== "Correo" && (
+            <button
+              onClick={() => startEdit(fieldKey as EditableField)}
+              className="p-1.5 text-sky-600 hover:text-sky-700 transition-colors"
+              aria-label={`Edit ${label}`}
+            >
+              <Pencil size={18} />
             </button>
+          )}
           </>
         )}
       </div>

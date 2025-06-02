@@ -132,6 +132,14 @@ switch ($route) {
             App\Core\Response::json(['error' => 'Método no permitido para /api/profile'], 405);
         }
         break;
+
+    case 'api/change-password':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            UserController::changePassword();
+        } else {
+            App\Core\Response::json(['error' => 'Method not allowed. Use POST for changing password.'], 405);
+        }
+        break;
    
     case 'api/advice':
 
