@@ -188,7 +188,7 @@ switch ($route) {
         PaymentController::createPaymentIntent();
         break;
 
-    case 'api/users/update':
+    case 'api/users/updateUserByAdmin':
         UserController::updateUserByAdmin();
         break;
 
