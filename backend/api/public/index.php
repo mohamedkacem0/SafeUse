@@ -200,6 +200,8 @@ switch ($route) {
         break;
 
     case 'api/users/updateUserByAdmin':
+         UserController::updateUserByAdmin();
+        break;
     case 'api/order/create': // Added for creating an order
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             OrderController::create();

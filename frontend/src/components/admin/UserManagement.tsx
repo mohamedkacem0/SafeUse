@@ -17,7 +17,7 @@ import {
   TableBody,
   TableCell,
 } from '../ui/table';
-import { Edit3, Trash2 } from 'lucide-react';
+import { Edit3, Trash2, Ban } from 'lucide-react';
 
 function formatDate(dateStr: string) {
   const date = new Date(dateStr.replace(' ', 'T'));
@@ -251,7 +251,12 @@ export default function UserManagement() {
                   </TableCell>
                   <TableCell>{formatDate(u.created_at)}</TableCell>
                   <TableCell>
-                    {editingId === u.ID_Usuario ? (
+                    {u.Tipo_Usuario === 'admin' ? (
+                      // Si es admin, muestra icono de prohibición y tooltip
+                      <span title="No puedes editar ni eliminar un admin">
+                        <Ban size={20} className="text-gray-400 mx-auto" />
+                      </span>
+                    ) : editingId === u.ID_Usuario ? (
                       <>
                         <Button onClick={handleSaveEdit} variant="default" className="mr-2">
                           Guardar
