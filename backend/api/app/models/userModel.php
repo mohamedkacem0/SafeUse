@@ -93,29 +93,36 @@ class UserModel {
      */
     public static function update(int $id, array $data): bool {
         $pdo = DB::getInstance()->conn();
-        
-        $allowedFields = ['Nombre', 'Correo', 'Telefono', 'Direccion']; // Ahora incluye Correo
+
+        $allowedFields = ['Nombre', 'Correo', 'Telefono', 'Direccion', 'Contraseña'];
         $setClauses = [];
         $params = ['id' => $id];
 
         foreach ($data as $key => $value) {
             if (in_array($key, $allowedFields)) {
-                $setClauses[] = "`$key` = :$key";
-                $params[$key] = $value;
+                // Si el campo es Contraseña, usa un alias de parámetro seguro
+                if ($key === 'Contraseña') {
+                    $setClauses[] = "`Contraseña` = :password";
+                    $params['password'] = $value;
+                } else {
+                    $setClauses[] = "`$key` = :$key";
+                    $params[$key] = $value;
+                }
             }
         }
 
         if (empty($setClauses)) {
-            return false; // No hay campos válidos para actualizar o datos vacíos
+            return false;
         }
 
         $sql = "UPDATE usuarios SET " . implode(', ', $setClauses) . " WHERE ID_Usuario = :id";
-        
+
         try {
             $stmt = $pdo->prepare($sql);
             return $stmt->execute($params);
         } catch (\PDOException $e) {
-            // Opcional: Loggear el error $e->getMessage()
+            error_log('Error en update: ' . $e->getMessage());
+            \App\Core\Response::json(['error' => 'DB: ' . $e->getMessage()], 500);
             return false;
         }
     }

@@ -335,14 +335,35 @@ public static function updateUserByAdmin(): void {
         return;
     }
 
+    // Opcional: No permitir que un admin edite a otro admin
+    $targetUser = UserModel::findById($id);
+    if (!$targetUser) {
+        Response::json(['error' => 'Usuario no encontrado'], 404);
+        return;
+    }
+    if ($targetUser['Tipo_Usuario'] === 'admin') {
+        Response::json(['error' => 'No puedes editar a otro admin'], 403);
+        return;
+    }
+
     // Campos permitidos
-    $allowedFields = ['Nombre', 'Correo', 'Telefono', 'Direccion'];
+    $allowedFields = ['Nombre', 'Correo', 'Telefono', 'Direccion', 'Contraseña'];
     $updateData = [];
     foreach ($allowedFields as $field) {
         if (isset($data[$field])) {
             $updateData[$field] = filter_var(trim($data[$field]), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         }
     }
+
+    // Solo actualiza la contraseña si viene y no está vacía
+    if (array_key_exists('password', $data) && !empty($data['password'])) {
+        if (strlen($data['password']) < 8) {
+            Response::json(['error' => 'La nueva contraseña debe tener al menos 8 caracteres.'], 400);
+            return;
+        }
+        $updateData['Contraseña'] = password_hash($data['password'], PASSWORD_DEFAULT);
+    }
+
     if (empty($updateData)) {
         Response::json(['error' => 'No hay datos para actualizar'], 400);
         return;
