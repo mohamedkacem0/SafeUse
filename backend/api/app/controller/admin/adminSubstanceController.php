@@ -141,5 +141,100 @@ class AdminSubstanceController {
         }
     }
 
+    public static function updateSubstance(): void {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::json(['error' => 'Método no permitido. Se esperaba POST.'], 405);
+            return;
+        }
+
+        session_start();
+        if (!isset($_SESSION['user']) || $_SESSION['user']['Tipo_Usuario'] !== 'admin') {
+            Response::json(['error' => 'Acceso no autorizado.'], 403);
+            return;
+        }
+
+        // Validar que los datos necesarios están presentes
+        $requiredFields = ['ID_Sustancia', 'Nombre', 'Titulo', 'Formula'];
+        foreach ($requiredFields as $field) {
+            if (!isset($_POST[$field]) || empty($_POST[$field])) {
+                Response::json(['error' => "El campo '$field' es obligatorio."], 400);
+                return;
+            }
+        }
+        
+        $id = (int)$_POST['ID_Sustancia'];
+        if ($id <= 0) {
+            Response::json(['error' => 'ID de sustancia inválido.'], 400);
+            return;
+        }
+
+        $data = [
+            'Nombre' => $_POST['Nombre'],
+            'Titulo' => $_POST['Titulo'],
+            'Formula' => $_POST['Formula'],
+            'descripcion' => $_POST['descripcion'] ?? null,
+            'metodos_consumo' => $_POST['metodos_consumo'] ?? null,
+            'efectos_deseados' => $_POST['efectos_deseados'] ?? null,
+            'composicion' => $_POST['composicion'] ?? null,
+            'riesgos' => $_POST['riesgos'] ?? null,
+            'interaccion_otras_sustancias' => $_POST['interaccion_otras_sustancias'] ?? null,
+            'reduccion_riesgos' => $_POST['reduccion_riesgos'] ?? null,
+            'legislacion' => $_POST['legislacion'] ?? null,
+        ];
+
+        $imageFile = isset($_FILES['Imagen']) && $_FILES['Imagen']['error'] !== UPLOAD_ERR_NO_FILE ? $_FILES['Imagen'] : null;
+
+        if (AdminSubstanceModel::updateSubstance($id, $data, $imageFile)) {
+            Response::json(['success' => true, 'message' => 'Sustancia actualizada correctamente.'], 200);
+        } else {
+            Response::json(['error' => 'No se pudo actualizar la sustancia.'], 500);
+        }
+    }
+
+    public static function listBasic(): void {
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            Response::json(['error' => 'Método no permitido. Se esperaba GET.'], 405);
+            return;
+        }
+        session_start();
+        if (!isset($_SESSION['user']) || $_SESSION['user']['Tipo_Usuario'] !== 'admin') {
+            Response::json(['error' => 'Acceso no autorizado.'], 403);
+            return;
+        }
+
+        $substances = AdminSubstanceModel::getAllBasic();
+        if ($substances !== false) {
+            $prefixToRemove = 'uploads/sustancias/';
+            foreach ($substances as &$substance) {
+                if (isset($substance['Imagen']) && strpos($substance['Imagen'], $prefixToRemove) === 0) {
+                    $substance['Imagen'] = substr($substance['Imagen'], strlen($prefixToRemove));
+                }
+            }
+            unset($substance); // Romper la referencia del último elemento
+            Response::json($substances, 200);
+        } else {
+            Response::json(['error' => 'No se pudieron obtener las sustancias básicas.'], 500);
+        }
+    }
+
+    public static function listDetails(): void {
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            Response::json(['error' => 'Método no permitido. Se esperaba GET.'], 405);
+            return;
+        }
+        session_start();
+        if (!isset($_SESSION['user']) || $_SESSION['user']['Tipo_Usuario'] !== 'admin') {
+            Response::json(['error' => 'Acceso no autorizado.'], 403);
+            return;
+        }
+
+        $details = AdminSubstanceModel::getAllDetails();
+        if ($details !== false) {
+            Response::json($details, 200);
+        } else {
+            Response::json(['error' => 'No se pudieron obtener los detalles de las sustancias.'], 500);
+        }
+    }
+
     // Aquí se podrían añadir otros métodos para el CRUD de sustancias (updateSubstance, deleteSubstance, getAllSubstancesAdmin, etc.)
 }

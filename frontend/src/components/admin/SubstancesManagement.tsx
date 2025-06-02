@@ -54,6 +54,7 @@ interface SubstanceMerged {
 }
 
 export default function SubstancesManagement() {
+  const [editingSubstance, setEditingSubstance] = useState<SubstanceMerged | null>(null);
   // State for the "Add New Substance" form
   const [newSubstanceName, setNewSubstanceName] = useState('');
   const [newSubstanceImage, setNewSubstanceImage] = useState<File | null>(null);
@@ -73,15 +74,53 @@ export default function SubstancesManagement() {
   const [addSuccess, setAddSuccess] = useState<string | null>(null);
   const [isFormVisible, setIsFormVisible] = useState(false); // State to control form visibility
 
-  // Function to handle form submission
-  const handleAddSubstance = async (event: React.FormEvent) => {
+  const resetFormFields = useCallback(() => {
+    setNewSubstanceName('');
+    setNewSubstanceImage(null);
+    const fileInput = document.getElementById('newSubstanceImage') as HTMLInputElement;
+    if (fileInput) fileInput.value = ''; // Reset file input
+    setNewSubstanceTitle('');
+    setNewSubstanceFormula('');
+    setDescripcion('');
+    setMetodosConsumo('');
+    setEfectosDeseados('');
+    setComposicion('');
+    setRiesgos('');
+    setInteraccionOtrasSustancias('');
+    setReduccionRiesgos('');
+    setLegislacion('');
+    setAddError(null);
+    setAddSuccess(null);
+  }, []);
+
+  const handleShowAddForm = () => {
+    setEditingSubstance(null); // Ensure not in editing mode
+    resetFormFields();
+    setIsFormVisible(true);
+  };
+
+  const handleCancelForm = () => {
+    setIsFormVisible(false);
+    resetFormFields();
+    setEditingSubstance(null);
+  };
+
+  // Function to handle form submission (for both Add and Update)
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setIsAdding(true);
     setAddError(null);
     setAddSuccess(null);
 
-    if (!newSubstanceName || !newSubstanceImage || !newSubstanceTitle || !newSubstanceFormula) { // Check if newSubstanceImage is null
-      setAddError('All fields are required.');
+    // Validation for required fields
+    if (!newSubstanceName || !newSubstanceTitle || !newSubstanceFormula) {
+      setAddError('Name, Title, and Formula are required.');
+      setIsAdding(false);
+      return;
+    }
+    // Image is required only for new substances, not for updates
+    if (!editingSubstance && !newSubstanceImage) {
+      setAddError('Image is required for new substances.');
       setIsAdding(false);
       return;
     }
@@ -91,9 +130,15 @@ export default function SubstancesManagement() {
       formData.append('Nombre', newSubstanceName);
       formData.append('Titulo', newSubstanceTitle);
       formData.append('Formula', newSubstanceFormula);
+      
       if (newSubstanceImage) {
         formData.append('Imagen', newSubstanceImage);
       }
+      // For updates, include ID_Sustancia
+      if (editingSubstance) {
+        formData.append('ID_Sustancia', editingSubstance.ID_Sustancia.toString());
+      }
+
       formData.append('descripcion', descripcion);
       formData.append('metodos_consumo', metodosConsumo);
       formData.append('efectos_deseados', efectosDeseados);
@@ -103,7 +148,8 @@ export default function SubstancesManagement() {
       formData.append('reduccion_riesgos', reduccionRiesgos);
       formData.append('legislacion', legislacion);
 
-      const response = await fetch('/api/admin/substances/add', {
+      const endpoint = editingSubstance ? '/api/admin/substances/update' : '/api/admin/substances/add';
+      const response = await fetch(endpoint, {
         method: 'POST',
         // headers: { 'Content-Type': 'application/json', } // REMOVED: Browser sets it for FormData
         body: formData,
@@ -112,26 +158,14 @@ export default function SubstancesManagement() {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || 'Failed to add substance');
+        throw new Error(result.error || `Failed to ${editingSubstance ? 'update' : 'add'} substance`);
       }
 
-      setAddSuccess(`Substance "${newSubstanceName}" added successfully! ID: ${result.substanceId}`);
-      // Clear form
-      setNewSubstanceName('');
-      setNewSubstanceImage(null);
-      setNewSubstanceTitle('');
-      setNewSubstanceFormula('');
-      setDescripcion('');
-      setMetodosConsumo('');
-      setEfectosDeseados('');
-      setComposicion('');
-      setRiesgos('');
-      setInteraccionOtrasSustancias('');
-      setReduccionRiesgos('');
-      setLegislacion('');
-      // TODO: Optionally, refresh the substances list here or notify parent for a refetch.
+      setAddSuccess(`Substance "${newSubstanceName}" ${editingSubstance ? 'updated' : 'added'} successfully! ${result.substanceId ? `ID: ${result.substanceId}` : ''}`);
+      resetFormFields();
       setIsFormVisible(false); // Hide the form after successful submission
-      window.location.reload(); // Reload the page to see the new substance in the list
+      if (editingSubstance) setEditingSubstance(null); // Clear editing state
+      window.location.reload(); // Reload the page to see changes
     } catch (error) {
       setAddError(error instanceof Error ? error.message : 'An unknown error occurred.');
     } finally {
@@ -235,9 +269,34 @@ export default function SubstancesManagement() {
     );
   }, [mergedSubstances, filter]);
 
-  const handleEdit = useCallback((id: number) => {
-    console.log('Editar sustancia:', id);
-  }, []);
+  const handleEditClick = useCallback((id: number) => {
+    const substanceToEdit = mergedSubstances.find(s => s.ID_Sustancia === id);
+    if (substanceToEdit) {
+      setEditingSubstance(substanceToEdit);
+      setNewSubstanceName(substanceToEdit.Nombre);
+      setNewSubstanceTitle(substanceToEdit.Titulo);
+      setNewSubstanceFormula(substanceToEdit.Formula);
+      setNewSubstanceImage(null); // Clear previous image selection for new upload
+      const fileInput = document.getElementById('newSubstanceImage') as HTMLInputElement;
+      if (fileInput) fileInput.value = ''; // Reset file input
+      
+      setDescripcion(substanceToEdit.descripcion || '');
+      setMetodosConsumo(substanceToEdit.metodos_consumo || '');
+      setEfectosDeseados(substanceToEdit.efectos_deseados || '');
+      setComposicion(substanceToEdit.composicion || '');
+      setRiesgos(substanceToEdit.riesgos || '');
+      setInteraccionOtrasSustancias(substanceToEdit.interaccion_otras_sustancias || '');
+      setReduccionRiesgos(substanceToEdit.reduccion_riesgos || '');
+      setLegislacion(substanceToEdit.legislacion || '');
+      
+      setIsFormVisible(true);
+      setAddError(null);
+      setAddSuccess(null);
+    } else {
+      console.error('Substance not found for editing:', id);
+      setAddError('Could not find the substance to edit.');
+    }
+  }, [mergedSubstances, resetFormFields]);
 
   return (
     <Card>
@@ -245,16 +304,18 @@ export default function SubstancesManagement() {
       <CardContent>
         {/* Button to toggle form visibility */}
         <div className="mb-4">
-          <Button onClick={() => setIsFormVisible(prev => !prev)} className="mb-4">
-            {isFormVisible ? 'Hide New Substance Form' : 'Add New Substance'}
-          </Button>
+          {!isFormVisible && (
+            <Button onClick={handleShowAddForm} className="mb-4">
+              Add New Substance
+            </Button>
+          )}
         </div>
 
         {/* Conditionally rendered "Add New Substance" Form Section */}
         {isFormVisible && (
           <div className="mb-6 border-b pb-6">
-        <h3 className="text-lg font-semibold mb-3">Add New Substance</h3>
-        <form onSubmit={handleAddSubstance} className="space-y-4">
+        <h3 className="text-lg font-semibold mb-3">{editingSubstance ? `Edit Substance: ${editingSubstance.Nombre}` : 'Add New Substance'}</h3>
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="newSubstanceName" className="block text-sm font-medium text-gray-700">Name</label>
             <Input
@@ -280,9 +341,16 @@ export default function SubstancesManagement() {
                   setNewSubstanceImage(null);
                 }
               }}
-              required
+              required={!editingSubstance} // Image is required only if not editing
               className="mt-1 block w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
             />
+            {newSubstanceImage && <img src={URL.createObjectURL(newSubstanceImage)} alt="New Preview" className="mt-2 h-24 w-24 object-cover rounded-md shadow" />}
+            {editingSubstance && !newSubstanceImage && editingSubstance.Imagen && (
+              <div className="mt-2">
+                <p className="text-sm text-gray-600 mb-1">Current Image:</p>
+                <img src={`/api/uploads/${editingSubstance.Imagen}`} alt={editingSubstance.Nombre} className="h-24 w-24 object-cover rounded-md shadow" />
+              </div>
+            )}
           </div>
           <div>
             <label htmlFor="newSubstanceTitle" className="block text-sm font-medium text-gray-700">Title</label>
@@ -340,9 +408,12 @@ export default function SubstancesManagement() {
             <label htmlFor="legislacion" className="block text-gray-700 text-sm font-bold mb-2">Legislación:</label>
             <textarea id="legislacion" value={legislacion} onChange={(e) => setLegislacion(e.target.value)} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" rows={3}></textarea>
           </div>
-          <Button type="submit" disabled={isAdding} className="w-full sm:w-auto">
-            {isAdding ? 'Adding...' : 'Add Substance'}
-          </Button>
+          <div className="flex items-center justify-between pt-4">
+            <Button type="button" variant="outline" onClick={handleCancelForm}>Cancel</Button>
+            <Button type="submit" disabled={isAdding} className={`w-full sm:w-auto ${isAdding ? 'bg-gray-400' : (editingSubstance ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700')}`}>
+              {isAdding ? (editingSubstance ? 'Saving...' : 'Adding...') : (editingSubstance ? 'Save Changes' : 'Add Substance')}
+            </Button>
+          </div>
           {addSuccess && <p className="text-green-600 mt-2 text-sm">{addSuccess}</p>}
           {addError && <p className="text-red-600 mt-2 text-sm">{addError}</p>}
         </form>
@@ -431,7 +502,7 @@ export default function SubstancesManagement() {
                     <TableCell className="whitespace-nowrap">
                       <Button
                         aria-label={`Editar sustancia ${s.Nombre}`}
-                        onClick={() => handleEdit(s.ID_Sustancia)}
+                        onClick={() => handleEditClick(s.ID_Sustancia)}
                       >
                         <Edit3 size={16} />
                       </Button>
