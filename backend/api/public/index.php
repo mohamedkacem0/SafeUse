@@ -46,6 +46,10 @@ require_once __DIR__ . '/../app/controller/orderController.php'; // Added for Or
 require_once __DIR__ . '/../app/models/admin/adminSubstanceModel.php';
 require_once __DIR__ . '/../app/controller/admin/adminSubstanceController.php';
 
+// Añade los requires para el modelo y controlador de admin user:
+require_once __DIR__ . '/../app/models/admin/adminUserModel.php';
+require_once __DIR__ . '/../app/controller/admin/adminUserController.php';
+
 use App\Controllers\UserController;
 use App\Controllers\Admin\AdminSubstanceController;
 use App\Controllers\SubstanceController;
@@ -57,6 +61,7 @@ use App\Controllers\ContactController;
 use App\Controllers\CartController;
 use App\Controller\PaymentController; // Corregido de App\Controllers a App\Controller
 use App\Controllers\OrderController; // Added for OrderController
+use App\Controllers\Admin\AdminUserController; // Added for AdminUserController
 
 use App\Core\Response;
 
@@ -204,9 +209,19 @@ switch ($route) {
         PaymentController::createPaymentIntent();
         break;
 
-    case 'api/users/updateUserByAdmin':
-         UserController::updateUserByAdmin();
+    case 'api/admin/users/addUser': // Ruta para añadir un usuario por parte del admin
+        // Solo permite POST y espera los datos en el body JSON
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            AdminUserController::addUser();
+        } else {
+            App\Core\Response::json(['error' => 'Método no permitido. Use POST para crear usuarios.'], 405);
+        }
         break;
+
+    case 'api/users/updateUserByAdmin':
+        UserController::updateUserByAdmin();
+        break;
+
     case 'api/order/create': // Added for creating an order
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             OrderController::create();
@@ -221,10 +236,6 @@ switch ($route) {
         } else {
             Response::json(['error' => 'Method not allowed. Use GET for fetching order history.'], 405);
         }
-        break;
-
-    case 'api/users/update':
-        UserController::updateUserByAdmin();
         break;
 
     case 'api/admin/substances/add':
