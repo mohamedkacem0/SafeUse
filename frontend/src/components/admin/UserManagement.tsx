@@ -47,6 +47,10 @@ export default function UserManagement() {
   const [editValues, setEditValues] = useState<Partial<UserRow & { password?: string }>>({});
   const [editError, setEditError] = useState<string | null>(null);
   const [resetError, setResetError] = useState<string | null>(null);
+  const [addUserValues, setAddUserValues] = useState<Partial<UserRow & { password?: string }>>({});
+  const [addUserLoading, setAddUserLoading] = useState(false);
+  const [addUserError, setAddUserError] = useState<string | null>(null);
+  const [addUserSuccess, setAddUserSuccess] = useState<string | null>(null);
 
   const {
     data: usersData,
@@ -165,6 +169,58 @@ export default function UserManagement() {
       });
   }, [refresh]);
 
+  const handleAddUser = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setAddUserError(null);
+    setAddUserSuccess(null);
+
+    // Validación básica
+    if (
+      !addUserValues.Nombre ||
+      !addUserValues.Correo ||
+      !addUserValues.password 
+    ) {
+      setAddUserError('Todos los campos obligatorios deben estar completos.');
+      return;
+    }
+
+    setAddUserLoading(true);
+
+    try {
+      const res = await fetch(
+  'http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/admin/users/addUser',
+  {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({
+      Nombre: addUserValues.Nombre,
+      Correo: addUserValues.Correo,
+      password: addUserValues.password,      // coincide con la clave que espera el controlador
+      // NO hace falta enviar Tipo_Usuario, pero si lo envías, el backend lo ignora
+      // Tipo_Usuario: "usuario",
+      Direccion: addUserValues.Direccion ?? '',
+      Telefono: addUserValues.Telefono ?? '',
+    }),
+  }
+);
+
+      const data = await res.json();
+      if (data.success) {
+        setAddUserSuccess('Usuario creado correctamente');
+        setAddUserValues({});
+        setRefresh(r => r + 1);
+        window.location.reload(); 
+      } else {
+        setAddUserError(data.error || 'No se pudo crear el usuario');
+      }
+    } catch {
+      setAddUserError('Error al crear el usuario');
+    } finally {
+      setAddUserLoading(false);
+    }
+  };
+
   return (
     <Card>
       <CardHeader className="flex items-center justify-between">
@@ -182,6 +238,56 @@ export default function UserManagement() {
       </CardHeader>
 
       <CardContent>
+        <form onSubmit={handleAddUser} className="mb-6 flex flex-wrap gap-2 items-end bg-gray-50 p-4 rounded">
+          <Input
+            placeholder="Nombre"
+            value={addUserValues.Nombre ?? ''}
+            onChange={e => setAddUserValues(v => ({ ...v, Nombre: e.target.value }))}
+            required
+            className="w-40"
+          />
+          <Input
+            placeholder="Correo"
+            type="email"
+            value={addUserValues.Correo ?? ''}
+            onChange={e => setAddUserValues(v => ({ ...v, Correo: e.target.value }))}
+            required
+            className="w-40"
+          />
+          <Input
+            placeholder="Contraseña"
+            type="password"
+            value={addUserValues.password ?? ''}
+            onChange={e => setAddUserValues(v => ({ ...v, password: e.target.value }))}
+            required
+            className="w-40"
+          />
+          {/* Rol fijo */}
+          <Input
+            placeholder="Rol"
+            value="usuario"
+            disabled
+            className="w-32 bg-gray-100 text-gray-500"
+          />
+          <Input
+            placeholder="Dirección"
+            value={addUserValues.Direccion ?? ''}
+            onChange={e => setAddUserValues(v => ({ ...v, Direccion: e.target.value }))}
+            className="w-40"
+          />
+          <Input
+            placeholder="Teléfono"
+            value={addUserValues.Telefono ?? ''}
+            onChange={e => setAddUserValues(v => ({ ...v, Telefono: e.target.value }))}
+            className="w-32"
+          />
+          <Button type="submit" disabled={addUserLoading}>
+            {addUserLoading ? 'Creando...' : 'Crear usuario'}
+          </Button>
+          {addUserError && <span className="text-red-500 ml-4">{addUserError}</span>}
+          {addUserSuccess && <span className="text-green-600 ml-4">{addUserSuccess}</span>}
+        </form>
+
         <Table>
           <TableHeader>
             <TableRow>
