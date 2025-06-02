@@ -356,4 +356,63 @@ public static function updateUserByAdmin(): void {
         Response::json(['error' => 'No se pudo actualizar el usuario'], 500);
     }
 }
+
+/**
+ * Cambia la contraseña del usuario autenticado.
+ * Espera JSON: { currentPassword, newPassword }
+ */
+public static function changePassword(): void {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        Response::json(['error' => 'Method not allowed'], 405);
+        return;
+    }
+
+    session_start();
+    if (empty($_SESSION['user']['ID_Usuario'])) {
+        Response::json(['error' => 'Not authenticated'], 401);
+        return;
+    }
+
+    $data = json_decode(file_get_contents('php://input'), true);
+    if (!$data || !isset($data['currentPassword']) || !isset($data['newPassword'])) {
+        Response::json(['error' => 'Invalid payload. Missing currentPassword or newPassword.'], 400);
+        return;
+    }
+
+    $userId = (int)$_SESSION['user']['ID_Usuario'];
+    $currentPassword = $data['currentPassword'];
+    $newPassword = $data['newPassword'];
+
+    if (empty($currentPassword) || empty($newPassword)) {
+        Response::json(['error' => 'Current password and new password cannot be empty.'], 400);
+        return;
+    }
+
+    // Validar longitud de la nueva contraseña (ejemplo: mínimo 8 caracteres)
+    if (strlen($newPassword) < 8) {
+        Response::json(['error' => 'New password must be at least 8 characters long.'], 400);
+        return;
+    }
+
+    $user = UserModel::findById($userId);
+    if (!$user) {
+        Response::json(['error' => 'User not found.'], 404); // Should not happen if session is valid
+        return;
+    }
+
+    if (!password_verify($currentPassword, $user['Contraseña'])) {
+        Response::json(['error' => 'Current password does not match.'], 401);
+        return;
+    }
+
+    // Hashear la nueva contraseña
+    $newPasswordHash = password_hash($newPassword, PASSWORD_DEFAULT);
+
+    // Actualizar la contraseña en la base de datos
+    if (UserModel::updatePassword($userId, $newPasswordHash)) {
+        Response::json(['success' => true, 'message' => 'Password updated successfully.']);
+    } else {
+        Response::json(['error' => 'Failed to update password in database.'], 500);
+    }
+}
 }
