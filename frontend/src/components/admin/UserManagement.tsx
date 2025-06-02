@@ -38,13 +38,15 @@ interface UserRow {
   Direccion: string;
   Telefono: string;
   created_at: string;
+  password?: string; // <-- Añadido para el hash bcrypt
 }
 
 export default function UserManagement() {
   const [refresh, setRefresh] = useState(0);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [editValues, setEditValues] = useState<Partial<UserRow>>({});
+  const [editValues, setEditValues] = useState<Partial<UserRow & { password?: string }>>({});
   const [editError, setEditError] = useState<string | null>(null);
+  const [resetError, setResetError] = useState<string | null>(null);
 
   const {
     data: usersData,
@@ -64,6 +66,7 @@ export default function UserManagement() {
       Direccion: item.Direccion ?? item.address ?? '',
       Telefono: item.Telefono ?? item.phone ?? '',
       created_at: item.created_at ?? item.createdAt ?? '',
+      password: item.password ?? '', // <-- Añadido
     }));
   });
 
@@ -85,6 +88,7 @@ export default function UserManagement() {
         Telefono: user.Telefono,
         Direccion: user.Direccion,
         Correo: user.Correo,
+        password: '', // <-- Añadido para el input de nueva contraseña
       });
       setEditError(null);
     }
@@ -99,13 +103,16 @@ export default function UserManagement() {
   const handleSaveEdit = async () => {
     if (editingId === null) return;
 
-    const payload = {
+    const payload: any = {
       id: editingId,
       Nombre: editValues.Nombre ?? '',
       Correo: editValues.Correo ?? '',
       Direccion: editValues.Direccion ?? '',
       Telefono: editValues.Telefono ?? '',
     };
+    if (editValues.password && editValues.password.trim()) {
+      payload.password = editValues.password;
+    }
 
     try {
       const res = await fetch(
@@ -122,8 +129,9 @@ export default function UserManagement() {
         setEditingId(null);
         setEditValues({});
         setEditError(null);
+        setResetError(null);
         setRefresh(r => r + 1);
-        window.location.reload(); 
+        window.location.reload();
       } else {
         setEditError(data.error || "No se pudo actualizar el usuario");
       }
@@ -183,27 +191,27 @@ export default function UserManagement() {
               <TableHead scope="col">Role</TableHead>
               <TableHead scope="col">Direccion</TableHead>
               <TableHead scope="col">Telefono</TableHead>
+              <TableHead scope="col">Password</TableHead> {/* Nueva columna */}
               <TableHead scope="col">Created At</TableHead>
               <TableHead scope="col">Actions</TableHead>
             </TableRow>
           </TableHeader>
-
           <TableBody>
             {loadingUsers ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-4">
+                <TableCell colSpan={9} className="text-center py-4">
                   Loading...
                 </TableCell>
               </TableRow>
             ) : usersError ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center text-red-500 py-4">
+                <TableCell colSpan={9} className="text-center text-red-500 py-4">
                   Error loading users
                 </TableCell>
               </TableRow>
             ) : filteredUsers.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-4">
+                <TableCell colSpan={9} className="text-center py-4">
                   No users found
                 </TableCell>
               </TableRow>
@@ -218,7 +226,7 @@ export default function UserManagement() {
                         onChange={e => setEditValues(v => ({ ...v, Nombre: e.target.value }))}
                         className="border px-2 py-1"
                       />
-                    ) : u.Nombre}
+                    ) : u.Nombre?.trim() ? u.Nombre : <span className="text-gray-400 italic">No name</span>}
                   </TableCell>
                   <TableCell>
                     {editingId === u.ID_Usuario ? (
@@ -228,9 +236,11 @@ export default function UserManagement() {
                         className="border px-2 py-1"
                         type="email"
                       />
-                    ) : u.Correo}
+                    ) : u.Correo?.trim() ? u.Correo : <span className="text-gray-400 italic">No mail</span>}
                   </TableCell>
-                  <TableCell>{u.Tipo_Usuario}</TableCell>
+                  <TableCell>
+                    {u.Tipo_Usuario?.trim() ? u.Tipo_Usuario : <span className="text-gray-400 italic">No rol</span>}
+                  </TableCell>
                   <TableCell>
                     {editingId === u.ID_Usuario ? (
                       <input
@@ -238,7 +248,7 @@ export default function UserManagement() {
                         onChange={e => setEditValues(v => ({ ...v, Direccion: e.target.value }))}
                         className="border px-2 py-1"
                       />
-                    ) : u.Direccion}
+                    ) : u.Direccion?.trim() ? u.Direccion : <span className="text-gray-400 italic">No address</span>}
                   </TableCell>
                   <TableCell>
                     {editingId === u.ID_Usuario ? (
@@ -247,12 +257,28 @@ export default function UserManagement() {
                         onChange={e => setEditValues(v => ({ ...v, Telefono: e.target.value }))}
                         className="border px-2 py-1"
                       />
-                    ) : u.Telefono}
+                    ) : u.Telefono?.trim() ? u.Telefono : <span className="text-gray-400 italic">No phone number</span>}
+                  </TableCell>
+                  {/* Password */}
+                  <TableCell>
+                    {editingId === u.ID_Usuario ? (
+                      <input
+                        type="password"
+                        value={editValues.password ?? ''}
+                        onChange={e => setEditValues(v => ({ ...v, password: e.target.value }))}
+                        placeholder="Nueva contraseña"
+                        className="border px-2 py-1"
+                      />
+                    ) : (
+                      '••••••'
+                    )}
+                    {resetError && editingId === u.ID_Usuario && (
+                      <div className="text-red-500 text-xs">{resetError}</div>
+                    )}
                   </TableCell>
                   <TableCell>{formatDate(u.created_at)}</TableCell>
                   <TableCell>
                     {u.Tipo_Usuario === 'admin' ? (
-                      // Si es admin, muestra icono de prohibición y tooltip
                       <span title="No puedes editar ni eliminar un admin">
                         <Ban size={20} className="text-gray-400 mx-auto" />
                       </span>
@@ -261,7 +287,12 @@ export default function UserManagement() {
                         <Button onClick={handleSaveEdit} variant="default" className="mr-2">
                           Guardar
                         </Button>
-                        <Button onClick={handleCancelEdit} variant="outline">
+                        <Button onClick={() => {
+                          setEditingId(null);
+                          setEditValues({});
+                          setEditError(null);
+                          setResetError(null);
+                        }} variant="outline">
                           Cancelar
                         </Button>
                         {editError && (
