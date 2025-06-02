@@ -39,6 +39,8 @@ require_once __DIR__ . '/../app/models/CartModel.php';
 require_once __DIR__ . '/../app/controller/CartController.php';
 
 require_once __DIR__ . '/../app/controller/PaymentController.php';
+require_once __DIR__ . '/../app/models/orderModel.php'; // Added for OrderModel
+require_once __DIR__ . '/../app/controller/orderController.php'; // Added for OrderController
 
 use App\Controllers\UserController;
 use App\Controllers\SubstanceController;
@@ -49,6 +51,7 @@ use App\Controllers\AdviceController;
 use App\Controllers\ContactController;
 use App\Controllers\CartController;
 use App\Controller\PaymentController; // Corregido de App\Controllers a App\Controller
+use App\Controllers\OrderController; // Added for OrderController
 
 use App\Core\Response;
 
@@ -189,6 +192,23 @@ switch ($route) {
         break;
 
     case 'api/users/updateUserByAdmin':
+    case 'api/order/create': // Added for creating an order
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            OrderController::create();
+        } else {
+            Response::json(['error' => 'Method not allowed. Use POST for creating orders.'], 405);
+        }
+        break;
+
+    case 'api/orders/history': // Added for fetching user order history
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            OrderController::getUserOrders();
+        } else {
+            Response::json(['error' => 'Method not allowed. Use GET for fetching order history.'], 405);
+        }
+        break;
+
+    case 'api/users/update':
         UserController::updateUserByAdmin();
         break;
 

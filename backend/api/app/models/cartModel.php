@@ -203,6 +203,27 @@ class CartModel {
         }
     }
 
+    /**
+     * Clears all items from a user's cart without adjusting product stock.
+     * This is used after an order is successfully placed, as stock was already
+     * decremented when items were added to the cart.
+     *
+     * @param int $userId The ID of the user whose cart is to be cleared.
+     * @return bool True on success, false on failure.
+     * @throws \Exception if a database error occurs.
+     */
+    public static function clearCartForOrder(int $userId): bool {
+        $pdo = DB::getInstance()->conn();
+        try {
+            $stmt = $pdo->prepare('DELETE FROM cart_items WHERE user_id = :uid');
+            $stmt->execute(['uid' => $userId]);
+            return $stmt->rowCount() >= 0; // Returns true even if no rows were deleted (e.g., cart was already empty)
+        } catch (\PDOException $e) {
+            // Log error: error_log("Error clearing cart for order for user $userId: " . $e->getMessage());
+            throw new \Exception("Database error while clearing cart: " . $e->getMessage());
+        }
+    }
+
     public static function getCartItemCountByUser(int $userId): int {
         $pdo = DB::getInstance()->conn();
         $stmt = $pdo->prepare(
