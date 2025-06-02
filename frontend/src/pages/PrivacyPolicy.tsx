@@ -53,23 +53,37 @@ All recipients are bound to strict confidentiality.`,
       heading: '11. Changes to This Policy',
       body: `We may update this Privacy Policy periodically. Material changes will be announced on the Site or via email. Continued use of the Service implies acceptance of the updated policy.`,
     },
-   
   ];
 
   return (
-    <section className="container mt-10 mx-auto max-w-4xl px-6 py-16 text-neutral-900">
-      <h1 className="mb-10 text-center text-4xl font-extrabold lg:text-5xl">
-        Privacy Policy
-      </h1>
+    <div className="min-h-screen bg-gray-50 py-8 sm:py-12 mt-10">
+      {/* If you have a global Navbar, it would typically be outside or part of a layout component */}
+      {/* <Navbar /> */}
+      <main className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+        <h1 className="mb-10 text-center mt-6 sm:mt-0 text-3xl sm:text-4xl font-extrabold tracking-tight text-neutral-800 lg:text-5xl">
+          Privacy Policy
+        </h1>
 
-      {sections.map((s, i) => (
-        <article key={i} className="mb-8 space-y-4">
-          <h2 className="text-xl font-semibold lg:text-2xl">{s.heading}</h2>
-          <p className="text-sm leading-relaxed whitespace-pre-line lg:text-base">{s.body}</p>
-        </article>
-      ))}
+        <div className="space-y-8">
+          {sections.map((section, index) => (
+            <article 
+              key={index} 
+              className="bg-white p-6 rounded-xl shadow-xl border border-gray-200"
+            >
+              <h2 className="text-xl font-semibold text-neutral-700 lg:text-2xl mb-3">{section.heading}</h2>
+              <p className="text-sm leading-relaxed text-gray-600 lg:text-base whitespace-pre-line">{section.body}</p>
+            </article>
+          ))}
+        </div>
 
-      <p className="mt-16 text-center text-xs text-gray-500">Last updated: May 19, 2025</p>
-    </section>
+        <div className="mt-12 md:mt-16 text-center">
+          <p className="text-xs text-gray-500">
+            Last updated: May 19, 2025
+          </p>
+        </div>
+      </main>
+      {/* If you have a global Footer, it would typically be outside or part of a layout component */}
+      {/* <Footer /> */}
+    </div>
   );
 }
