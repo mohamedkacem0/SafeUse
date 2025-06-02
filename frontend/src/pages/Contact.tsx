@@ -10,6 +10,7 @@ import {
   MessageCircle,
 } from "lucide-react";
 import clsx from "clsx";
+import CatchyQuoteSection from "../components/CatchyQuoteSection";
 
 export default function Contact() {
   const navigate = useNavigate();
@@ -68,12 +69,7 @@ export default function Contact() {
 
   return (
     <section className="bg-gray-50 mx-auto max-w-6xl px-4 py-16">
-      {/* Slogan Section - Reverted */}
-      <div className="border-t border-gray-300">
-        <p className="text-center text-[#111111] font-light text-[20px] md:text-[36px] py-[40px]">
-          “We’d love to hear from you. Get in touch!”
-        </p>
-      </div>
+      <CatchyQuoteSection quote="We’d love to hear from you. Get in touch!" ariaLabel="Contact page slogan" />
 
       {/* Main Contact Box */}
       <div className="mx-auto max-w-6xl overflow-hidden bg-[#335A2C] rounded-xl shadow-xl md:grid md:grid-cols-3 md:gap-0"> {/* Removed gap-8, panels will control their padding */}
