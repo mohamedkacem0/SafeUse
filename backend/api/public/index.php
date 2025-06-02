@@ -235,7 +235,31 @@ switch ($route) {
         }
         break;
 
+    case 'api/admin/substances/list_basic':
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            AdminSubstanceController::listBasic();
+        } else {
+            App\Core\Response::json(['error' => 'Method not allowed. Use GET for listing basic substances.'], 405);
+        }
+        break;
+
+    case 'api/admin/substances/list_details':
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            AdminSubstanceController::listDetails();
+        } else {
+            App\Core\Response::json(['error' => 'Method not allowed. Use GET for listing detailed substances.'], 405);
+        }
+        break;
+
+    case 'api/admin/substances/update':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            AdminSubstanceController::updateSubstance();
+        } else {
+            App\Core\Response::json(['error' => 'Method not allowed. Use POST for updating substances.'], 405);
+        }
+        break;
+
     default:
-        App\Core\Response::json(['error' => 'Ruta no encontrada'], 404);
+        App\Core\Response::json(['error' => 'Ruta no encontrada.'], 404);
         break;
 }
