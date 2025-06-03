@@ -51,11 +51,15 @@ require_once __DIR__ . '/../app/models/admin/adminSubstanceModel.php';
 require_once __DIR__ . '/../app/models/admin/adminUserModel.php';
 require_once __DIR__ . '/../app/models/admin/adminAdviceModel.php';
 
+require_once __DIR__ . '/../app/models/admin/AdminOrdersModel.php';
+
 // Controladores admin
 require_once __DIR__ . '/../app/controller/admin/AdminContactController.php';
 require_once __DIR__ . '/../app/controller/admin/adminSubstanceController.php';
 require_once __DIR__ . '/../app/controller/admin/adminUserController.php';
 require_once __DIR__ . '/../app/controller/admin/adminAdviceController.php';
+
+require_once __DIR__ . '/../app/controller/admin/AdminOrdersController.php';
 
 use App\Controllers\ContactController;
 use App\Controllers\AdviceController;
@@ -72,6 +76,8 @@ use App\Controllers\Admin\AdminSubstanceController;
 use App\Controllers\Admin\AdminUserController;
 use App\Controllers\Admin\AdminAdviceController;
 
+use App\Controllers\Admin\AdminOrdersController;
+
 use App\Core\Response;
 
 // ----------------------------------------------------------------------------
@@ -86,7 +92,11 @@ if (preg_match('#^api/admin/contact/(\d+)$#', $route, $matches)) {
 } elseif (preg_match('#^api/admin/advice/(\d+)$#', $route, $matches)) {
     $routeBase = 'api/admin/advice';
     $routeId   = (int)$matches[1];
-} else {
+}elseif (preg_match('#^api/admin/orders/(\d+)$#', $route, $matches)) {
+    $routeBase = 'api/admin/orders';
+    $routeId   = (int)$matches[1];
+}
+ else {
     $routeBase = $route;
     $routeId   = null;
 }
@@ -226,6 +236,25 @@ switch ($routeBase) {
             Response::json(['error' => 'Método no permitido'], 405);
         }
         break;
+
+
+    // ADMIN ORDERS 
+    case 'api/admin/orders':
+        // Si è empleado como /api/admin/orders/123, dejamos $_GET['id']
+        if ($routeId) {
+            $_GET['id'] = $routeId;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            AdminOrdersController::index();
+        }
+        elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+            AdminOrdersController::destroy();
+        }
+        else {
+            Response::json(['error' => 'Método no permitido para /api/admin/orders'], 405);
+        }
+        break;    
     // ------------------------------------------------------------------------
     // RUTAS PÚBLICAS ADICIONALES
     // ------------------------------------------------------------------------
