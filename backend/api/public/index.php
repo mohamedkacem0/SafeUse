@@ -49,11 +49,13 @@ require_once __DIR__ . '/../app/controller/userController.php';
 require_once __DIR__ . '/../app/models/admin/AdminContactModel.php';
 require_once __DIR__ . '/../app/models/admin/adminSubstanceModel.php';
 require_once __DIR__ . '/../app/models/admin/adminUserModel.php';
+require_once __DIR__ . '/../app/models/admin/adminAdviceModel.php';
 
 // Controladores admin
 require_once __DIR__ . '/../app/controller/admin/AdminContactController.php';
 require_once __DIR__ . '/../app/controller/admin/adminSubstanceController.php';
 require_once __DIR__ . '/../app/controller/admin/adminUserController.php';
+require_once __DIR__ . '/../app/controller/admin/adminAdviceController.php';
 
 use App\Controllers\ContactController;
 use App\Controllers\AdviceController;
@@ -68,6 +70,7 @@ use App\Controllers\UserController;
 use App\Controllers\Admin\AdminContactController;
 use App\Controllers\Admin\AdminSubstanceController;
 use App\Controllers\Admin\AdminUserController;
+use App\Controllers\Admin\AdminAdviceController;
 
 use App\Core\Response;
 
@@ -76,9 +79,12 @@ use App\Core\Response;
 // ----------------------------------------------------------------------------
 $route = $_GET['route'] ?? '';
 
-// Detectar si la ruta es “api/admin/contact/{id}”
+// Detectar si la ruta es “api/admin/contact/{id}” o “api/admin/advice/{id}”
 if (preg_match('#^api/admin/contact/(\d+)$#', $route, $matches)) {
     $routeBase = 'api/admin/contact';
+    $routeId   = (int)$matches[1];
+} elseif (preg_match('#^api/admin/advice/(\d+)$#', $route, $matches)) {
+    $routeBase = 'api/admin/advice';
     $routeId   = (int)$matches[1];
 } else {
     $routeBase = $route;
@@ -126,6 +132,29 @@ switch ($routeBase) {
         }
         else {
             Response::json(['error' => 'Método no permitido para /api/admin/contact'], 405);
+        }
+        break;
+
+        case 'api/admin/advice':
+        // Si vinieron con “/123”, asignar $_GET['id']
+        if ($routeId) {
+            $_GET['id'] = $routeId;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            AdminAdviceController::index();
+        }
+        elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+            AdminAdviceController::destroy();
+        }
+        elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+            AdminAdviceController::update();
+        }
+        elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            AdminAdviceController::store();
+        }
+        else {
+            Response::json(['error' => 'Método no permitido para /api/admin/advice'], 405);
         }
         break;
 
