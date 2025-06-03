@@ -351,9 +351,56 @@ switch ($routeBase) {
         }
         break;
 
-    // ------------------------------------------------------------------------
-    // CADENA “Route” NO COINCIDE: 404
-    // ------------------------------------------------------------------------
+    case 'api/admin/substances/add':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            AdminSubstanceController::addSubstance();
+        } else {
+            App\Core\Response::json(['error' => 'Method not allowed. Use POST for adding substances.'], 405);
+        }
+        break;
+
+    case 'api/admin/substances/list_basic':
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            AdminSubstanceController::listBasic();
+        } else {
+            App\Core\Response::json(['error' => 'Method not allowed. Use GET for listing basic substances.'], 405);
+        }
+        break;
+
+    case 'api/admin/substances/list_details':
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            AdminSubstanceController::listDetails();
+        } else {
+            App\Core\Response::json(['error' => 'Method not allowed. Use GET for listing detailed substances.'], 405);
+        }
+        break;
+
+    case 'api/admin/substances/update':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            AdminSubstanceController::updateSubstance();
+        } else {
+            App\Core\Response::json(['error' => 'Method not allowed. Use POST for updating substances.'], 405);
+        }
+        break;
+
+    case 'api/admin/auth/logout':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            App\Controllers\Admin\AdminUserController::logout();
+        } else {
+            App\Core\Response::json(['error' => 'Method not allowed. Use POST for logout.'], 405);
+        }
+        break;
+
+    // Route for deleting a substance by ID
+    case (preg_match('/^api\/admin\/substances\/delete\/(\d+)$/', $route, $matches) ? $route : ''):
+        if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+            $substanceId = $matches[1]; // Extracted ID from the URL
+            AdminSubstanceController::deleteSubstance($substanceId);
+        } else {
+            App\Core\Response::json(['error' => 'Method not allowed. Use DELETE for deleting substances.'], 405);
+        }
+        break;
+
     default:
         Response::json(['error' => 'Ruta no encontrada.'], 404);
         break;
