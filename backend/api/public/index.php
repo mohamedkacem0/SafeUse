@@ -7,6 +7,7 @@ header('Access-Control-Allow-Credentials: true');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
 
+
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit(0);
@@ -46,22 +47,22 @@ require_once __DIR__ . '/../app/controller/SubstanceDetailController.php';
 require_once __DIR__ . '/../app/controller/userController.php';
 
 // Modelos admin
-require_once __DIR__ . '/../app/models/admin/AdminContactModel.php';
+require_once __DIR__ . '/../app/models/admin/adminContactModel.php';
 require_once __DIR__ . '/../app/models/admin/adminSubstanceModel.php';
 require_once __DIR__ . '/../app/models/admin/adminUserModel.php';
 require_once __DIR__ . '/../app/models/admin/adminAdviceModel.php';
 require_once __DIR__ . '/../app/models/admin/adminProductModel.php';
 
-require_once __DIR__ . '/../app/models/admin/AdminOrdersModel.php';
+require_once __DIR__ . '/../app/models/admin/adminOrdersModel.php';
 
 // Controladores admin
-require_once __DIR__ . '/../app/controller/admin/AdminContactController.php';
+require_once __DIR__ . '/../app/controller/admin/adminContactController.php';
 require_once __DIR__ . '/../app/controller/admin/adminSubstanceController.php';
 require_once __DIR__ . '/../app/controller/admin/adminUserController.php';
 require_once __DIR__ . '/../app/controller/admin/adminAdviceController.php';
 require_once __DIR__ . '/../app/controller/admin/adminProductController.php';
 
-require_once __DIR__ . '/../app/controller/admin/AdminOrdersController.php';
+require_once __DIR__ . '/../app/controller/admin/adminOrdersController.php';
 
 use App\Controllers\ContactController;
 use App\Controllers\AdviceController;
@@ -101,9 +102,16 @@ if (preg_match('#^api/admin/contact/(\d+)$#', $route, $matches)) {
 } elseif (preg_match('#^api/admin/products/(\d+)$#', $route, $matches)) {
     $routeBase = 'api/admin/products_id_action'; // Unique base for ID-specific actions (show, update)
     $routeId   = (int)$matches[1];
-} elseif (preg_match('#^api/admin/orders/(\d+)$#', $route, $matches)) {
+} elseif (preg_match('#^api/admin/orders/(\d+)/details$#', $route, $m1)) {
+    $routeBase = 'api/admin/orders_details';
+    $orderId   = (int)$m1[1];
+} elseif (preg_match('#^api/admin/orders/(\d+)/details/(\d+)$#', $route, $m2)) {
+    $routeBase = 'api/admin/orders_update_detail';
+    $orderId   = (int)$m2[1];
+    $detailId  = (int)$m2[2];
+} elseif (preg_match('#^api/admin/orders/(\d+)$#', $route, $m3)) {
     $routeBase = 'api/admin/orders';
-    $routeId   = (int)$matches[1];
+    $orderId   = (int)$m3[1];
 } else {
     $routeBase = $route;
     $routeId   = null;
@@ -310,22 +318,40 @@ switch ($routeBase) {
 
 
     // ADMIN ORDERS 
-    case 'api/admin/orders':
-        // Si è empleado como /api/admin/orders/123, dejamos $_GET['id']
-        if ($routeId) {
-            $_GET['id'] = $routeId;
+     case 'api/admin/orders':
+        if ($orderId !== null) {
+            $_GET['id'] = $orderId;
         }
-
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             AdminOrdersController::index();
-        }
-        elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
             AdminOrdersController::destroy();
-        }
-        else {
+        } else {
             Response::json(['error' => 'Método no permitido para /api/admin/orders'], 405);
         }
-        break;    
+        break;
+
+    // 4) GET  /api/admin/orders/{id}/details       -> devuelve cabecera + líneas
+    case 'api/admin/orders_details':
+        if ($orderId !== null) {
+            $_GET['id'] = $orderId;
+            $_GET['action'] = 'details';
+            AdminOrdersController::index();
+        } else {
+            Response::json(['error' => 'ID de pedido no especificado'], 400);
+        }
+        break;
+
+    // 5) PUT  /api/admin/orders/{orderId}/details/{detailId}
+    case 'api/admin/orders_update_detail':
+        if ($orderId !== null && $detailId !== null) {
+            $_GET['orderId']  = $orderId;
+            $_GET['detailId'] = $detailId;
+            AdminOrdersController::updateDetail();
+        } else {
+            Response::json(['error' => 'IDs no especificados para update detail'], 400);
+        }
+        break;
     // ------------------------------------------------------------------------
     // RUTAS PÚBLICAS ADICIONALES
     // ------------------------------------------------------------------------
@@ -360,8 +386,17 @@ switch ($routeBase) {
         }
         break;
 
-
     // Registro y login (público)
+
+    case 'api/users/delete':
+        // Solo permite DELETE y espera el id en el body JSON
+        if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+            UserController::deleteUser();
+        } else {
+            Response::json(['error' => 'Método no permitido'], 405);
+        }
+        break;
+
     case 'api/register':
         UserController::register();
         break;
