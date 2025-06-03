@@ -219,4 +219,91 @@ class AdminSubstanceModel {
     }
 
     // Aquí se podrían añadir otros métodos para el CRUD de sustancias por parte del admin (update, delete, getById, etc.)
+
+    /**
+     * Elimina una sustancia y sus detalles de la base de datos, y su imagen asociada del servidor.
+     *
+     * @param int $id El ID de la sustancia a eliminar.
+     * @return bool True si la eliminación fue exitosa, false en caso contrario.
+     */
+    public static function deleteById(int $id): bool {
+        $pdo = DB::getInstance()->conn();
+
+        try {
+            $pdo->beginTransaction();
+
+            // 1. Obtener la ruta de la imagen y el nombre para la carpeta antes de eliminar la sustancia
+            $stmtSelectImage = $pdo->prepare("SELECT Imagen, Nombre FROM sustancias WHERE ID_Sustancia = :id");
+            $stmtSelectImage->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmtSelectImage->execute();
+            $substanceData = $stmtSelectImage->fetch(PDO::FETCH_ASSOC);
+            $imagePathInDb = $substanceData ? $substanceData['Imagen'] : null;
+            $substanceName = $substanceData ? $substanceData['Nombre'] : null;
+
+            // 2. Eliminar de detalles_sustancia (si existe la relación)
+            $sqlDeleteDetails = "DELETE FROM detalles_sustancia WHERE ID_Sustancia = :id";
+            $stmtDeleteDetails = $pdo->prepare($sqlDeleteDetails);
+            $stmtDeleteDetails->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmtDeleteDetails->execute();
+            // No es un error si no hay detalles, así que no verificamos rowCount estrictamente aquí
+
+            // 3. Eliminar de sustancias
+            $sqlDeleteSubstance = "DELETE FROM sustancias WHERE ID_Sustancia = :id";
+            $stmtDeleteSubstance = $pdo->prepare($sqlDeleteSubstance);
+            $stmtDeleteSubstance->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmtDeleteSubstance->execute();
+
+            if ($stmtDeleteSubstance->rowCount() === 0) {
+                // Si no se eliminó ninguna fila de 'sustancias', la sustancia no existía.
+                $pdo->rollBack();
+                error_log("Intento de eliminar sustancia con ID $id no encontrada.");
+                return false;
+            }
+
+            // 4. Eliminar el archivo de imagen y el directorio si es posible
+            if ($imagePathInDb) {
+                $fullImagePath = $_SERVER['DOCUMENT_ROOT'] . '/TFG/SafeUse/' . $imagePathInDb;
+                if (file_exists($fullImagePath) && is_file($fullImagePath)) {
+                    if (!unlink($fullImagePath)) {
+                        error_log("No se pudo eliminar el archivo de imagen: $fullImagePath");
+                        // Continuar con la transacción, la eliminación de la DB es más crítica
+                    }
+                }
+
+                // Intentar eliminar el directorio de la sustancia si está vacío
+                // El nombre de la carpeta se deriva del nombre de la sustancia, como en addSubstance/updateSubstance
+                if ($substanceName) {
+                    $substanceFolderName = strtolower(preg_replace('/[^a-zA-Z0-9_-]+/', '', str_replace(' ', '_', $substanceName)));
+                    $substanceDirectory = $_SERVER['DOCUMENT_ROOT'] . '/TFG/SafeUse/uploads/sustancias/' . $substanceFolderName;
+                    
+                    if (is_dir($substanceDirectory)) {
+                        // Verificar si el directorio está vacío (solo contiene . y ..)
+                        $items = array_diff(scandir($substanceDirectory), ['.', '..']);
+                        if (empty($items)) {
+                            if (!rmdir($substanceDirectory)) {
+                                error_log("No se pudo eliminar el directorio vacío: $substanceDirectory");
+                            }
+                        }
+                    }
+                }
+            }
+
+            $pdo->commit();
+            return true;
+
+        } catch (\PDOException $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            error_log('Error eliminando sustancia con ID ' . $id . ': ' . $e->getMessage());
+            return false;
+        } catch (\Exception $e) {
+            // Para cualquier otra excepción (ej. de manipulación de archivos)
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack(); // Asegurar rollback si algo falla fuera de PDOException pero dentro del try
+            }
+            error_log('Error general durante la eliminación de sustancia con ID ' . $id . ': ' . $e->getMessage());
+            return false;
+        }
+    }
 }

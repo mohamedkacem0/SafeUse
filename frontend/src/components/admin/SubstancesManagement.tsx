@@ -15,7 +15,7 @@ import {
   TableBody,
   TableCell,
 } from '../ui/table';
-import { Edit3 } from 'lucide-react';
+import { Edit3, Trash2 } from 'lucide-react';
 
 interface SubstanceBasic {
   ID_Sustancia: number;
@@ -103,6 +103,25 @@ export default function SubstancesManagement() {
     setIsFormVisible(false);
     resetFormFields();
     setEditingSubstance(null);
+  };
+
+  const handleDeleteSubstance = async (substanceId: number, substanceName: string) => {
+    if (window.confirm(`Are you sure you want to delete the substance "${substanceName}"?`)) {
+      try {
+        const response = await fetch(`/api/admin/substances/delete/${substanceId}`, {
+          method: 'DELETE',
+        });
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.error || 'Failed to delete substance');
+        }
+        alert(`Substance "${substanceName}" deleted successfully!`);
+        window.location.reload(); // Reload to reflect changes
+      } catch (error) {
+        console.error('Error deleting substance:', error);
+        alert(`Error deleting substance: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    }
   };
 
   // Function to handle form submission (for both Add and Update)
@@ -437,49 +456,48 @@ export default function SubstancesManagement() {
 
         {/* Tabla responsiva */}
         <div className="w-full overflow-x-auto">
-          <Table className="min-w-[1200px]">
+          <Table className="min-w-[1000px]">
             <TableHeader>
               <TableRow>
-                <TableHead scope="col">ID</TableHead>
                 <TableHead scope="col">Name</TableHead>
                 <TableHead scope="col">Image</TableHead>
-                <TableHead scope="col" className="max-w-[150px]">Title</TableHead>
-                <TableHead scope="col" className="max-w-[120px]">Formula</TableHead>
-                <TableHead scope="col" className="max-w-[200px]">Description</TableHead>
-                <TableHead scope="col" className="max-w-[200px]">Consumption Methods</TableHead>
-                <TableHead scope="col" className="max-w-[200px]">Desired Effects</TableHead>
-                <TableHead scope="col" className="max-w-[200px]">Composition</TableHead>
-                <TableHead scope="col" className="max-w-[200px]">Risks</TableHead>
-                <TableHead scope="col" className="max-w-[200px]">Interaction</TableHead>
-                <TableHead scope="col" className="max-w-[200px]">Risk Reduction</TableHead>
-                <TableHead scope="col" className="max-w-[200px]">Legislation</TableHead>
-                <TableHead scope="col">Actions</TableHead>
+                <TableHead scope="col" className="max-w-[100px]">Title</TableHead>
+                <TableHead scope="col" className="max-w-[80px]">Formula</TableHead>
+                <TableHead scope="col" className="max-w-[120px]">Description</TableHead>
+                <TableHead scope="col" className="max-w-[120px]">Consumption Methods</TableHead>
+                <TableHead scope="col" className="max-w-[120px]">Desired Effects</TableHead>
+                <TableHead scope="col" className="max-w-[120px]">Composition</TableHead>
+                <TableHead scope="col" className="max-w-[120px]">Risks</TableHead>
+                <TableHead scope="col" className="max-w-[120px]">Interaction</TableHead>
+                <TableHead scope="col" className="max-w-[120px]">Risk Reduction</TableHead>
+                <TableHead scope="col" className="max-w-[120px]">Legislation</TableHead>
+                <TableHead scope="col">Edit</TableHead>
+                <TableHead scope="col">Delete</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {/* Estados: loading, error, vacío, datos */}
               {loadingBasicList || loadingDetailList ? (
                 <TableRow>
-                  <TableCell colSpan={15} className="text-center py-4">
+                  <TableCell colSpan={14} className="text-center py-4">
                     Loading...
                   </TableCell>
                 </TableRow>
               ) : basicListError || detailListError ? (
                 <TableRow>
-                  <TableCell colSpan={15} className="text-center text-red-500 py-4">
+                  <TableCell colSpan={14} className="text-center text-red-500 py-4">
                     Error loading substances
                   </TableCell>
                 </TableRow>
               ) : filteredSubstances.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={15} className="text-center py-4">
+                  <TableCell colSpan={14} className="text-center py-4">
                     No substances found
                   </TableCell>
                 </TableRow>
               ) : (
                 filteredSubstances.map((s) => (
                   <TableRow key={s.ID_Sustancia}>
-                    <TableCell>{s.ID_Sustancia}</TableCell>
                     <TableCell className="whitespace-nowrap">{s.Nombre}</TableCell>
                     <TableCell className="whitespace-nowrap">
                       <img
@@ -489,22 +507,32 @@ export default function SubstancesManagement() {
                         className="h-8 w-8 object-cover rounded"
                       />
                     </TableCell>
-                    <TableCell className="max-w-[150px] truncate">{s.Titulo}</TableCell>
-                    <TableCell className="max-w-[120px] truncate">{s.Formula}</TableCell>
-                    <TableCell className="max-w-[200px] truncate">{s.descripcion}</TableCell>
-                    <TableCell className="max-w-[200px] truncate">{s.metodos_consumo}</TableCell>
-                    <TableCell className="max-w-[200px] truncate">{s.efectos_deseados}</TableCell>
-                    <TableCell className="max-w-[200px] truncate">{s.composicion}</TableCell>
-                    <TableCell className="max-w-[200px] truncate">{s.riesgos}</TableCell>
-                    <TableCell className="max-w-[200px] truncate">{s.interaccion_otras_sustancias}</TableCell>
-                    <TableCell className="max-w-[200px] truncate">{s.reduccion_riesgos}</TableCell>
-                    <TableCell className="max-w-[200px] truncate">{s.legislacion}</TableCell>
+                    <TableCell className="max-w-[100px] truncate">{s.Titulo}</TableCell>
+                    <TableCell className="max-w-[80px] truncate">{s.Formula}</TableCell>
+                    <TableCell className="max-w-[120px] truncate">{s.descripcion}</TableCell>
+                    <TableCell className="max-w-[120px] truncate">{s.metodos_consumo}</TableCell>
+                    <TableCell className="max-w-[120px] truncate">{s.efectos_deseados}</TableCell>
+                    <TableCell className="max-w-[120px] truncate">{s.composicion}</TableCell>
+                    <TableCell className="max-w-[120px] truncate">{s.riesgos}</TableCell>
+                    <TableCell className="max-w-[120px] truncate">{s.interaccion_otras_sustancias}</TableCell>
+                    <TableCell className="max-w-[120px] truncate">{s.reduccion_riesgos}</TableCell>
+                    <TableCell className="max-w-[120px] truncate">{s.legislacion}</TableCell>
                     <TableCell className="whitespace-nowrap">
                       <Button
                         aria-label={`Editar sustancia ${s.Nombre}`}
                         onClick={() => handleEditClick(s.ID_Sustancia)}
                       >
                         <Edit3 size={16} />
+                      </Button>
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap">
+                      <Button
+                        variant="outline"
+                        className="text-red-600 hover:text-red-700 border-red-500 hover:border-red-600 hover:bg-red-50 p-2"
+                        aria-label={`Delete sustancia ${s.Nombre}`}
+                        onClick={() => handleDeleteSubstance(s.ID_Sustancia, s.Nombre)}
+                      >
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </TableCell>
                   </TableRow>

@@ -51,6 +51,21 @@ export default function UserManagement() {
   const [addUserLoading, setAddUserLoading] = useState(false);
   const [addUserError, setAddUserError] = useState<string | null>(null);
   const [addUserSuccess, setAddUserSuccess] = useState<string | null>(null);
+  const [isAddUserFormVisible, setIsAddUserFormVisible] = useState(false);
+
+  const handleShowAddUserForm = () => {
+    setAddUserValues({}); // Reset form fields
+    setAddUserError(null);
+    setAddUserSuccess(null);
+    setIsAddUserFormVisible(true);
+  };
+
+  const handleCancelAddUser = () => {
+    setIsAddUserFormVisible(false);
+    setAddUserValues({});
+    setAddUserError(null);
+    setAddUserSuccess(null);
+  };
 
   const {
     data: usersData,
@@ -102,6 +117,7 @@ export default function UserManagement() {
     setEditingId(null);
     setEditValues({});
     setEditError(null);
+    setResetError(null); // Added to match existing inline cancel logic
   };
 
   const handleSaveEdit = async () => {
@@ -207,10 +223,10 @@ export default function UserManagement() {
 
       const data = await res.json();
       if (data.success) {
-        setAddUserSuccess('Usuario creado correctamente');
-        setAddUserValues({});
-        setRefresh(r => r + 1);
-        window.location.reload(); 
+        setAddUserSuccess('Usuario añadido correctamente');
+        setAddUserValues({}); // Limpiar formulario
+        setIsAddUserFormVisible(false); // Hide form
+        setRefresh((r) => r + 1); // Refrescar la lista de usuarios
       } else {
         setAddUserError(data.error || 'No se pudo crear el usuario');
       }
@@ -222,214 +238,217 @@ export default function UserManagement() {
   };
 
   return (
-    <Card>
-      <CardHeader className="flex items-center justify-between">
-        <CardTitle>User Management</CardTitle>
-        <div className="flex space-x-2">
-          <Input
-            placeholder="Search users..."
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-          />
-          <Button onClick={() => { /* Acción extra si es necesario */ }}>
-            Filter
-          </Button>
-        </div>
-      </CardHeader>
-
-      <CardContent>
-        <form onSubmit={handleAddUser} className="mb-6 flex flex-wrap gap-2 items-end bg-gray-50 p-4 rounded">
-          <Input
-            placeholder="Nombre"
-            value={addUserValues.Nombre ?? ''}
-            onChange={e => setAddUserValues(v => ({ ...v, Nombre: e.target.value }))}
-            required
-            className="w-40"
-          />
-          <Input
-            placeholder="Correo"
-            type="email"
-            value={addUserValues.Correo ?? ''}
-            onChange={e => setAddUserValues(v => ({ ...v, Correo: e.target.value }))}
-            required
-            className="w-40"
-          />
-          <Input
-            placeholder="Contraseña"
-            type="password"
-            value={addUserValues.password ?? ''}
-            onChange={e => setAddUserValues(v => ({ ...v, password: e.target.value }))}
-            required
-            className="w-40"
-          />
-          {/* Rol fijo */}
-          <Input
-            placeholder="Rol"
-            value="usuario"
-            disabled
-            className="w-32 bg-gray-100 text-gray-500"
-          />
-          <Input
-            placeholder="Dirección"
-            value={addUserValues.Direccion ?? ''}
-            onChange={e => setAddUserValues(v => ({ ...v, Direccion: e.target.value }))}
-            className="w-40"
-          />
-          <Input
-            placeholder="Teléfono"
-            value={addUserValues.Telefono ?? ''}
-            onChange={e => setAddUserValues(v => ({ ...v, Telefono: e.target.value }))}
-            className="w-32"
-          />
-          <Button type="submit" disabled={addUserLoading}>
-            {addUserLoading ? 'Creando...' : 'Crear usuario'}
-          </Button>
-          {addUserError && <span className="text-red-500 ml-4">{addUserError}</span>}
-          {addUserSuccess && <span className="text-green-600 ml-4">{addUserSuccess}</span>}
-        </form>
-
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead scope="col">ID</TableHead>
-              <TableHead scope="col">Name</TableHead>
-              <TableHead scope="col">Email</TableHead>
-              <TableHead scope="col">Role</TableHead>
-              <TableHead scope="col">Direccion</TableHead>
-              <TableHead scope="col">Telefono</TableHead>
-              <TableHead scope="col">Password</TableHead> {/* Nueva columna */}
-              <TableHead scope="col">Created At</TableHead>
-              <TableHead scope="col">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loadingUsers ? (
+      <Card>
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
+          <CardTitle className="mb-2 sm:mb-0">User Management</CardTitle>
+          <div className="flex space-x-2 w-full sm:w-auto">
+            <Input
+              placeholder="Search users..."
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="flex-grow sm:flex-grow-0"
+            />
+          </div>
+        </CardHeader>
+        <CardContent>
+          {!isAddUserFormVisible && (
+            <Button onClick={handleShowAddUserForm} className="mb-4">
+              Add New User
+            </Button>
+          )}
+          {isAddUserFormVisible && (
+            <form onSubmit={handleAddUser} className="mb-6 flex flex-wrap gap-2 items-end bg-gray-50 p-4 rounded">
+              {/* Form inputs remain the same as before */}
+              <Input
+                placeholder="Nombre"
+                value={addUserValues.Nombre ?? ''}
+                onChange={e => setAddUserValues(v => ({ ...v, Nombre: e.target.value }))}
+                required
+                className="w-full sm:w-40"
+              />
+              <Input
+                placeholder="Correo"
+                type="email"
+                value={addUserValues.Correo ?? ''}
+                onChange={e => setAddUserValues(v => ({ ...v, Correo: e.target.value }))}
+                required
+                className="w-full sm:w-40"
+              />
+              <Input
+                placeholder="Contraseña"
+                type="password"
+                value={addUserValues.password ?? ''}
+                onChange={e => setAddUserValues(v => ({ ...v, password: e.target.value }))}
+                required
+                className="w-full sm:w-40"
+              />
+              <Input
+                placeholder="Rol"
+                value="usuario"
+                disabled
+                className="w-full sm:w-32 bg-gray-100 text-gray-500"
+              />
+              <Input
+                placeholder="Dirección"
+                value={addUserValues.Direccion ?? ''}
+                onChange={e => setAddUserValues(v => ({ ...v, Direccion: e.target.value }))}
+                className="w-full sm:w-40"
+              />
+              <Input
+                placeholder="Teléfono"
+                value={addUserValues.Telefono ?? ''}
+                onChange={e => setAddUserValues(v => ({ ...v, Telefono: e.target.value }))}
+                className="w-full sm:w-32"
+              />
+              <div className="flex w-full sm:w-auto">
+                <Button type="submit" disabled={addUserLoading} className="flex-grow sm:flex-grow-0">
+                  {addUserLoading ? 'Adding...' : 'Add User'}
+                </Button>
+                <Button type="button" variant="outline" onClick={handleCancelAddUser} className="ml-2 flex-grow sm:flex-grow-0">
+                  Cancel
+                </Button>
+              </div>
+              {addUserError && <span className="text-red-500 ml-4 w-full">{addUserError}</span>}
+              {addUserSuccess && <span className="text-green-600 ml-4 w-full">{addUserSuccess}</span>}
+            </form>
+          )}
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-4">
-                  Loading...
-                </TableCell>
+                <TableHead scope="col">ID</TableHead>
+                <TableHead scope="col">Name</TableHead>
+                <TableHead scope="col">Email</TableHead>
+                <TableHead scope="col">Role</TableHead>
+                <TableHead scope="col">Direccion</TableHead>
+                <TableHead scope="col">Telefono</TableHead>
+                <TableHead scope="col">Password</TableHead> {/* Nueva columna */}
+                <TableHead scope="col">Created At</TableHead>
+                <TableHead scope="col">Actions</TableHead>
               </TableRow>
-            ) : usersError ? (
-              <TableRow>
-                <TableCell colSpan={9} className="text-center text-red-500 py-4">
-                  Error loading users
-                </TableCell>
-              </TableRow>
-            ) : filteredUsers.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={9} className="text-center py-4">
-                  No users found
-                </TableCell>
-              </TableRow>
-            ) : (
-              filteredUsers.map((u) => (
-                <TableRow key={u.ID_Usuario}>
-                  <TableCell>{u.ID_Usuario}</TableCell>
-                  <TableCell>
-                    {editingId === u.ID_Usuario ? (
-                      <input
-                        value={editValues.Nombre ?? ''}
-                        onChange={e => setEditValues(v => ({ ...v, Nombre: e.target.value }))}
-                        className="border px-2 py-1"
-                      />
-                    ) : u.Nombre?.trim() ? u.Nombre : <span className="text-gray-400 italic">No name</span>}
-                  </TableCell>
-                  <TableCell>
-                    {editingId === u.ID_Usuario ? (
-                      <input
-                        value={editValues.Correo ?? ''}
-                        onChange={e => setEditValues(v => ({ ...v, Correo: e.target.value }))}
-                        className="border px-2 py-1"
-                        type="email"
-                      />
-                    ) : u.Correo?.trim() ? u.Correo : <span className="text-gray-400 italic">No mail</span>}
-                  </TableCell>
-                  <TableCell>
-                    {u.Tipo_Usuario?.trim() ? u.Tipo_Usuario : <span className="text-gray-400 italic">No rol</span>}
-                  </TableCell>
-                  <TableCell>
-                    {editingId === u.ID_Usuario ? (
-                      <input
-                        value={editValues.Direccion ?? ''}
-                        onChange={e => setEditValues(v => ({ ...v, Direccion: e.target.value }))}
-                        className="border px-2 py-1"
-                      />
-                    ) : u.Direccion?.trim() ? u.Direccion : <span className="text-gray-400 italic">No address</span>}
-                  </TableCell>
-                  <TableCell>
-                    {editingId === u.ID_Usuario ? (
-                      <input
-                        value={editValues.Telefono ?? ''}
-                        onChange={e => setEditValues(v => ({ ...v, Telefono: e.target.value }))}
-                        className="border px-2 py-1"
-                      />
-                    ) : u.Telefono?.trim() ? u.Telefono : <span className="text-gray-400 italic">No phone number</span>}
-                  </TableCell>
-                  {/* Password */}
-                  <TableCell>
-                    {editingId === u.ID_Usuario ? (
-                      <input
-                        type="password"
-                        value={editValues.password ?? ''}
-                        onChange={e => setEditValues(v => ({ ...v, password: e.target.value }))}
-                        placeholder="Nueva contraseña"
-                        className="border px-2 py-1"
-                      />
-                    ) : (
-                      '••••••'
-                    )}
-                    {resetError && editingId === u.ID_Usuario && (
-                      <div className="text-red-500 text-xs">{resetError}</div>
-                    )}
-                  </TableCell>
-                  <TableCell>{formatDate(u.created_at)}</TableCell>
-                  <TableCell>
-                    {u.Tipo_Usuario === 'admin' ? (
-                      <span title="No puedes editar ni eliminar un admin">
-                        <Ban size={20} className="text-gray-400 mx-auto" />
-                      </span>
-                    ) : editingId === u.ID_Usuario ? (
-                      <>
-                        <Button onClick={handleSaveEdit} variant="default" className="mr-2">
-                          Guardar
-                        </Button>
-                        <Button onClick={() => {
-                          setEditingId(null);
-                          setEditValues({});
-                          setEditError(null);
-                          setResetError(null);
-                        }} variant="outline">
-                          Cancelar
-                        </Button>
-                        {editError && (
-                          <div className="text-red-500 text-xs">{editError}</div>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        <Button
-                          aria-label={`Editar usuario ${u.Nombre}`}
-                          onClick={() => handleEdit(u.ID_Usuario)}
-                        >
-                          <Edit3 size={16} />
-                        </Button>
-                        <Button
-                          aria-label={`Eliminar usuario ${u.Nombre}`}
-                          onClick={() => handleDelete(u.ID_Usuario)}
-                          variant="outline"
-                          className="ml-2"
-                        >
-                          <Trash2 size={16} />
-                        </Button>
-                      </>
-                    )}
+            </TableHeader>
+            <TableBody>
+              {loadingUsers ? (
+                <TableRow>
+                  <TableCell colSpan={9} className="text-center py-4">
+                    Loading...
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+              ) : usersError ? (
+                <TableRow>
+                  <TableCell colSpan={9} className="text-center text-red-500 py-4">
+                    Error loading users
+                  </TableCell>
+                </TableRow>
+              ) : filteredUsers.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={9} className="text-center py-4">
+                    No users found
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredUsers.map((u) => (
+                  <TableRow key={u.ID_Usuario}>
+                    <TableCell>{u.ID_Usuario}</TableCell>
+                    <TableCell>
+                      {editingId === u.ID_Usuario ? (
+                        <input
+                          value={editValues.Nombre ?? ''}
+                          onChange={e => setEditValues(v => ({ ...v, Nombre: e.target.value }))}
+                          className="border px-2 py-1"
+                        />
+                      ) : u.Nombre?.trim() ? u.Nombre : <span className="text-gray-400 italic">No name</span>}
+                    </TableCell>
+                    <TableCell>
+                      {editingId === u.ID_Usuario ? (
+                        <input
+                          value={editValues.Correo ?? ''}
+                          onChange={e => setEditValues(v => ({ ...v, Correo: e.target.value }))}
+                          className="border px-2 py-1"
+                          type="email"
+                        />
+                      ) : u.Correo?.trim() ? u.Correo : <span className="text-gray-400 italic">No mail</span>}
+                    </TableCell>
+                    <TableCell>
+                      {u.Tipo_Usuario?.trim() ? u.Tipo_Usuario : <span className="text-gray-400 italic">No rol</span>}
+                    </TableCell>
+                    <TableCell>
+                      {editingId === u.ID_Usuario ? (
+                        <input
+                          value={editValues.Direccion ?? ''}
+                          onChange={e => setEditValues(v => ({ ...v, Direccion: e.target.value }))}
+                          className="border px-2 py-1"
+                        />
+                      ) : u.Direccion?.trim() ? u.Direccion : <span className="text-gray-400 italic">No address</span>}
+                    </TableCell>
+                    <TableCell>
+                      {editingId === u.ID_Usuario ? (
+                        <input
+                          value={editValues.Telefono ?? ''}
+                          onChange={e => setEditValues(v => ({ ...v, Telefono: e.target.value }))}
+                          className="border px-2 py-1"
+                        />
+                      ) : u.Telefono?.trim() ? u.Telefono : <span className="text-gray-400 italic">No phone number</span>}
+                    </TableCell>
+                    {/* Password */}
+                    <TableCell>
+                      {editingId === u.ID_Usuario ? (
+                        <input
+                          type="password"
+                          value={editValues.password ?? ''}
+                          onChange={e => setEditValues(v => ({ ...v, password: e.target.value }))}
+                          placeholder="Nueva contraseña"
+                          className="border px-2 py-1"
+                        />
+                      ) : (
+                        '••••••'
+                      )}
+                      {resetError && editingId === u.ID_Usuario && (
+                        <div className="text-red-500 text-xs">{resetError}</div>
+                      )}
+                    </TableCell>
+                    <TableCell>{formatDate(u.created_at)}</TableCell>
+                    <TableCell>
+                      {u.Tipo_Usuario === 'admin' ? (
+                        <span title="No puedes editar ni eliminar un admin">
+                          <Ban size={20} className="text-gray-400 mx-auto" />
+                        </span>
+                      ) : editingId === u.ID_Usuario ? (
+                        <>
+                          <Button onClick={handleSaveEdit} variant="default" className="mr-2">
+                            Guardar
+                          </Button>
+                          <Button onClick={handleCancelEdit} variant="outline">
+                            Cancelar
+                          </Button>
+                          {editError && (
+                            <div className="text-red-500 text-xs">{editError}</div>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          <Button
+                            aria-label={`Editar usuario ${u.Nombre}`}
+                            onClick={() => handleEdit(u.ID_Usuario)}
+                          >
+                            <Edit3 size={16} />
+                          </Button>
+                          <Button
+                            aria-label={`Eliminar usuario ${u.Nombre}`}
+                            onClick={() => handleDelete(u.ID_Usuario)}
+                            variant="outline"
+                            className="ml-2"
+                          >
+                            <Trash2 size={16} />
+                          </Button>
+                        </>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
   );
 }

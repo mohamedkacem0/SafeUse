@@ -1,5 +1,6 @@
 // src/pages/AdminDashboard.tsx
-import React from 'react';
+import React, { useState } from 'react'; // Added useState
+import AdminHeader from '../../components/admin/AdminHeader'; // Import the header
 import { useFetchData } from '../admin/useFetchData';
 import {
   Card,
@@ -12,7 +13,9 @@ import {
   Package,
   FlaskConical,
   Mail,
-} from 'lucide-react';
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react'; // Added ChevronDown, ChevronUp
 import UserManagement from '../../components/admin/UserManagement';
 import SubstancesManagement from '../../components/admin/SubstancesManagement';
 import ProductManagement from '../../components/admin/ProductManagement';
@@ -20,6 +23,11 @@ import ContactSubmissions from '../../components/admin/ContactSubmissions';
 import AdviceManagement from '../../components/admin/AdviceManagement';
 
 export default function AdminDashboard() {
+  const [showUserManagement, setShowUserManagement] = useState(false);
+  const [showSubstancesManagement, setShowSubstancesManagement] = useState(false);
+  const [showProductManagement, setShowProductManagement] = useState(false);
+  const [showContactSubmissions, setShowContactSubmissions] = useState(false);
+  const [showAdviceManagement, setShowAdviceManagement] = useState(false);
   // Fetch users (for total count)
   const {
     data: usersData,
@@ -81,7 +89,9 @@ export default function AdminDashboard() {
     : 0;
 
   return (
-    <div className="p-6 space-y-6 mt-[70px]">
+    <>
+      <AdminHeader />
+      <div className="p-6 space-y-6 mt-[70px]">
       {/* Metrics Cards */}
       <div className="grid grid-cols-5 gap-4">
         <Card className="p-4">
@@ -175,20 +185,66 @@ export default function AdminDashboard() {
         </Card>
       </div>
 
-      {/* User Management Component */}
-      <UserManagement />
+      {/* User Management Section */}
+      <div className="bg-white shadow rounded-lg p-4">
+        <button
+          onClick={() => setShowUserManagement(!showUserManagement)}
+          className="w-full flex justify-between items-center text-left text-xl font-semibold text-gray-700 hover:text-gray-900 focus:outline-none mb-2"
+        >
+          User Management
+          {showUserManagement ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
+        </button>
+        {showUserManagement && <UserManagement />}
+      </div>
 
-      {/* Substances Management Component */}
-      <SubstancesManagement />
+      {/* Substances Management Section */}
+      <div className="bg-white shadow rounded-lg p-4">
+        <button
+          onClick={() => setShowSubstancesManagement(!showSubstancesManagement)}
+          className="w-full flex justify-between items-center text-left text-xl font-semibold text-gray-700 hover:text-gray-900 focus:outline-none mb-2"
+        >
+          Substances Management
+          {showSubstancesManagement ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
+        </button>
+        {showSubstancesManagement && <SubstancesManagement />}
+      </div>
 
-      {/* Product Management Component */}
-      <ProductManagement />
+      {/* Product Management Section */}
+      <div className="bg-white shadow rounded-lg p-4">
+        <button
+          onClick={() => setShowProductManagement(!showProductManagement)}
+          className="w-full flex justify-between items-center text-left text-xl font-semibold text-gray-700 hover:text-gray-900 focus:outline-none mb-2"
+        >
+          Product Management
+          {showProductManagement ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
+        </button>
+        {showProductManagement && <ProductManagement />}
+      </div>
 
-      {/* Contact Submissions Component */}
-      <ContactSubmissions />
+      {/* Contact Submissions Section */}
+      <div className="bg-white shadow rounded-lg p-4">
+        <button
+          onClick={() => setShowContactSubmissions(!showContactSubmissions)}
+          className="w-full flex justify-between items-center text-left text-xl font-semibold text-gray-700 hover:text-gray-900 focus:outline-none mb-2"
+        >
+          Contact Submissions
+          {showContactSubmissions ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
+        </button>
+        {showContactSubmissions && <ContactSubmissions />}
+      </div>
 
-      {/* Advice Management Component */}
-      <AdviceManagement />
+      {/* Advice Management Section */}
+      <div className="bg-white shadow rounded-lg p-4">
+        <button
+          onClick={() => setShowAdviceManagement(!showAdviceManagement)}
+          className="w-full flex justify-between items-center text-left text-xl font-semibold text-gray-700 hover:text-gray-900 focus:outline-none mb-2"
+        >
+          Advice Management
+          {showAdviceManagement ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
+        </button>
+        {showAdviceManagement && <AdviceManagement />}
+      </div>
     </div>
+    </>
   );
 }

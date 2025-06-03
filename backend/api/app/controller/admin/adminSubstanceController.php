@@ -191,6 +191,31 @@ class AdminSubstanceController {
         }
     }
 
+    public static function deleteSubstance($id): void {
+        if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
+            Response::json(['error' => 'Método no permitido. Se esperaba DELETE.'], 405);
+            return;
+        }
+
+        session_start();
+        if (!isset($_SESSION['user']) || $_SESSION['user']['Tipo_Usuario'] !== 'admin') {
+            Response::json(['error' => 'Acceso no autorizado. Se requieren privilegios de administrador.'], 403);
+            return;
+        }
+
+        $substanceId = (int)$id;
+        if ($substanceId <= 0) {
+            Response::json(['error' => 'ID de sustancia inválido.'], 400);
+            return;
+        }
+
+        if (AdminSubstanceModel::deleteById($substanceId)) {
+            Response::json(['success' => true, 'message' => 'Sustancia eliminada correctamente.'], 200);
+        } else {
+            Response::json(['error' => 'No se pudo eliminar la sustancia.'], 500);
+        }
+    }
+
     public static function listBasic(): void {
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
             Response::json(['error' => 'Método no permitido. Se esperaba GET.'], 405);
