@@ -50,6 +50,7 @@ require_once __DIR__ . '/../app/models/admin/AdminContactModel.php';
 require_once __DIR__ . '/../app/models/admin/adminSubstanceModel.php';
 require_once __DIR__ . '/../app/models/admin/adminUserModel.php';
 require_once __DIR__ . '/../app/models/admin/adminAdviceModel.php';
+require_once __DIR__ . '/../app/models/admin/adminProductModel.php';
 
 require_once __DIR__ . '/../app/models/admin/AdminOrdersModel.php';
 
@@ -58,6 +59,7 @@ require_once __DIR__ . '/../app/controller/admin/AdminContactController.php';
 require_once __DIR__ . '/../app/controller/admin/adminSubstanceController.php';
 require_once __DIR__ . '/../app/controller/admin/adminUserController.php';
 require_once __DIR__ . '/../app/controller/admin/adminAdviceController.php';
+require_once __DIR__ . '/../app/controller/admin/adminProductController.php';
 
 require_once __DIR__ . '/../app/controller/admin/AdminOrdersController.php';
 
@@ -75,6 +77,7 @@ use App\Controllers\Admin\AdminContactController;
 use App\Controllers\Admin\AdminSubstanceController;
 use App\Controllers\Admin\AdminUserController;
 use App\Controllers\Admin\AdminAdviceController;
+use App\Controllers\Admin\AdminProductController;
 
 use App\Controllers\Admin\AdminOrdersController;
 
@@ -92,11 +95,16 @@ if (preg_match('#^api/admin/contact/(\d+)$#', $route, $matches)) {
 } elseif (preg_match('#^api/admin/advice/(\d+)$#', $route, $matches)) {
     $routeBase = 'api/admin/advice';
     $routeId   = (int)$matches[1];
-}elseif (preg_match('#^api/admin/orders/(\d+)$#', $route, $matches)) {
+} elseif (preg_match('#^api/admin/products/(\d+)/delete$#', $route, $matches)) {
+    $routeBase = 'api/admin/products_delete_action'; // Unique base for delete
+    $routeId   = (int)$matches[1];
+} elseif (preg_match('#^api/admin/products/(\d+)$#', $route, $matches)) {
+    $routeBase = 'api/admin/products_id_action'; // Unique base for ID-specific actions (show, update)
+    $routeId   = (int)$matches[1];
+} elseif (preg_match('#^api/admin/orders/(\d+)$#', $route, $matches)) {
     $routeBase = 'api/admin/orders';
     $routeId   = (int)$matches[1];
-}
- else {
+} else {
     $routeBase = $route;
     $routeId   = null;
 }
@@ -204,6 +212,47 @@ switch ($routeBase) {
             AdminSubstanceController::updateSubstance();
         } else {
             Response::json(['error' => 'Método no permitido. Use POST para actualizar sustancias.'], 405);
+        }
+        break;
+
+    // ------------------------------------------------------------------------
+    // RUTAS ADMIN PRODUCTS
+    // ------------------------------------------------------------------------
+    case 'api/admin/products': // Handles GET (list) and POST (create)
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            AdminProductController::index();
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            AdminProductController::store();
+        } else {
+            Response::json(['error' => 'Método no permitido para /api/admin/products'], 405);
+        }
+        break;
+
+    case 'api/admin/products_id_action': // Handles GET /api/admin/products/{id} (show) and POST /api/admin/products/{id} (update)
+        if ($routeId !== null) {
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                AdminProductController::show($routeId);
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') { // Using POST for update to support multipart/form-data
+                AdminProductController::update($routeId);
+            } else {
+                Response::json(['error' => "Método no permitido para /api/admin/products/{$routeId}"], 405);
+            }
+        } else {
+            Response::json(['error' => 'ID de producto no especificado para la acción.'], 400);
+        }
+        break;
+
+    case 'api/admin/products_delete_action': // Handles POST /api/admin/products/{id}/delete
+        if ($routeId !== null) {
+            // For deletion, it's common to use DELETE method, but POST is also acceptable and simpler for forms.
+            // Let's stick to POST for now for consistency with how we might handle it from a simple admin form.
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') { 
+                AdminProductController::destroy($routeId);
+            } else {
+                Response::json(['error' => "Método no permitido para /api/admin/products/{$routeId}/delete. Use POST."], 405);
+            }
+        } else {
+            Response::json(['error' => 'ID de producto no especificado para eliminar.'], 400);
         }
         break;
 
