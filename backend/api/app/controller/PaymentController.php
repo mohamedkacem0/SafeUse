@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controllers;
 
 // PaymentController.php is in backend/api/app/controller/
 // Assuming vendor/ is in backend/api/vendor/ (i.e., composer install was run in backend/api/)

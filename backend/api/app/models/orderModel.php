@@ -93,9 +93,9 @@ class OrderModel {
 
         // 1. Get all main order records for the user, including the pre-calculated total price
         $sqlOrders = "SELECT ID_Pedido, Fecha_Pedido, Estado_Pedido, Direccion_entrega, precio_total AS Total_Pedido 
-                      FROM pedidos 
-                      WHERE ID_Usuario = :user_id 
-                      ORDER BY Fecha_Pedido DESC";
+                  FROM pedidos 
+                  WHERE ID_Usuario = :user_id 
+                  ORDER BY Fecha_Pedido DESC, ID_Pedido DESC";
         
         $stmtOrders = $pdo->prepare($sqlOrders);
         $stmtOrders->bindParam(':user_id', $userId, PDO::PARAM_INT);

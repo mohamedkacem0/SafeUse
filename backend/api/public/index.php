@@ -111,6 +111,28 @@ if (preg_match('#^api/admin/contact/(\d+)$#', $route, $matches)) {
 
 switch ($routeBase) {
     // ------------------------------------------------------------------------
+    // RUTAS DE PAGO
+    // ------------------------------------------------------------------------
+    case 'api/create-payment-intent':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            PaymentController::createPaymentIntent();
+        } else {
+            Response::json(['error' => 'Método no permitido. Use POST para crear una intención de pago.'], 405);
+        }
+        break;
+
+    // ------------------------------------------------------------------------
+    // RUTAS DE PEDIDOS
+    // ------------------------------------------------------------------------
+    case 'api/orders/history':
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            OrderController::getUserOrders();
+        } else {
+            Response::json(['error' => 'Método no permitido. Use GET para obtener el historial de pedidos.'], 405);
+        }
+        break;
+
+    // ------------------------------------------------------------------------
     // RUTAS PÚBLICAS: Contact (público)
     // ------------------------------------------------------------------------
     // GET  /api/contact       -> lista todas las consultas

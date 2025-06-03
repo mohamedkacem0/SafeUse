@@ -143,14 +143,14 @@ const MyOrders: React.FC = () => {
                     <div>
                       <h2 className="text-xl sm:text-2xl font-bold">Order #{order.ID_Pedido}</h2>
                       <p className="text-sm sm:text-base opacity-90">
-                        Placed on: {new Date(order.Fecha_Pedido).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                        Placed on: {new Date(order.Fecha_Pedido).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </div>
                     <div className="mt-3 sm:mt-0 text-left sm:text-right">
                       <p className="text-lg sm:text-xl font-semibold">
-                        Total: {typeof order.Total_Pedido === 'number' 
-                                ? order.Total_Pedido.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })
-                                : 'N/A'}
+                        Total: {order.Total_Pedido !== null && !isNaN(Number(order.Total_Pedido))
+                                ? Number(order.Total_Pedido).toLocaleString('en-US', { style: 'currency', currency: 'EUR' })
+                                : order.detalles.reduce((sum, item) => sum + (item.Precio_total || 0), 0).toLocaleString('en-US', { style: 'currency', currency: 'EUR' })}
                       </p>
                       <span 
                         className={`px-3 py-1 text-xs sm:text-sm font-semibold rounded-full mt-1 inline-block ${ 
