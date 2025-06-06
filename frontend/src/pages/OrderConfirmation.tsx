@@ -171,13 +171,12 @@ const OrderConfirmation: React.FC = () => {
             >
               Continue Shopping
             </Link>
-            {/* Más adelante podrías añadir un enlace a 'Mis Pedidos' */}
-            {/* <Link 
+            <Link 
               to="/my-orders"
-              className="ml-4 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-md text-sm transition duration-150 ease-in-out"
+              className="ml-4 bg-emerald-600 hover:bg-gray-300 text-white font-semibold py-3 px-6 rounded-md text-sm transition duration-150 ease-in-out"
             >
-              Ver Mis Pedidos
-            </Link> */}
+              My orders
+            </Link> 
           </div>
         </div>
       </main>
