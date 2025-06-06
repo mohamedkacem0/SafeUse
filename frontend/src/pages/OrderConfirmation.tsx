@@ -120,22 +120,22 @@ const OrderConfirmation: React.FC = () => {
         <div className="bg-white shadow-xl rounded-lg p-8 md:p-12 max-w-2xl mx-auto">
           <div className="text-center mb-8">
             <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-            <h1 className="text-3xl font-bold text-gray-800">¡Tu compra ha sido realizada con éxito!</h1>
-            <p className="text-gray-600 mt-2">Gracias por tu pedido. Hemos recibido tu pago.</p>
+            <h1 className="text-3xl font-bold text-gray-800">Your purchase has been successfully completed!</h1>
+            <p className="text-gray-600 mt-2">Thank you for your order. We have received your payment.</p>
           </div>
 
           <div className="bg-gray-100 p-6 rounded-lg mb-8">
-            <h2 className="text-xl font-semibold text-gray-700 mb-3">Resumen del Pedido</h2>
+            <h2 className="text-xl font-semibold text-gray-700 mb-3">Order Summary</h2>
             <div className="space-y-2 text-sm text-gray-600">
-              <p><strong>Número de Pedido:</strong> {orderId}</p>
-              <p><strong>Fecha:</strong> {new Date(paymentDate).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })} - {new Date(paymentDate).toLocaleTimeString('es-ES')}</p>
-              <p className="text-lg font-bold text-gray-800"><strong>Total Pagado:</strong> {total.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}</p>
+              <p><strong>Order number:</strong> {orderId}</p>
+              <p><strong>Date:</strong> {new Date(paymentDate).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })} - {new Date(paymentDate).toLocaleTimeString('es-ES')}</p>
+              <p className="text-lg font-bold text-gray-800"><strong>Total:</strong> {total.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}</p>
             </div>
           </div>
 
           {shippingAddress && (
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">Dirección de Envío</h3>
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">Order Adress</h3>
               <div className="text-sm text-gray-600 bg-white p-4 border rounded-md">
                 <p>{shippingAddress.name}</p>
                 <p>{shippingAddress.address}</p>
@@ -147,14 +147,14 @@ const OrderConfirmation: React.FC = () => {
 
           <div>
             <h3 className="text-lg font-semibold text-gray-700 mb-3 flex items-center">
-              <Package size={20} className="mr-2" /> Productos Comprados
+              <Package size={20} className="mr-2" /> Products Purchased
             </h3>
             <ul className="divide-y divide-gray-200 border rounded-md">
               {items.map((item) => (
                 <li key={item.id} className="p-4 flex justify-between items-center">
                   <div>
                     <p className="font-semibold text-gray-800">{item.name}</p>
-                    <p className="text-xs text-gray-500">Cantidad: {item.quantity}</p>
+                    <p className="text-xs text-gray-500">Quantity: {item.quantity}</p>
                   </div>
                   <p className="text-gray-700 font-medium">
                     {(item.price * item.quantity).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}
@@ -169,7 +169,7 @@ const OrderConfirmation: React.FC = () => {
               to="/"
               className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-md text-sm transition duration-150 ease-in-out"
             >
-              Seguir Comprando
+              Continue Shopping
             </Link>
             {/* Más adelante podrías añadir un enlace a 'Mis Pedidos' */}
             {/* <Link 
