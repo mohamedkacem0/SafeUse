@@ -1,5 +1,5 @@
 // src/pages/ShopPage.tsx
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Search, SearchX } from "lucide-react";
 import { motion } from "framer-motion";
 import DrugCard from "../components/Card";
