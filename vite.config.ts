@@ -8,6 +8,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: '0.0.0.0',
+    allowedHosts: ['safeuse.onrender.com'],
     proxy: {
       '/api': {
         target: 'http://localhost/tfg/SafeUse/backend/api/public/index.php',
