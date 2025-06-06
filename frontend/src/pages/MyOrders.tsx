@@ -143,7 +143,7 @@ const MyOrders: React.FC = () => {
                     <div>
                       <h2 className="text-xl sm:text-2xl font-bold">Order #{order.ID_Pedido}</h2>
                       <p className="text-sm sm:text-base opacity-90">
-                        Placed on: {new Date(order.Fecha_Pedido).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                        Placed on: {new Date(order.Fecha_Pedido).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric'})}
                       </p>
                     </div>
                     <div className="mt-3 sm:mt-0 text-left sm:text-right">
