@@ -35,7 +35,7 @@ export default function SubstancesPage() {
 
   useEffect(() => {
     fetch(
-      "https://safeuse.onrender.com/api?route=api/sustancias"
+      "https://safeuse.onrender.com/index.php?route=api/sustancias"
     )
       .then<ApiSubstance[]>(res => res.json())
       .then(apiData => {
