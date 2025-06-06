@@ -7,6 +7,7 @@ export default defineConfig({
   root: path.resolve(__dirname, 'frontend'),
   plugins: [react()],
   server: {
+    host: '0.0.0.0',
     proxy: {
       '/api': {
         target: 'http://localhost/tfg/SafeUse/backend/api/public/index.php',
