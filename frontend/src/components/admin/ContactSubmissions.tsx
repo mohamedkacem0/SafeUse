@@ -1,5 +1,5 @@
 // src/components/admin/ContactSubmissions.tsx
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import {
   Card,
   CardHeader,
