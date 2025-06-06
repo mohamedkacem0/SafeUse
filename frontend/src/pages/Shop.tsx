@@ -31,7 +31,7 @@ export default function ShopPage() {
 
   // Load products
   useEffect(() => {
-    fetch("/api?route=api/productos", { credentials: "include" })
+    fetch("https://safeuse.onrender.com?route=api/productos", { credentials: "include" })
       .then(res => res.json())
       .then((data: any[]) => {
         const parsed: Product[] = data.map(p => ({
