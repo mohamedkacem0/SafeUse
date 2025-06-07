@@ -8,10 +8,10 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: '0.0.0.0',
-    allowedHosts: ['safeuse.onrender.com'],
+    allowedHosts: ['safeuse-lkde.onrender.com'],
     proxy: {
       '/api': {
-        target: 'https://safeuse.onrender.com',
+        target: 'https://safeuse-lkde.onrender.com',
         changeOrigin: true,
         // convierte "/api/loquesea" en "?route=api/loquesea"
         rewrite: (path) =>
