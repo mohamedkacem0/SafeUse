@@ -11,7 +11,7 @@ export default defineConfig({
     allowedHosts: ['safeuse.onrender.com'],
     proxy: {
       '/api': {
-        target: 'http://localhost/tfg/SafeUse/backend/api/public/index.php',
+        target: 'https://safeuse.onrender.com',
         changeOrigin: true,
         // convierte "/api/loquesea" en "?route=api/loquesea"
         rewrite: (path) =>
