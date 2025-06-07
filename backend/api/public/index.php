@@ -439,8 +439,6 @@ switch ($routeBase) {
     case 'api/cart/count':
         CartController::getCartCount();
         break;
-
-
     // Ordenes (público)
     case 'api/order/create':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
