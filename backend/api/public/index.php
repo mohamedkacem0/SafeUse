@@ -6,8 +6,7 @@ error_reporting(E_ALL);
 
 // CORS headers
 $allowed_origins = [
-    'https://safeuse.onrender.com',
-    'http://localhost:5173'
+    'https://safeuse.onrender.com'
 ];
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 if (in_array($origin, $allowed_origins)) {
