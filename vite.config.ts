@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: '0.0.0.0',
-    allowedHosts: ['safeuse-lkde.onrender.com'],
+    allowedHosts: ['safeuse.onrender.com'],
     proxy: {
       '/api': {
         target: 'https://safeuse-lkde.onrender.com',
