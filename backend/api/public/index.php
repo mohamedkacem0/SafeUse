@@ -464,11 +464,6 @@ switch ($routeBase) {
         CartController::getCartCount();
         break;
 
-    // Pago (público)
-    case 'api/create-payment-intent':
-        PaymentController::createPaymentIntent();
-        break;
-
     // Ordenes (público)
     case 'api/order/create':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
