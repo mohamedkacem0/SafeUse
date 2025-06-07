@@ -23,7 +23,7 @@ class ShopModel
 
         // 1) Obtener todos los productos
         $products = $pdo
-            ->query('SELECT * FROM Productos')
+            ->query('SELECT * FROM productos')
             ->fetchAll(PDO::FETCH_ASSOC);
 
         // 2) Obtener todas las imágenes ordenadas
