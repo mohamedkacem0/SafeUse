@@ -5,9 +5,12 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 // CORS headers
+$allowed_origins = [
+    'https://safeuse.onrender.com',
+    'http://localhost:5173'
+];
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-
-if ($origin === 'https://safeuse.onrender.com') {
+if (in_array($origin, $allowed_origins)) {
     header("Access-Control-Allow-Origin: $origin");
     header("Access-Control-Allow-Credentials: true");
     header("Access-Control-Allow-Methods: GET, POST, OPTIONS");

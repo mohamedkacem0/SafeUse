@@ -85,48 +85,52 @@ export default function ShopPage() {
     setButtonStatus(prev => ({ ...prev, [productId]: 'adding' }));
 
     try {
-      const response = await fetch(`/api?route=api/cart/add`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ productId, quantity }),
-      });
+      const response = await fetch(
+        'https://safeuse-lkde.onrender.com/?route=api/cart/add',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({ productId, quantity }),
+        }
+      );
 
       const data = await response.json();
 
       if (!response.ok || !data.success) {
-        if (response.status === 401) { // Specific check for unauthorized
+        if (response.status === 401) {
           toast(
-          (t) => (
-            <div className="bg-white p-4 rounded-lg shadow-lg flex flex-col items-start text-sm">
-              <p className="text-gray-800 mb-3">
-                You need to be logged in to add items to your cart.
-              </p>
-              <div className="flex w-full space-x-2">
-                <button
-                  onClick={() => {
-                    navigate('/login');
-                    toast.dismiss(t.id);
-                  }}
-                  className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md font-medium transition-colors duration-150"
-                >
-                  Login
-                </button>
-                <button
-                  onClick={() => toast.dismiss(t.id)}
-                  className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-md font-medium transition-colors duration-150"
-                >
-                  Dismiss
-                </button>
+            (t) => (
+              <div className="bg-white p-4 rounded-lg shadow-lg flex flex-col items-start text-sm">
+                <p className="text-gray-800 mb-3">
+                  You need to be logged in to add items to your cart.
+                </p>
+                <div className="flex w-full space-x-2">
+                  <button
+                    onClick={() => {
+                      navigate('/login');
+                      toast.dismiss(t.id);
+                    }}
+                    className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md font-medium transition-colors duration-150"
+                  >
+                    Login
+                  </button>
+                  <button
+                    onClick={() => toast.dismiss(t.id)}
+                    className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-md font-medium transition-colors duration-150"
+                  >
+                    Dismiss
+                  </button>
+                </div>
               </div>
-            </div>
-          ),
-          {
-            duration: 6000, // Keep it on screen a bit longer for interaction
-            id: 'login-required-toast', // Prevent duplicate toasts if clicked multiple times fast
-          }
-        );
+            ),
+            {
+              duration: 6000,
+              id: 'login-required-toast',
+            }
+          );
         } else {
           toast.error(data.message || 'Failed to add product. Please try again.');
         }
@@ -137,14 +141,12 @@ export default function ShopPage() {
       toast.success(data.message || `${productName} added to cart!`);
       setButtonStatus(prev => ({ ...prev, [productId]: 'added' }));
 
-      // Locally update product stock
       setProducts(prevProducts =>
         prevProducts.map(p =>
           p.id === productId ? { ...p, stock: p.stock - quantity } : p
         )
       );
 
-      // Dispatch event to update cart icon
       window.dispatchEvent(new CustomEvent('cartUpdated'));
 
       setTimeout(() => {
