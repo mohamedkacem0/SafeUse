@@ -84,7 +84,7 @@ class ShopModel
         $pdo = DB::getInstance()->conn();
 
         // 1) Obtener datos del producto
-        $stmt = $pdo->prepare('SELECT * FROM Productos WHERE ID_Producto = ?');
+        $stmt = $pdo->prepare('SELECT * FROM productos WHERE ID_Producto = ?');
         $stmt->execute([$id]);
         $prod = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$prod) {
