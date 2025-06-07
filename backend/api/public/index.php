@@ -130,15 +130,6 @@ switch ($routeBase) {
         break;
 
     // ------------------------------------------------------------------------
-    // RUTAS DE PEDIDOS
-    // ------------------------------------------------------------------------
-    case 'api/orders/history':
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            OrderController::getUserOrders();
-        } else {
-            Response::json(['error' => 'Método no permitido. Use GET para obtener el historial de pedidos.'], 405);
-        }
-        break;
 
     // ------------------------------------------------------------------------
     // RUTAS PÚBLICAS: Contact (público)
@@ -213,13 +204,7 @@ switch ($routeBase) {
     // GET   /api/admin/substances/list_basic -> lista básicas
     // GET   /api/admin/substances/list_details -> lista detalladas
     // POST  /api/admin/substances/update     -> actualiza sustancia
-    case 'api/admin/substances/add':
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            AdminSubstanceController::addSubstance();
-        } else {
-            Response::json(['error' => 'Método no permitido. Use POST para añadir sustancias.'], 405);
-        }
-        break;
+
 
     case 'api/admin/substances/list_basic':
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -388,15 +373,6 @@ switch ($routeBase) {
 
     // Registro y login (público)
 
-    case 'api/users/delete':
-        // Solo permite DELETE y espera el id en el body JSON
-        if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-            UserController::deleteUser();
-        } else {
-            Response::json(['error' => 'Método no permitido'], 405);
-        }
-        break;
-
     case 'api/register':
         UserController::register();
         break;
@@ -464,10 +440,6 @@ switch ($routeBase) {
         CartController::getCartCount();
         break;
 
-    // Pago (público)
-    case 'api/create-payment-intent':
-        PaymentController::createPaymentIntent();
-        break;
 
     // Ordenes (público)
     case 'api/order/create':
@@ -491,30 +463,6 @@ switch ($routeBase) {
             AdminSubstanceController::addSubstance();
         } else {
             App\Core\Response::json(['error' => 'Method not allowed. Use POST for adding substances.'], 405);
-        }
-        break;
-
-    case 'api/admin/substances/list_basic':
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            AdminSubstanceController::listBasic();
-        } else {
-            App\Core\Response::json(['error' => 'Method not allowed. Use GET for listing basic substances.'], 405);
-        }
-        break;
-
-    case 'api/admin/substances/list_details':
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            AdminSubstanceController::listDetails();
-        } else {
-            App\Core\Response::json(['error' => 'Method not allowed. Use GET for listing detailed substances.'], 405);
-        }
-        break;
-
-    case 'api/admin/substances/update':
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            AdminSubstanceController::updateSubstance();
-        } else {
-            App\Core\Response::json(['error' => 'Method not allowed. Use POST for updating substances.'], 405);
         }
         break;
 
