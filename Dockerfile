@@ -10,5 +10,8 @@ RUN a2enmod rewrite
 # Copy the whole backend/api directory (including app, public, etc.)
 COPY backend/api/ /var/www/html/
 
+# List the contents of the /var/www/html directory recursively
+RUN ls -lR /var/www/html/
+
 # Expose port 80
 EXPOSE 80
