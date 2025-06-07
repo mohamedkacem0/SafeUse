@@ -35,7 +35,7 @@ export default function SubstancesPage() {
 
   useEffect(() => {
     fetch(
-      "https://safeuse-lkde.onrender.com/index.php?route=api/sustancias"
+      "https://safeuse-lkde.onrender.com/index.php?route=api/sustancias", { credentials: "include" }
     )
       .then<ApiSubstance[]>(res => res.json())
       .then(apiData => {
