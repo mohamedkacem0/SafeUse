@@ -7,7 +7,7 @@ const AdminHeader: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch('/api?route=api/logout', { // Align with Profile.tsx
+      const response = await fetch('api/logout', { // Align with Profile.tsx
         method: 'POST',
         credentials: 'include', // Align with Profile.tsx
         headers: {

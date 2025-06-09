@@ -9,11 +9,11 @@ class ShopModel
     /** URL base para las carpetas de subida de imágenes */
     private static function baseUploadsUrl(): string
     {
-        return 'http://localhost/tfg/SafeUse/uploads/productos/';
+        return 'http://localhost/tfg/SafeUse/uploads/Productos/';
     }
 
     /**
-     * Devuelve todos los productos con:
+     * Devuelve todos los Productos con:
      * - 'Imagen_Principal': primera imagen (numero_imagen=1)
      * - 'galeria': array de todas las imágenes (principal incluida en la posición 0)
      */
@@ -21,9 +21,9 @@ class ShopModel
     {
         $pdo = DB::getInstance()->conn();
 
-        // 1) Obtener todos los productos
+        // 1) Obtener todos los Productos
         $products = $pdo
-            ->query('SELECT * FROM productos')
+            ->query('SELECT * FROM Productos')
             ->fetchAll(PDO::FETCH_ASSOC);
 
         // 2) Obtener todas las imágenes ordenadas
@@ -40,7 +40,7 @@ class ShopModel
         $uploadsBase = self::baseUploadsUrl();
         $out = [];
 
-        // 4) Construir array final de productos
+        // 4) Construir array final de Productos
         foreach ($products as $prod) {
             $pid = (int)$prod['ID_Producto'];
             $imgs = $mapImgs[$pid] ?? [];
@@ -84,7 +84,7 @@ class ShopModel
         $pdo = DB::getInstance()->conn();
 
         // 1) Obtener datos del producto
-        $stmt = $pdo->prepare('SELECT * FROM productos WHERE ID_Producto = ?');
+        $stmt = $pdo->prepare('SELECT * FROM Productos WHERE ID_Producto = ?');
         $stmt->execute([$id]);
         $prod = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$prod) {

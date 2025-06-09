@@ -136,7 +136,7 @@ export default function UserManagement() {
 
     try {
       const res = await fetch(
-        "http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/users/updateUserByAdmin",
+        "api/users/updateUserByAdmin",
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -163,7 +163,7 @@ export default function UserManagement() {
   const handleDelete = useCallback((id: number) => {
     if (!window.confirm('¿Estás seguro de querer eliminar este usuario?')) return;
     fetch(
-      'http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/users/delete',
+      'api/users/delete',
       {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
@@ -204,7 +204,7 @@ export default function UserManagement() {
 
     try {
       const res = await fetch(
-  'http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/admin/users/addUser',
+  'api/admin/users/addUser',
   {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

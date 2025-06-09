@@ -97,7 +97,7 @@ const CheckoutForm = ({ orderTotal, userName, initialCardName, onPaymentSuccess 
 
     try {
       // 1. Create PaymentIntent on the server
-      const response = await fetch('/api?route=api/create-payment-intent', { // Ensure this matches your backend route
+      const response = await fetch('api/create-payment-intent', { // Ensure this matches your backend route
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

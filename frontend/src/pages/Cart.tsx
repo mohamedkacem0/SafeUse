@@ -38,7 +38,7 @@ export default function Cart() {
 
   // Load cart items
   useEffect(() => {
-    fetch("/api?route=api/cart", { credentials: "include" })
+    fetch("api/cart", { credentials: "include" })
       .then(res => {
         if (res.status === 401) {
           setAuthError(true);
@@ -81,7 +81,7 @@ export default function Cart() {
     if (newQty === item.quantity && delta < 0) return; 
 
     try {
-      const response = await fetch("/api?route=api/cart/update", {
+      const response = await fetch("api/cart/update", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -118,7 +118,7 @@ export default function Cart() {
     if (!itemToRemove) return;
 
     try {
-      const response = await fetch("/api?route=api/cart/remove", {
+      const response = await fetch("api/cart/remove", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

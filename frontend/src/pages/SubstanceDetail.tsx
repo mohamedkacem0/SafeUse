@@ -29,7 +29,7 @@ export default function SubstanceDetail() {
       setLoading(true);
       try {
         const resSubstances = await fetch(
-          `http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/sustancias`
+          `api/sustancias`
         );
         const substances: any[] = await resSubstances.json();
         const substance = substances.find(
@@ -38,7 +38,7 @@ export default function SubstanceDetail() {
         if (!substance) throw new Error("Sustancia no encontrada");
 
         const resDetail = await fetch(
-          `http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/sustancia&id=${substance.ID_Sustancia}`
+          `api/sustancia&id=${substance.ID_Sustancia}`
         );
         const detail = await resDetail.json();
 

@@ -86,7 +86,7 @@ export default function ShopPage() {
 
     try {
       const response = await fetch(
-        'http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/cart/add',
+        'api/cart/add',
         {
           method: 'POST',
           headers: {

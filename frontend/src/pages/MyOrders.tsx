@@ -47,7 +47,7 @@ const MyOrders: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch('http://localhost/TFG/SafeUse/backend/api/public/index.php?route=api/orders/history', {
+        const response = await fetch('api/orders/history', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
