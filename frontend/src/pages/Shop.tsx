@@ -31,7 +31,7 @@ export default function ShopPage() {
 
   // Load products
   useEffect(() => {
-    fetch("https://safeuse-lkde.onrender.com/?route=api/productos", { credentials: "include" })
+    fetch("http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/productos", { credentials: "include" })
       .then(res => res.json())
       .then((data: any[]) => {
         const parsed: Product[] = data.map(p => ({
@@ -86,7 +86,7 @@ export default function ShopPage() {
 
     try {
       const response = await fetch(
-        'https://safeuse-lkde.onrender.com/?route=api/cart/add',
+        'http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/cart/add',
         {
           method: 'POST',
           headers: {
