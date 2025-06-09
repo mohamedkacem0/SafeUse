@@ -20,7 +20,7 @@ export default function Header() {
     // Fetch cart item count
     const fetchCartCount = async () => {
       try {
-        const response = await fetch('/api?route=api/cart/count', {
+        const response = await fetch('api/cart/count', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

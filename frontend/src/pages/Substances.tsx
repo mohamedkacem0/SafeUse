@@ -35,7 +35,7 @@ export default function SubstancesPage() {
 
   useEffect(() => {
     fetch(
-      "http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/sustancias", { credentials: "include" }
+      "api/sustancias", { credentials: "include" }
     )
       .then<ApiSubstance[]>(res => res.json())
       .then(apiData => {

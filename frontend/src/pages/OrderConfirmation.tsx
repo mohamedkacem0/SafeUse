@@ -66,7 +66,7 @@ const OrderConfirmation: React.FC = () => {
         };
 
         try {
-          const response = await fetch('http://localhost/TFG/SafeUse/backend/api/public/index.php?route=api/order/create', {
+          const response = await fetch('api/order/create', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

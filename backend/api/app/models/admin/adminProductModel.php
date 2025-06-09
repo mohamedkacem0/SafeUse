@@ -17,7 +17,7 @@ class AdminProductModel
         $pdo = DB::getInstance()->conn();
         $stmt = $pdo->query(
             "SELECT p.*, GROUP_CONCAT(ip.url_imagen SEPARATOR ';') as imagenes 
-             FROM Productos p 
+             FROM productos p 
              LEFT JOIN imagenes_producto ip ON p.ID_Producto = ip.ID_Producto 
              GROUP BY p.ID_Producto 
              ORDER BY p.ID_Producto DESC"
@@ -46,7 +46,7 @@ class AdminProductModel
     public static function getById(int $id): ?array
     {
         $pdo = DB::getInstance()->conn();
-        $stmt = $pdo->prepare("SELECT * FROM Productos WHERE ID_Producto = ?");
+        $stmt = $pdo->prepare("SELECT * FROM productos WHERE ID_Producto = ?");
         $stmt->execute([$id]);
         $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -72,7 +72,7 @@ class AdminProductModel
         try {
             $pdo->beginTransaction();
 
-            $sql = "INSERT INTO Productos (Nombre, Precio, Stock, Descripcion, Fecha_Creacion) VALUES (?, ?, ?, ?, NOW())";
+            $sql = "INSERT INTO productos (Nombre, Precio, Stock, Descripcion, Fecha_Creacion) VALUES (?, ?, ?, ?, NOW())";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([
                 $data['Nombre'], 
@@ -116,7 +116,7 @@ class AdminProductModel
         try {
             $pdo->beginTransaction();
 
-            $sql = "UPDATE Productos SET Nombre = ?, Precio = ?, Stock = ?, Descripcion = ? WHERE ID_Producto = ?";
+            $sql = "UPDATE productos SET Nombre = ?, Precio = ?, Stock = ?, Descripcion = ? WHERE ID_Producto = ?";
             $stmt = $pdo->prepare($sql);
             $success = $stmt->execute([
                 $data['Nombre'], 
@@ -187,8 +187,8 @@ class AdminProductModel
             $stmt_imgs = $pdo->prepare("DELETE FROM imagenes_producto WHERE ID_Producto = ?");
             $stmt_imgs->execute([$id]);
 
-            // 3. Delete from Productos
-            $stmt_prod = $pdo->prepare("DELETE FROM Productos WHERE ID_Producto = ?");
+            // 3. Delete from productos
+            $stmt_prod = $pdo->prepare("DELETE FROM productos WHERE ID_Producto = ?");
             $success = $stmt_prod->execute([$id]);
 
             if ($success) {

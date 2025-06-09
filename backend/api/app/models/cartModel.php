@@ -27,7 +27,7 @@ class CartModel {
                     p.Precio,
                     img.url_imagen
              FROM cart_items ci
-             JOIN Productos p ON ci.product_id = p.ID_Producto
+             JOIN productos p ON ci.product_id = p.ID_Producto
              LEFT JOIN imagenes_producto img
                ON img.ID_Producto = p.ID_Producto AND img.numero_imagen = 1
              WHERE ci.user_id = :uid'
@@ -63,7 +63,7 @@ class CartModel {
             $pdo->beginTransaction();
 
             // 1. Get current stock
-            $stmtStock = $pdo->prepare('SELECT Stock FROM Productos WHERE ID_Producto = :pid FOR UPDATE'); // Lock row for update
+            $stmtStock = $pdo->prepare('SELECT Stock FROM productos WHERE ID_Producto = :pid FOR UPDATE'); // Lock row for update
             $stmtStock->execute(['pid' => $productId]);
             $productStock = $stmtStock->fetchColumn();
 
@@ -85,8 +85,8 @@ class CartModel {
                 throw new \Exception("Not enough stock available for the quantity requested to add.");
             }
 
-            // 3. Decrement stock in Productos table
-            $stmtUpdateStock = $pdo->prepare('UPDATE Productos SET Stock = Stock - :qty WHERE ID_Producto = :pid');
+            // 3. Decrement stock in productos table
+            $stmtUpdateStock = $pdo->prepare('UPDATE productos SET Stock = Stock - :qty WHERE ID_Producto = :pid');
             $stmtUpdateStock->execute(['qty' => $qty, 'pid' => $productId]);
 
             // 4. Add/Update item in cart_items
@@ -136,7 +136,7 @@ class CartModel {
 
             if ($qtyDifference > 0) { // Increasing quantity
                 // Check current stock
-                $stmtStock = $pdo->prepare('SELECT Stock FROM Productos WHERE ID_Producto = :pid FOR UPDATE');
+                $stmtStock = $pdo->prepare('SELECT Stock FROM productos WHERE ID_Producto = :pid FOR UPDATE');
                 $stmtStock->execute(['pid' => $productId]);
                 $productStock = (int)$stmtStock->fetchColumn();
 
@@ -144,11 +144,11 @@ class CartModel {
                     throw new \Exception("Not enough stock to increase quantity.");
                 }
                 // Decrement stock
-                $stmtUpdateStock = $pdo->prepare('UPDATE Productos SET Stock = Stock - :diff WHERE ID_Producto = :pid');
+                $stmtUpdateStock = $pdo->prepare('UPDATE productos SET Stock = Stock - :diff WHERE ID_Producto = :pid');
                 $stmtUpdateStock->execute(['diff' => $qtyDifference, 'pid' => $productId]);
             } elseif ($qtyDifference < 0) { // Decreasing quantity
                 // Increment stock
-                $stmtUpdateStock = $pdo->prepare('UPDATE Productos SET Stock = Stock + :diff WHERE ID_Producto = :pid');
+                $stmtUpdateStock = $pdo->prepare('UPDATE productos SET Stock = Stock + :diff WHERE ID_Producto = :pid');
                 $stmtUpdateStock->execute(['diff' => abs($qtyDifference), 'pid' => $productId]);
             }
             // If $qtyDifference is 0, no stock change needed, just proceed to update cart quantity if different (though logic implies $newQty != $currentCartQty)
@@ -180,8 +180,8 @@ class CartModel {
             $currentCartQty = (int)$stmtCartQty->fetchColumn();
 
             if ($currentCartQty > 0) {
-                // 2. Increment stock in Productos table
-                $stmtUpdateStock = $pdo->prepare('UPDATE Productos SET Stock = Stock + :qty WHERE ID_Producto = :pid');
+                // 2. Increment stock in productos table
+                $stmtUpdateStock = $pdo->prepare('UPDATE productos SET Stock = Stock + :qty WHERE ID_Producto = :pid');
                 $stmtUpdateStock->execute(['qty' => $currentCartQty, 'pid' => $productId]);
             } else {
                 // Item not in cart or quantity is 0, nothing to restore to stock, but proceed to ensure it's deleted if somehow present

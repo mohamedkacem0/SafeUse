@@ -79,7 +79,7 @@ export default function AdviceManagement() {
     setAdviceError(null);
     try {
       const res = await fetch(
-        'http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/admin/advice',
+        'api/admin/advice',
         {
           method: 'GET',
           credentials: 'include',
@@ -131,7 +131,7 @@ export default function AdviceManagement() {
     if (!confirm('¿Seguro que quieres borrar este consejo?')) return;
     try {
       const res = await fetch(
-        `http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/admin/advice/${id}`,
+        `api/admin/advice/${id}`,
         {
           method: 'DELETE',
           credentials: 'include',
@@ -174,8 +174,8 @@ export default function AdviceManagement() {
     try {
       const isEdit = !!editingAdvice;
       const url = isEdit
-        ? `http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/admin/advice/${editingAdvice?.ID_Advice}`
-        : 'http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/admin/advice';
+        ? `api/admin/advice/${editingAdvice?.ID_Advice}`
+        : 'api/admin/advice';
       const method = isEdit ? 'PUT' : 'POST';
       const res = await fetch(url, {
         method,

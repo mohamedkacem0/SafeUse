@@ -53,7 +53,7 @@ export default function AdminDashboard() {
     data: productsCount,
     loading: loadingProducts,
     error: productsError,
-  } = useFetchData<number>('/api/productos', (json) => {
+  } = useFetchData<number>('http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/productos', (json) => {
     if (Array.isArray(json)) return json.length;
     if (Array.isArray((json as any).productos)) return (json as any).productos.length;
     if (typeof (json as any).total === 'number') return (json as any).total;

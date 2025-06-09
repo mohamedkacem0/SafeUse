@@ -34,7 +34,7 @@ export default function Contact() {
    };
    try {
      const dbRes = await fetch(
-       'http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/contact',
+       'api/contact',
        {
          method: 'POST',
          headers: { 'Content-Type': 'application/json' },

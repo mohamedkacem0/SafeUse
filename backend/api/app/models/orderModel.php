@@ -107,11 +107,11 @@ class OrderModel {
         }
 
         // 2. For each order, get its details including product name and image
-        // Assuming 'Productos' has 'Nombre' for product name and 'Imagen_principal' for image URL/path
+        // Assuming 'productos' has 'Nombre' for product name and 'Imagen_principal' for image URL/path
         $sqlDetails = "SELECT dp.ID_Producto, dp.Cantidad, dp.Precio_Unitario, dp.Precio_total, 
                               p.Nombre as NombreProducto, ip.url_imagen as ImagenProducto
                        FROM detalles_pedido dp
-                       JOIN Productos p ON dp.ID_Producto = p.ID_Producto
+                       JOIN productos p ON dp.ID_Producto = p.ID_Producto
                        LEFT JOIN imagenes_producto ip ON p.ID_Producto = ip.ID_Producto AND ip.numero_imagen = 1
                        WHERE dp.ID_Pedido = :id_pedido";
         $stmtDetails = $pdo->prepare($sqlDetails);

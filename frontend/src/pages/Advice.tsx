@@ -30,7 +30,7 @@ export default function Advice() {
     async function fetchAdvices() {
       try {
         const res = await fetch(
-          'http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/advices'
+          'api/advices'
         );
         const data: Advice[] = await res.json();
         setAdvices(data);

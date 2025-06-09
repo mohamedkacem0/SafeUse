@@ -58,7 +58,7 @@ export default function OrdersManagement() {
     loading: loadingOrders,
     error: ordersError,
   } = useFetchData<Order[]>(
-    'http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/admin/orders',
+    'api/admin/orders',
     (json) => {
       if (json && Array.isArray((json as any).orders)) {
         return (json as any).orders;
@@ -95,7 +95,7 @@ export default function OrdersManagement() {
 
     try {
       const res = await fetch(
-        `http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/admin/orders/${id}`,
+        `api/admin/orders/${id}`,
         {
           method: 'DELETE',
           credentials: 'include',
@@ -128,7 +128,7 @@ export default function OrdersManagement() {
 
     try {
       const res = await fetch(
-        `http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/admin/orders/${order.id}/details`,
+        `api/admin/orders/${order.id}/details`,
         {
           method: 'GET',
           credentials: 'include',
@@ -197,7 +197,7 @@ export default function OrdersManagement() {
     for (const detail of orderDetails) {
       try {
         const res = await fetch(
-          `http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/admin/orders/${selectedOrder.id}/details/${detail.detail_id}`,
+          `api/admin/orders/${selectedOrder.id}/details/${detail.detail_id}`,
           {
             method: 'PUT',
             credentials: 'include',
