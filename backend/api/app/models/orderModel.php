@@ -12,7 +12,7 @@ class OrderModel {
     {
         // Ensure this path is correct for your setup. 
         // It should point to the directory where product images are publicly accessible.
-        return 'http://localhost/tfg/SafeUse/uploads/productos/';
+        return 'https://safeuse-lkde.onrender.com/uploads/productos/';
     }
 
     /** Comprueba si la ruta es ya URL absoluta */

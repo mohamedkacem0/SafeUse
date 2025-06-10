@@ -9,7 +9,7 @@ class ShopModel
     /** URL base para las carpetas de subida de imágenes */
     private static function baseUploadsUrl(): string
     {
-        return 'http://localhost/tfg/SafeUse/uploads/productos/';
+        return 'https://safeuse-lkde.onrender.com/uploads/productos/';
     }
 
     /**
