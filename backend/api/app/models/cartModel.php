@@ -7,7 +7,7 @@ use PDO;
 class CartModel {
     /** Base URL para subir imágenes de productos */
     private static function baseUploadsUrl(): string {
-        return 'http://localhost/tfg/SafeUse/uploads/productos/';
+        return 'https://safeuse-lkde.onrender.com/uploads/productos/';
     }
 
     private static function isAbsolute(string $path): bool {
