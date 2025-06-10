@@ -86,7 +86,7 @@ export default function ShopPage() {
 
     try {
       const response = await fetch(
-        'api/cart/add',
+        '/api/cart/add',
         {
           method: 'POST',
           headers: {

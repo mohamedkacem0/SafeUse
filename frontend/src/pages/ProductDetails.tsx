@@ -99,7 +99,7 @@ export default function ProductDetailPage() {
 
     setAddToCartStatus('adding');
     try {
-      const response = await fetch("http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/cart/add", {
+      const response = await fetch("/api/cart/add", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
