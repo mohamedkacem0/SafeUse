@@ -33,7 +33,7 @@ export default function ProductDetailPage() {
 
     setLoading(true);
     fetch(
-      `http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/producto&id=${id}`
+      `/api/producto&id=${id}`
     )
       .then(res => {
         if (!res.ok) throw new Error("Producto no encontrado");

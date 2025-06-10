@@ -58,7 +58,7 @@ export default function ProductManagement() {
     data: productsData,
     loading: loadingProducts,
     error: productsError,
-  } = useFetchData<Product[]>('http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/productos', (json) => {
+  } = useFetchData<Product[]>('/api/productos', (json) => {
     // La API puede devolver un array directo o un objeto { productos: [...] }
     if (Array.isArray(json)) {
       return json as Product[];
