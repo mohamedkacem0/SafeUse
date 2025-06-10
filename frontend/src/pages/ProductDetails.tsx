@@ -33,7 +33,7 @@ export default function ProductDetailPage() {
 
     setLoading(true);
     fetch(
-      `api/producto&id=${id}`
+      `http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/producto&id=${id}`
     )
       .then(res => {
         if (!res.ok) throw new Error("Producto no encontrado");
@@ -99,7 +99,7 @@ export default function ProductDetailPage() {
 
     setAddToCartStatus('adding');
     try {
-      const response = await fetch("api/cart/add", {
+      const response = await fetch("http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/cart/add", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
