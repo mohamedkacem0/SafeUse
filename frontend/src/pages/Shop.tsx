@@ -31,7 +31,7 @@ export default function ShopPage() {
 
   // Load products
   useEffect(() => {
-    fetch("http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/productos", { credentials: "include" })
+    fetch("/api/productos", { credentials: "include" })
       .then(res => res.json())
       .then((data: any[]) => {
         const parsed: Product[] = data.map(p => ({
