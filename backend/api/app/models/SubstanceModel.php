@@ -20,7 +20,7 @@ class SubstanceModel
     
     $filas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $baseUrl = 'https://safeuse-lkde.onrender.com';
+    $baseUrl = 'https://safeuse-lkde.onrender.com/uploads/sustancias/';
 
     foreach ($filas as &$fila) {
         $fila['Imagen'] = $baseUrl . trim($fila['Imagen']);
