@@ -87,7 +87,7 @@ class AdminSubstanceController {
             // Definir la ruta base de subidas relativa al DOCUMENT_ROOT del servidor
             // Asegúrate de que esta ruta sea correcta para tu estructura de XAMPP
             // Ejemplo: C:/xampp/htdocs/TFG/SafeUse/uploads/sustancias/
-            $baseUploadDir = $_SERVER['DOCUMENT_ROOT'] . '/TFG/SafeUse/uploads/sustancias/';
+            $baseUploadDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/sustancias/'; 
             $targetDir = $baseUploadDir . $substanceFolderName . '/';
 
             if (!is_dir($targetDir)) {
@@ -104,7 +104,7 @@ class AdminSubstanceController {
 
             if (move_uploaded_file($file['tmp_name'], $targetFilePath)) {
                 // Ruta a guardar en la BD, relativa a la raíz del proyecto web
-                $imagePathForDb = 'uploads/sustancias/' . $substanceFolderName . '/' . $sanitizedFileName;
+                $imagePathForDb = $substanceFolderName . '/' . $sanitizedFileName;
             } else {
                 Response::json(['error' => 'Error al mover el archivo subido.'], 500);
                 return;

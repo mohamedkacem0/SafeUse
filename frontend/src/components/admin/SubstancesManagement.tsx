@@ -52,6 +52,12 @@ interface SubstanceMerged {
   reduccion_riesgos: string | null;
   legislacion: string | null;
 }
+const createSlug = (name: string) => {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+};
 
 export default function SubstancesManagement() {
   const [editingSubstance, setEditingSubstance] = useState<SubstanceMerged | null>(null);
@@ -147,6 +153,7 @@ export default function SubstancesManagement() {
     try {
       const formData = new FormData();
       formData.append('Nombre', newSubstanceName);
+      formData.append('Slug', createSlug(newSubstanceName));
       formData.append('Titulo', newSubstanceTitle);
       formData.append('Formula', newSubstanceFormula);
       

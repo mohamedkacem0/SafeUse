@@ -108,7 +108,7 @@ class AdminSubstanceModel {
                 $targetFilePath = $targetDir . $newFileName;
 
                 if (move_uploaded_file($imageFile['tmp_name'], $targetFilePath)) {
-                    $newImagePath = 'uploads/sustancias/' . $sanitizedName . '/' . $newFileName;
+                    $newImagePath = $sanitizedName . '/' . $newFileName;
 
                     if ($oldImagePath && $oldImagePath !== $newImagePath && file_exists(__DIR__ . '/../../../../' . $oldImagePath)) {
                         unlink(__DIR__ . '/../../../../' . $oldImagePath);
@@ -274,7 +274,7 @@ class AdminSubstanceModel {
                 // El nombre de la carpeta se deriva del nombre de la sustancia, como en addSubstance/updateSubstance
                 if ($substanceName) {
                     $substanceFolderName = strtolower(preg_replace('/[^a-zA-Z0-9_-]+/', '', str_replace(' ', '_', $substanceName)));
-                    $substanceDirectory = $_SERVER['DOCUMENT_ROOT'] . '/TFG/SafeUse/uploads/sustancias/' . $substanceFolderName;
+                    $substanceDirectory = $_SERVER['DOCUMENT_ROOT'] . 'https://safeuse-lkde.onrender.com/uploads/sustancias/' . $substanceFolderName;
                     
                     if (is_dir($substanceDirectory)) {
                         // Verificar si el directorio está vacío (solo contiene . y ..)
