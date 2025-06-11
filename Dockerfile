@@ -11,7 +11,7 @@ RUN docker-php-ext-install pdo pdo_mysql
 # ✅ Asegurar permisos para carpeta de subidas
 RUN mkdir -p /var/www/html/uploads/sustancias && \
     chown -R www-data:www-data /var/www/html/uploads && \
-    chmod -R 755 /var/www/html/uploads
+    chmod -R 777 /var/www/html/uploads
 
 RUN ls -lR /var/www/html/
 
