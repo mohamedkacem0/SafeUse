@@ -1,4 +1,4 @@
-// src/pages/Cart.tsx
+
 import { useState, useEffect } from "react";
 import { Minus, Plus, Trash2, ShoppingCart, LogIn } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -6,14 +6,12 @@ import toast, { Toaster } from 'react-hot-toast';
 import PrimaryButton from "../components/PrimaryButton";
 import { NavLink, useNavigate } from "react-router-dom";
 
-// Define an interface for the raw API response item
 interface ApiCartItemResponse {
   product_id: number;
   Nombre: string;
-  Precio: string; // Assuming Precio is a string from API
+  Precio: string; 
   quantity: number;
   Imagen_Principal: string;
-  // Add other fields if your API returns more
 }
 
 interface CartItem {
@@ -25,18 +23,12 @@ interface CartItem {
 }
 
 export default function Cart() {
-  // useEffect(() => {
-  //   document.body.classList.add('bg-slate-50');
-  //   return () => {
-  //     document.body.classList.remove('bg-slate-50');
-  //   };
-  // }, []);
+ 
   const [items, setItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState(false);
   const navigate = useNavigate();
-
-  // Load cart items
+ 
   useEffect(() => {
     fetch("api/cart", { credentials: "include" })
       .then(res => {
@@ -70,14 +62,13 @@ export default function Cart() {
     exit: { opacity: 0, x: -50, scale: 0.9, transition: { duration: 0.2, ease: "easeIn" } },
   };
   const subtotal = items.reduce((sum, it) => sum + it.price * it.quantity, 0);
-  const orderTotal = subtotal * 1.21; // Calculate the actual total including VAT
-
-  // Update quantity
+  const orderTotal = subtotal * 1.21;  
+ 
   const updateQty = async (id: number, delta: number) => {
     const item = items.find(i => i.id === id);
     if (!item) return;
     const newQty = Math.max(1, item.quantity + delta);
-    // If newQty is the same as current, do nothing (e.g., trying to decrease from 1)
+   
     if (newQty === item.quantity && delta < 0) return; 
 
     try {
@@ -104,15 +95,13 @@ export default function Cart() {
       );
       toast.success(data.message || "Quantity updated!");
       window.dispatchEvent(new CustomEvent('cartUpdated'));
-      // Dispatch stock adjustment event: quantityChange is negative of delta because if delta is +1 (added to cart), stock decreases by 1.
+    
       window.dispatchEvent(new CustomEvent('productStockAdjusted', { detail: { productId: id, quantityChange: -delta } }));
     } catch (err) {
       toast.error("Error updating cart.");
       console.error("Error updating cart:", err);
     }
-  };
-
-  // Remove item
+  }; 
   const remove = async (id: number) => {
     const itemToRemove = items.find(i => i.id === id);
     if (!itemToRemove) return;
@@ -139,7 +128,7 @@ export default function Cart() {
       setItems(prev => prev.filter(i => i.id !== id));
       toast.success(data.message || "Item removed!");
       window.dispatchEvent(new CustomEvent('cartUpdated'));
-      // Dispatch stock adjustment event: quantityChange is the quantity of the item removed (positive, as it's returned to stock)
+      
       window.dispatchEvent(new CustomEvent('productStockAdjusted', { detail: { productId: id, quantityChange: itemToRemove.quantity } }));
     } catch (err) {
       toast.error("Error removing item.");
@@ -156,7 +145,7 @@ export default function Cart() {
     );
   }
 
-  // Show login required view if user is not authenticated
+  
   if (authError) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
@@ -186,8 +175,7 @@ export default function Cart() {
       </div>
     );
   }
-
-  // Show empty cart message if cart is empty
+ 
   if (items.length === 0) {
     return (
       <>
@@ -247,7 +235,7 @@ export default function Cart() {
       </h1>
 
       <div className="grid gap-12 lg:grid-cols-[2fr_1fr]">
-        {/* Item list */}
+   
         <div className="space-y-6">
             <AnimatePresence initial={false}>
           {items.map(item => (
@@ -302,8 +290,7 @@ export default function Cart() {
           ))}
           </AnimatePresence>
         </div>
-
-        {/* Summary */}
+ 
         <aside className="rounded-xl border border-gray-200 bg-white p-6 shadow-lg lg:sticky lg:top-28">
           <h2 className="mb-6 text-2xl font-semibold">Order summary</h2>
           <div className="mb-4 flex justify-between text-sm">
@@ -320,7 +307,7 @@ export default function Cart() {
           </div>
           <NavLink 
             to="/checkout" 
-            state={{ orderTotal: orderTotal, cartItems: items }} // Pass total price AND cart items in state
+            state={{ orderTotal: orderTotal, cartItems: items }}  
             className="w-full"
           >
             <PrimaryButton

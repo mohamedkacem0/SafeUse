@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 import { router } from './router';
 import CookieBanner from './components/CookieBanner';
-import './index.css';             // Tailwind
+import './index.css';             
 
 const App = () => (
   <>

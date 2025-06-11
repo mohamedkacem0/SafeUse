@@ -8,7 +8,7 @@ interface DrugCardProps {
   button?: string;
   onButtonClick?: () => void;
   onCardClick?: () => void;
-  hideTitle?: boolean; // NUEVO
+  hideTitle?: boolean;  
   buttonDisabled?: boolean;
 }
 
@@ -40,9 +40,6 @@ const DrugCard: React.FC<DrugCardProps> = ({
           {title}
         </p>
       )}
-      {/*<p className="font-lato text-[12px] italic text-center leading-tight mb-4">
-        {formula}
-      </p>*/}
       <div
         onClick={e => e.stopPropagation()}
       >

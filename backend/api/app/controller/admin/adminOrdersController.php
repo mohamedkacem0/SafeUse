@@ -3,20 +3,10 @@ namespace App\Controllers\Admin;
 
 use App\Models\Admin\AdminOrdersModel;
 use App\Core\Response;
-// **IMPORTANTE**: necesitamos DB para la transacción en destroy()
 use App\Core\DB;
 
 class AdminOrdersController
 {
-    /**
-     * GET /api/admin/orders
-     * GET /api/admin/orders/{id}
-     * GET /api/admin/orders/{id}/details
-     *
-     * - Si llega con action=details, devuelve orden + detalles.
-     * - Si llega solo con {id}, devuelve solo la cabecera.
-     * - Si no hay id, lista todos los pedidos.
-     */
     public static function index(): void
     {
         session_start();
@@ -28,7 +18,6 @@ class AdminOrdersController
         $id     = isset($_GET['id']) ? (int) $_GET['id'] : null;
         $action = isset($_GET['action']) ? $_GET['action'] : null;
 
-        // 1) GET /api/admin/orders/{id}/details
         if ($id !== null && $action === 'details') {
             $order = AdminOrdersModel::findById($id);
             if ($order === null) {
@@ -47,7 +36,6 @@ class AdminOrdersController
             return;
         }
 
-        // 2) GET /api/admin/orders/{id} (sin detalles)
         if ($id !== null && $action === null) {
             $order = AdminOrdersModel::findById($id);
             if ($order === null) {
@@ -58,7 +46,6 @@ class AdminOrdersController
             return;
         }
 
-        // 3) GET /api/admin/orders (listado completo)
         if ($id === null) {
             $all = AdminOrdersModel::fetchAll();
             if ($all === null) {
@@ -69,14 +56,8 @@ class AdminOrdersController
             return;
         }
 
-        // Si no coincide, 404
         Response::json(['error' => 'Ruta no encontrada'], 404);
     }
-
-    /**
-     * PUT /api/admin/orders/{orderId}/details/{detailId}
-     * Actualiza una línea de detalle de pedido (cantidad y precio unitario).
-     */
     public static function updateDetail(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'PUT') {
@@ -114,15 +95,11 @@ class AdminOrdersController
             Response::json(['error' => 'Cantidad o precio unitario inválido'], 400);
             return;
         }
-
-        // Verificación de que el pedido exista
         $order = AdminOrdersModel::findById($orderId);
         if ($order === null) {
             Response::json(['error' => 'Pedido no encontrado'], 404);
             return;
         }
-
-        // Actualizamos detalle
         try {
             AdminOrdersModel::updateDetail($detailId, $quantity, $unitPrice);
             Response::json(['success' => true], 200);
@@ -130,11 +107,6 @@ class AdminOrdersController
             Response::json(['error' => 'Error al actualizar detalle: ' . $e->getMessage()], 500);
         }
     }
-
-    /**
-     * DELETE /api/admin/orders/{id}
-     * Elimina un pedido y sus detalles.
-     */
     public static function destroy(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
@@ -154,30 +126,23 @@ class AdminOrdersController
             return;
         }
 
-        // Verificamos si existe el pedido
         $existing = AdminOrdersModel::findById($id);
         if ($existing === null) {
             Response::json(['error' => 'Pedido no encontrado'], 404);
             return;
         }
-
-        // Iniciamos la transacción
         $pdo = DB::getInstance()->conn();
         try {
             $pdo->beginTransaction();
 
-            // 1) Eliminamos primero todos los detalles
             AdminOrdersModel::deleteDetailsByOrderId($id);
 
-            // 2) Luego eliminamos la cabecera
             AdminOrdersModel::deleteById($id);
 
-            // 3) Confirmamos
             $pdo->commit();
 
             Response::json(['success' => true], 200);
         } catch (\PDOException $e) {
-            // En caso de error, deshacemos transacción
             $pdo->rollBack();
             Response::json(['error' => 'Error al eliminar el pedido y sus detalles: ' . $e->getMessage()], 500);
         }

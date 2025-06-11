@@ -5,8 +5,8 @@ interface DescriptionProps {
   subtitle: string;
   link: string;
   active?: boolean;
-  width?: string; // Nuevo prop opcional para el ancho
-  className?: string; // Alternativamente, para máxima flexibilidad
+  width?: string;  
+  className?: string; 
 }
 
 export default function Description({
@@ -14,7 +14,7 @@ export default function Description({
   subtitle,
   link,
   active,
-  width = "w-[65%]", // Valor por defecto
+  width = "w-[65%]",  
   className = "",
 }: DescriptionProps) {
   return (

@@ -1,16 +1,11 @@
 <?php
-// app/models/UserModel.php
 namespace App\Models;
 
 use App\Core\DB;
 use PDO;
 
 class UserModel {
-    /**
-     * Busca un usuario por correo.
-     * @param string $email
-     * @return array|null
-     */
+  
     public static function findByEmail(string $email): ?array {
         $pdo = DB::getInstance()->conn();
         $stmt = $pdo->prepare(
@@ -23,11 +18,6 @@ class UserModel {
         return $user ?: null;
     }
 
-    /**
-     * Crea un nuevo usuario y devuelve su ID.
-     * @param array $data
-     * @return int
-     */
     public static function create(array $data): int {
         $pdo = DB::getInstance()->conn();
         $stmt = $pdo->prepare(
@@ -39,7 +29,7 @@ class UserModel {
         $stmt->execute([
             'nombre'          => $data['nombre'],
             'correo'          => $data['correo'],
-            'hashed_password' => $data['contraseña'], // Key changed, value source is the same
+            'hashed_password' => $data['contraseña'], 
             'telefono'        => $data['telefono'],
             'direccion'       => $data['direccion'],
             'tipo_usuario'    => $data['tipo_usuario'],
@@ -47,11 +37,6 @@ class UserModel {
         return (int)$pdo->lastInsertId();
     }
 
-    /**
-     * Busca un usuario por ID.
-     * @param int $id
-     * @return array|null
-     */
     public static function findById(int $id): ?array {
         $pdo = DB::getInstance()->conn();
         $stmt = $pdo->prepare(
@@ -63,11 +48,6 @@ class UserModel {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         return $user ?: null;
     }
-
-    /**
-     * Recupera todos los usuarios de la tabla, incluyendo fecha de creación.
-     * @return array Lista de usuarios.
-     */
     public static function getAll(): array {
         $pdo = DB::getInstance()->conn();
         $sql = "
@@ -84,13 +64,6 @@ class UserModel {
         $stmt = $pdo->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
-    /**
-     * Actualiza los datos de un usuario por ID.
-     * @param int $id
-     * @param array $data Campos a actualizar (ej: ['Nombre' => 'Nuevo Nombre'])
-     * @return bool True si la actualización fue exitosa, false en caso contrario.
-     */
     public static function update(int $id, array $data): bool {
         $pdo = DB::getInstance()->conn();
 
@@ -100,7 +73,7 @@ class UserModel {
 
         foreach ($data as $key => $value) {
             if (in_array($key, $allowedFields)) {
-                // Si el campo es Contraseña, usa un alias de parámetro seguro
+               
                 if ($key === 'Contraseña') {
                     $setClauses[] = "`Contraseña` = :password";
                     $params['password'] = $value;
@@ -126,29 +99,15 @@ class UserModel {
             return false;
         }
     }
-
-    /**
-     * Elimina un usuario por su ID.
-     * @param int $id
-     * @return bool True si se eliminó, false si no.
-     */
     public static function delete(int $id): bool {
         $pdo = DB::getInstance()->conn();
         try {
             $stmt = $pdo->prepare('DELETE FROM usuarios WHERE ID_Usuario = :id');
             return $stmt->execute(['id' => $id]);
         } catch (\PDOException $e) {
-            // Opcional: Loggear el error $e->getMessage()
             return false;
         }
     }
-
-    /**
-     * Actualiza la contraseña de un usuario por ID.
-     * @param int $userId
-     * @param string $newPasswordHash
-     * @return bool True si la actualización fue exitosa, false en caso contrario.
-     */
     public static function updatePassword(int $userId, string $newPasswordHash): bool {
         $pdo = DB::getInstance()->conn();
         $sql = "UPDATE usuarios SET `Contraseña` = :password WHERE ID_Usuario = :id";
@@ -157,7 +116,6 @@ class UserModel {
             $stmt = $pdo->prepare($sql);
             return $stmt->execute(['password' => $newPasswordHash, 'id' => $userId]);
         } catch (\PDOException $e) {
-            // Opcional: Loggear el error $e->getMessage()
             error_log('Error updating password for user ' . $userId . ': ' . $e->getMessage());
             return false;
         }

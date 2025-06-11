@@ -4,7 +4,6 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// CORS headers
 $allowed_origins = [
     'https://safeuse.onrender.com',
     'http://localhost:5173'
@@ -21,14 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
 
-// Opcional: impedir que PHP imprima errores directamente en pantalla (se registrarán en el log)
-ini_set('display_errors', 0);
-ini_set('log_errors', 1);
-error_reporting(E_ALL);
+// Carga manual de dependencias 
 
-// ----------------------------------------------------------------------------
-// Carga manual de dependencias (sin Composer)
-// ----------------------------------------------------------------------------
 require_once __DIR__ . '/../app/core/config.php';
 require_once __DIR__ . '/../app/core/db.php';
 require_once __DIR__ . '/../app/core/response.php';
@@ -92,12 +85,8 @@ use App\Controllers\Admin\AdminOrdersController;
 
 use App\Core\Response;
 
-// ----------------------------------------------------------------------------
-// Router sencillo
-// ----------------------------------------------------------------------------
 $route = $_GET['route'] ?? '';
 
-// Detectar si la ruta es “api/admin/contact/{id}” o “api/admin/advice/{id}”
 if (preg_match('#^api/admin/contact/(\d+)$#', $route, $matches)) {
     $routeBase = 'api/admin/contact';
     $routeId   = (int)$matches[1];
@@ -108,7 +97,7 @@ if (preg_match('#^api/admin/contact/(\d+)$#', $route, $matches)) {
     $routeBase = 'api/admin/products_delete_action'; // Unique base for delete
     $routeId   = (int)$matches[1];
 } elseif (preg_match('#^api/admin/products/(\d+)$#', $route, $matches)) {
-    $routeBase = 'api/admin/products_id_action'; // Unique base for ID-specific actions (show, update)
+    $routeBase = 'api/admin/products_id_action'; // Unique base for product actions
     $routeId   = (int)$matches[1];
 } elseif (preg_match('#^api/admin/orders/(\d+)/details$#', $route, $m1)) {
     $routeBase = 'api/admin/orders_details';
@@ -126,9 +115,6 @@ if (preg_match('#^api/admin/contact/(\d+)$#', $route, $matches)) {
 }
 
 switch ($routeBase) {
-    // ------------------------------------------------------------------------
-    // RUTAS DE PAGO
-    // ------------------------------------------------------------------------
     case 'api/create-payment-intent':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             PaymentController::createPaymentIntent();
@@ -137,13 +123,6 @@ switch ($routeBase) {
         }
         break;
 
-    // ------------------------------------------------------------------------
-
-    // ------------------------------------------------------------------------
-    // RUTAS PÚBLICAS: Contact (público)
-    // ------------------------------------------------------------------------
-    // GET  /api/contact       -> lista todas las consultas
-    // POST /api/contact       -> crea una nueva consulta
     case 'api/contact':
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             ContactController::index();
@@ -155,15 +134,9 @@ switch ($routeBase) {
             Response::json(['error' => 'Método no permitido para /api/contact'], 405);
         }
         break;
-
-    // ------------------------------------------------------------------------
     // RUTAS ADMIN: Contact (sólo admin)
-    // ------------------------------------------------------------------------
-    // GET    /api/admin/contact          -> listado completo para admin
-    // PUT    /api/admin/contact/{id}     -> toggle “checked” de la consulta {id}
-    // DELETE /api/admin/contact/{id}     -> elimina la consulta {id}
+
     case 'api/admin/contact':
-        // Si vinieron con “api/admin/contact/123”, asignamos $_GET['id']
         if ($routeId) {
             $_GET['id'] = $routeId;
         }
@@ -183,7 +156,6 @@ switch ($routeBase) {
         break;
 
         case 'api/admin/advice':
-        // Si vinieron con “/123”, asignar $_GET['id']
         if ($routeId) {
             $_GET['id'] = $routeId;
         }
@@ -204,15 +176,6 @@ switch ($routeBase) {
             Response::json(['error' => 'Método no permitido para /api/admin/advice'], 405);
         }
         break;
-
-    // ------------------------------------------------------------------------
-    // RUTAS ADMIN SUBSTANCES (ejemplo)
-    // ------------------------------------------------------------------------
-    // POST  /api/admin/substances/add        -> añade sustancia
-    // GET   /api/admin/substances/list_basic -> lista básicas
-    // GET   /api/admin/substances/list_details -> lista detalladas
-    // POST  /api/admin/substances/update     -> actualiza sustancia
-
 
     case 'api/admin/substances/list_basic':
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -238,10 +201,7 @@ switch ($routeBase) {
         }
         break;
 
-    // ------------------------------------------------------------------------
-    // RUTAS ADMIN PRODUCTS
-    // ------------------------------------------------------------------------
-    case 'api/admin/products': // Handles GET (list) and POST (create)
+    case 'api/admin/products': 
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             AdminProductController::index();
         } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -251,11 +211,11 @@ switch ($routeBase) {
         }
         break;
 
-    case 'api/admin/products_id_action': // Handles GET /api/admin/products/{id} (show) and POST /api/admin/products/{id} (update)
+    case 'api/admin/products_id_action':
         if ($routeId !== null) {
             if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 AdminProductController::show($routeId);
-            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') { // Using POST for update to support multipart/form-data
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 AdminProductController::update($routeId);
             } else {
                 Response::json(['error' => "Método no permitido para /api/admin/products/{$routeId}"], 405);
@@ -265,10 +225,8 @@ switch ($routeBase) {
         }
         break;
 
-    case 'api/admin/products_delete_action': // Handles POST /api/admin/products/{id}/delete
+    case 'api/admin/products_delete_action': 
         if ($routeId !== null) {
-            // For deletion, it's common to use DELETE method, but POST is also acceptable and simpler for forms.
-            // Let's stick to POST for now for consistency with how we might handle it from a simple admin form.
             if ($_SERVER['REQUEST_METHOD'] === 'POST') { 
                 AdminProductController::destroy($routeId);
             } else {
@@ -278,11 +236,6 @@ switch ($routeBase) {
             Response::json(['error' => 'ID de producto no especificado para eliminar.'], 400);
         }
         break;
-
-    // ------------------------------------------------------------------------
-    // RUTAS ADMIN USERS (ejemplo)
-    // ------------------------------------------------------------------------
-    // POST /api/admin/users/addUser  -> crea un nuevo usuario como admin
     case 'api/admin/users/addUser':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             AdminUserController::addUser();
@@ -295,8 +248,6 @@ switch ($routeBase) {
          UserController::updateUserByAdmin();
         break;
 
-
-         // Usuarios (público / admin)
     case 'api/users':
         UserController::users();
         break;
@@ -309,8 +260,6 @@ switch ($routeBase) {
         }
         break;
 
-
-    // ADMIN ORDERS 
      case 'api/admin/orders':
         if ($orderId !== null) {
             $_GET['id'] = $orderId;
@@ -324,7 +273,6 @@ switch ($routeBase) {
         }
         break;
 
-    // 4) GET  /api/admin/orders/{id}/details       -> devuelve cabecera + líneas
     case 'api/admin/orders_details':
         if ($orderId !== null) {
             $_GET['id'] = $orderId;
@@ -334,8 +282,6 @@ switch ($routeBase) {
             Response::json(['error' => 'ID de pedido no especificado'], 400);
         }
         break;
-
-    // 5) PUT  /api/admin/orders/{orderId}/details/{detailId}
     case 'api/admin/orders_update_detail':
         if ($orderId !== null && $detailId !== null) {
             $_GET['orderId']  = $orderId;
@@ -345,15 +291,11 @@ switch ($routeBase) {
             Response::json(['error' => 'IDs no especificados para update detail'], 400);
         }
         break;
-    // ------------------------------------------------------------------------
-    // RUTAS PÚBLICAS ADICIONALES
-    // ------------------------------------------------------------------------
-    // Sustancias (público)
+
     case 'api/sustancias':
         SubstanceController::index();
         break;
 
-    // Detalles de sustancia (público)
     case 'api/detalles_sustancias':
         SubstanceDetailController::index();
         break;
@@ -366,7 +308,6 @@ switch ($routeBase) {
         }
         break;
 
-    // Productos / Tienda (público)
     case 'api/productos':
         ShopController::index();
         break;
@@ -379,8 +320,6 @@ switch ($routeBase) {
         }
         break;
 
-    // Registro y login (público)
-
     case 'api/register':
         UserController::register();
         break;
@@ -392,8 +331,6 @@ switch ($routeBase) {
     case 'api/logout':
         UserController::logout();
         break;
-
-    // Perfil de usuario
     case 'api/profile':
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             UserController::profile();
@@ -413,8 +350,6 @@ switch ($routeBase) {
             Response::json(['error' => 'Método no permitido. Use POST para cambiar contraseña.'], 405);
         }
         break;
-
-    // Advice (público)
     case 'api/advice':
         if (isset($_GET['id'])) {
             AdviceController::show((int)$_GET['id']);
@@ -427,7 +362,6 @@ switch ($routeBase) {
         AdviceController::index();
         break;
 
-    // Carrito (público)
     case 'api/cart':
         CartController::index();
         break;
@@ -447,7 +381,6 @@ switch ($routeBase) {
     case 'api/cart/count':
         CartController::getCartCount();
         break;
-    // Ordenes (público)
     case 'api/order/create':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             OrderController::create();
@@ -479,11 +412,9 @@ switch ($routeBase) {
             App\Core\Response::json(['error' => 'Method not allowed. Use POST for logout.'], 405);
         }
         break;
-
-    // Route for deleting a substance by ID
     case (preg_match('/^api\/admin\/substances\/delete\/(\d+)$/', $route, $matches) ? $route : ''):
         if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-            $substanceId = $matches[1]; // Extracted ID from the URL
+            $substanceId = $matches[1];
             AdminSubstanceController::deleteSubstance($substanceId);
         } else {
             App\Core\Response::json(['error' => 'Method not allowed. Use DELETE for deleting substances.'], 405);

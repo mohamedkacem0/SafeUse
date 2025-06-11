@@ -5,19 +5,11 @@ use App\Core\DB;
 use PDO;
 
 class AdminSubstanceModel {
-    /**
-     * Crea una nueva sustancia en la base de datos.
-     *
-     * @param array $data Datos de la sustancia. Espera claves: 'Nombre', 'Imagen', 'Titulo', 'Formula'.
-     * @return int|false El ID de la sustancia recién creada o false en caso de error.
-     */
     public static function createSubstance(array $data): int|false {
         $pdo = DB::getInstance()->conn();
 
         try {
             $pdo->beginTransaction();
-
-            // 1. Insert into sustancias
             $sqlSustancia = "INSERT INTO sustancias (Nombre, Imagen, Titulo, Formula) VALUES (:nombre, :imagen, :titulo, :formula)";
             $stmtSustancia = $pdo->prepare($sqlSustancia);
             $stmtSustancia->execute([
@@ -34,8 +26,6 @@ class AdminSubstanceModel {
                 error_log('Error creating substance: Failed to get lastInsertId for sustancias table.');
                 return false;
             }
-
-            // 2. Insert into detalles_sustancia
             $sqlDetalles = "INSERT INTO detalles_sustancia (
                                 ID_Sustancia, descripcion, metodos_consumo, efectos_deseados, 
                                 composicion, riesgos, interaccion_otras_sustancias, 
@@ -73,7 +63,6 @@ class AdminSubstanceModel {
     public static function updateSubstance(int $id, array $data, ?array $imageFile): bool {
         $pdo = DB::getInstance()->conn();
         
-        // Fetch current substance data, especially Nombre for folder path and old Imagen
         $stmtCurrent = $pdo->prepare("SELECT Nombre, Imagen FROM sustancias WHERE ID_Sustancia = :id");
         $stmtCurrent->bindParam(':id', $id, \PDO::PARAM_INT);
         $stmtCurrent->execute();
@@ -81,7 +70,7 @@ class AdminSubstanceModel {
 
         if (!$currentSubstance) {
             error_log("Substance with ID $id not found for update.");
-            return false; // Substance not found
+            return false; 
         }
 
         $oldImagePath = $currentSubstance['Imagen'];
@@ -89,9 +78,7 @@ class AdminSubstanceModel {
 
         $pdo->beginTransaction();
         try {
-            $newImagePath = $oldImagePath; // By default, keep the old image path
-
-            // Handle image upload if a new image is provided
+            $newImagePath = $oldImagePath; 
             if (isset($imageFile) && $imageFile['error'] === UPLOAD_ERR_OK) {
                 $nombreForFolder = $data['Nombre'] ?? $currentNombreForPath; 
                 $sanitizedName = preg_replace('/[^a-zA-Z0-9_-]/', '_', $nombreForFolder);
@@ -119,7 +106,7 @@ class AdminSubstanceModel {
                     return false;
                 }
             } else {
-                // No new image. If Nombre changed, move existing image to new folder based on new Nombre.
+            //  If Nombre changed, move existing image to new folder based on new Nombre.
                 if (isset($data['Nombre']) && $data['Nombre'] !== $currentNombreForPath && !empty($oldImagePath)) {
                     $newNombreForFolder = $data['Nombre'];
                     $newSanitizedName = preg_replace('/[^a-zA-Z0-9_-]/', '_', $newNombreForFolder);
@@ -148,8 +135,6 @@ class AdminSubstanceModel {
                     }
                 }
             }
-
-            // Update 'sustancias' table
             $sqlSustancias = "UPDATE sustancias SET Nombre = :Nombre, Titulo = :Titulo, Formula = :Formula, Imagen = :Imagen WHERE ID_Sustancia = :ID_Sustancia";
             $stmtSustancias = $pdo->prepare($sqlSustancias);
             $stmtSustancias->bindParam(':Nombre', $data['Nombre']);
@@ -158,8 +143,7 @@ class AdminSubstanceModel {
             $stmtSustancias->bindParam(':Imagen', $newImagePath);
             $stmtSustancias->bindParam(':ID_Sustancia', $id, \PDO::PARAM_INT);
             $stmtSustancias->execute();
-
-            // Update 'detalles_sustancia' table
+ 
             $stmtCheckDetails = $pdo->prepare("SELECT COUNT(*) FROM detalles_sustancia WHERE ID_Sustancia = :id");
             $stmtCheckDetails->bindParam(':id', $id, \PDO::PARAM_INT);
             $stmtCheckDetails->execute();
@@ -217,67 +201,49 @@ class AdminSubstanceModel {
             return false;
         }
     }
-
-    // Aquí se podrían añadir otros métodos para el CRUD de sustancias por parte del admin (update, delete, getById, etc.)
-
-    /**
-     * Elimina una sustancia y sus detalles de la base de datos, y su imagen asociada del servidor.
-     *
-     * @param int $id El ID de la sustancia a eliminar.
-     * @return bool True si la eliminación fue exitosa, false en caso contrario.
-     */
+ 
     public static function deleteById(int $id): bool {
         $pdo = DB::getInstance()->conn();
 
         try {
             $pdo->beginTransaction();
-
-            // 1. Obtener la ruta de la imagen y el nombre para la carpeta antes de eliminar la sustancia
+ 
             $stmtSelectImage = $pdo->prepare("SELECT Imagen, Nombre FROM sustancias WHERE ID_Sustancia = :id");
             $stmtSelectImage->bindParam(':id', $id, PDO::PARAM_INT);
             $stmtSelectImage->execute();
             $substanceData = $stmtSelectImage->fetch(PDO::FETCH_ASSOC);
             $imagePathInDb = $substanceData ? $substanceData['Imagen'] : null;
-            $substanceName = $substanceData ? $substanceData['Nombre'] : null;
-
-            // 2. Eliminar de detalles_sustancia (si existe la relación)
+            $substanceName = $substanceData ? $substanceData['Nombre'] : null; 
             $sqlDeleteDetails = "DELETE FROM detalles_sustancia WHERE ID_Sustancia = :id";
             $stmtDeleteDetails = $pdo->prepare($sqlDeleteDetails);
             $stmtDeleteDetails->bindParam(':id', $id, PDO::PARAM_INT);
-            $stmtDeleteDetails->execute();
-            // No es un error si no hay detalles, así que no verificamos rowCount estrictamente aquí
-
-            // 3. Eliminar de sustancias
+            $stmtDeleteDetails->execute(); 
             $sqlDeleteSubstance = "DELETE FROM sustancias WHERE ID_Sustancia = :id";
             $stmtDeleteSubstance = $pdo->prepare($sqlDeleteSubstance);
             $stmtDeleteSubstance->bindParam(':id', $id, PDO::PARAM_INT);
             $stmtDeleteSubstance->execute();
 
-            if ($stmtDeleteSubstance->rowCount() === 0) {
-                // Si no se eliminó ninguna fila de 'sustancias', la sustancia no existía.
+            if ($stmtDeleteSubstance->rowCount() === 0) { 
                 $pdo->rollBack();
                 error_log("Intento de eliminar sustancia con ID $id no encontrada.");
                 return false;
             }
-
-            // 4. Eliminar el archivo de imagen y el directorio si es posible
+ 
             if ($imagePathInDb) {
                 $fullImagePath = $_SERVER['DOCUMENT_ROOT'] . '/TFG/SafeUse/' . $imagePathInDb;
                 if (file_exists($fullImagePath) && is_file($fullImagePath)) {
                     if (!unlink($fullImagePath)) {
                         error_log("No se pudo eliminar el archivo de imagen: $fullImagePath");
-                        // Continuar con la transacción, la eliminación de la DB es más crítica
+                         
                     }
                 }
-
-                // Intentar eliminar el directorio de la sustancia si está vacío
-                // El nombre de la carpeta se deriva del nombre de la sustancia, como en addSubstance/updateSubstance
+ 
                 if ($substanceName) {
                     $substanceFolderName = strtolower(preg_replace('/[^a-zA-Z0-9_-]+/', '', str_replace(' ', '_', $substanceName)));
                     $substanceDirectory = $_SERVER['DOCUMENT_ROOT'] . 'https://safeuse-lkde.onrender.com/uploads/sustancias/' . $substanceFolderName;
                     
                     if (is_dir($substanceDirectory)) {
-                        // Verificar si el directorio está vacío (solo contiene . y ..)
+                     
                         $items = array_diff(scandir($substanceDirectory), ['.', '..']);
                         if (empty($items)) {
                             if (!rmdir($substanceDirectory)) {
@@ -298,9 +264,9 @@ class AdminSubstanceModel {
             error_log('Error eliminando sustancia con ID ' . $id . ': ' . $e->getMessage());
             return false;
         } catch (\Exception $e) {
-            // Para cualquier otra excepción (ej. de manipulación de archivos)
+       
             if ($pdo->inTransaction()) {
-                $pdo->rollBack(); // Asegurar rollback si algo falla fuera de PDOException pero dentro del try
+                $pdo->rollBack();  
             }
             error_log('Error general durante la eliminación de sustancia con ID ' . $id . ': ' . $e->getMessage());
             return false;

@@ -5,7 +5,6 @@ use App\Models\CartModel;
 use App\Core\Response;
 
 class CartController {
-    // GET /api?route=api/cart
     public static function index(): void {
         session_start();
         if (empty($_SESSION['user']['ID_Usuario'])) {
@@ -17,7 +16,6 @@ class CartController {
         Response::json($items);
     }
 
-    // POST /api?route=api/cart/add
     public static function add(): void {
         session_start();
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -43,7 +41,6 @@ class CartController {
         }
     }
 
-    // POST /api?route=api/cart/update
     public static function update(): void {
         session_start();
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -69,7 +66,6 @@ class CartController {
         }
     }
 
-    // POST /api?route=api/cart/remove
     public static function remove(): void {
         session_start();
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -94,7 +90,6 @@ class CartController {
         }
     }
 
-    // GET /api?route=api/cart/count
     public static function getCartCount(): void {
         session_start();
         if (empty($_SESSION['user']['ID_Usuario'])) {

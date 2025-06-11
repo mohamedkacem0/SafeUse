@@ -1,4 +1,4 @@
-// src/components/Admin/ProductManagement.tsx
+ 
 import React, { useState, useMemo, useCallback } from 'react';
 import { useFetchData } from '../../pages/admin/useFetchData';
 import {
@@ -31,21 +31,19 @@ function formatDate(dateStr: string) {
 }
 
 interface Product {
-  Imagen_Principal?: string; // Optional: for displaying current primary image
-  imagenes_list?: string[]; // Optional: for displaying list of current images
+  Imagen_Principal?: string;  
+  imagenes_list?: string[]; 
   ID_Producto: number;
   Nombre: string;
   Precio: number;
   Stock: number;
   Descripcion: string | null;
   Fecha_Creacion: string;
-  // Add other fields if they are returned by the API and needed for display or editing
 }
 
 export default function ProductManagement() {
   const [isProductFormVisible, setIsProductFormVisible] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  // Form field states
   const [currentProductName, setCurrentProductName] = useState('');
   const [currentProductPrice, setCurrentProductPrice] = useState('');
   const [currentProductStock, setCurrentProductStock] = useState('');
@@ -59,7 +57,6 @@ export default function ProductManagement() {
     loading: loadingProducts,
     error: productsError,
   } = useFetchData<Product[]>('/api/productos', (json) => {
-    // La API puede devolver un array directo o un objeto { productos: [...] }
     if (Array.isArray(json)) {
       return json as Product[];
     }
@@ -88,7 +85,7 @@ export default function ProductManagement() {
     setCurrentProductDescription('');
     setCurrentProductImages(null);
     const fileInput = document.getElementById('productImagesInput') as HTMLInputElement;
-    if (fileInput) fileInput.value = ''; // Reset file input
+    if (fileInput) fileInput.value = ''; 
     setProductFormError(null);
     setProductFormSuccess(null);
   }, []);
@@ -108,7 +105,7 @@ export default function ProductManagement() {
       setCurrentProductPrice(productToEdit.Precio.toString());
       setCurrentProductStock(productToEdit.Stock.toString());
       setCurrentProductDescription(productToEdit.Descripcion ?? '');
-      setCurrentProductImages(null); // Reset file input for new uploads
+      setCurrentProductImages(null);
       setProductFormError(null);
       setProductFormSuccess(null);
       setIsProductFormVisible(true);
@@ -117,7 +114,7 @@ export default function ProductManagement() {
       console.error('Product not found for editing:', id);
       setProductFormError('Product not found. It might have been deleted.');
     }
-  }, [products]); // Add products to dependency array
+  }, [products]); 
 
   const handleCancelProductForm = () => {
     setIsProductFormVisible(false);
@@ -136,34 +133,20 @@ export default function ProductManagement() {
     formData.append('Stock', currentProductStock);
     formData.append('Descripcion', currentProductDescription);
 
-    // For updates, the backend expects ID_Producto in the URL, not in FormData for Slim's route matching.
-    // However, your AdminProductController's update method might expect it in $_POST if not using Slim's args directly for ID.
-    // Let's assume the ID is part of the endpoint URL as per typical REST patterns and Slim setup.
-    // If your PHP backend specifically needs ID_Producto in POST body for updates, uncomment below:
-    // if (editingProduct) {
-    //   formData.append('ID_Producto', editingProduct.ID_Producto.toString());
-    // }
-
     if (currentProductImages) {
       for (let i = 0; i < currentProductImages.length; i++) {
-        formData.append('imagenes[]', currentProductImages[i]); // Key must match backend: $_FILES['imagenes']
+        formData.append('imagenes[]', currentProductImages[i]); 
       }
     }
 
-    // TODO: Add a checkbox for 'clear_images' if desired for updates
-    // if (editingProduct && shouldClearImages) { // shouldClearImages would be a state from a checkbox
-    //  formData.append('clear_images', 'true');
-    // }
-
     try {
       const endpoint = editingProduct 
-        ? `/api/admin/products/${editingProduct.ID_Producto}` // Update endpoint
-        : '/api/admin/products'; // Create endpoint
+        ? `/api/admin/products/${editingProduct.ID_Producto}` 
+        : '/api/admin/products'; 
       
       const response = await fetch(endpoint, {
-        method: 'POST', // Slim routes for update are POST in your index.php
+        method: 'POST', 
         body: formData,
-        // Headers are not needed for FormData; browser sets 'multipart/form-data' automatically
       });
 
       const result = await response.json();
@@ -175,8 +158,6 @@ export default function ProductManagement() {
       setProductFormSuccess(`Product ${editingProduct ? 'updated' : 'added'} successfully! ${result.id ? `ID: ${result.id}` : ''}`);
       setIsProductFormVisible(false);
       resetProductFormFields();
-      // Refresh data - simple reload for now
-      // Consider a more sophisticated state update or re-fetch pattern later
       window.location.reload(); 
     } catch (err: any) {
       console.error('Product form submission error:', err);
@@ -300,6 +281,6 @@ export default function ProductManagement() {
         </div>
       </CardContent>
     </Card>
-  </> // Closing tag for the React Fragment
+  </>
   );
 }

@@ -24,8 +24,7 @@ export default function Advice() {
     { id: 'while-using', ref: whileRef, stage: 'while' as const },
     { id: 'after-use', ref: afterRef, stage: 'after' as const },
   ];
-
-  // Fetch advices from API
+ 
   useEffect(() => {
     async function fetchAdvices() {
       try {
@@ -40,8 +39,7 @@ export default function Advice() {
     }
     fetchAdvices();
   }, []);
-
-  // Update active section on scroll
+ 
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY + 200;
@@ -67,26 +65,23 @@ export default function Advice() {
         ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     };
-
-  // Helper to filter advices by stage
+ 
   const getByStage = (stage: 'before' | 'while' | 'after') =>
     advices.filter((a) => a.stage === stage);
 
   return (
-    <div className='bg-gray-50 min-h-screen'>
-      {/* Banner - UNTOUCHED AS PER USER REQUEST */}
+    <div className='bg-gray-50 min-h-screen'> 
       <div className=" top-0 z-10 h-[220px] md:h-[350px] lg:h-[450px] w-full overflow-hidden">
         <img src={Banner} alt="Advice Banner" className="w-full pt-[70px] md:pt-0" />
       </div>
-
-      {/* Sticky Navigation - Adjusted for better positioning and style */}
+ 
       <div className='sticky top-[70px] z-30 bg-white/95 backdrop-blur-sm shadow-lg border-b border-gray-200'>
         <div className="container mx-auto flex overflow-x-auto md:overflow-visible justify-start md:justify-center gap-6 md:gap-12 lg:gap-20 py-3 md:py-4 px-4 md:px-0">
           {sections.map(({ id, ref: sectionRef }) => (
             <a
               key={id}
               href={`#${id}`}
-              onClick={handleNavClick(sectionRef)} // Use sectionRef directly from map
+              onClick={handleNavClick(sectionRef)}  
               className={`whitespace-nowrap text-base md:text-xl font-medium pb-2 transition-all duration-300 ease-in-out ${
                 activeSection === id
                   ? 'text-[#44844D] border-b-2 border-[#44844D] font-semibold'
@@ -94,7 +89,7 @@ export default function Advice() {
               }`}
             >
               {id === 'before-use'
-                ? 'Before Use' // Consistent casing
+                ? 'Before Use'  
                 : id === 'while-using'
                 ? 'While Using'
                 : 'After Use'}
@@ -102,10 +97,9 @@ export default function Advice() {
           ))}
         </div>
       </div>
-
-      {/* Content Sections Wrapper */}
+ 
       <div className="container mx-auto px-4 pt-8 pb-16">
-        {/* BEFORE USE Section */}
+   
         <section
           id="before-use"
           ref={beforeRef}
@@ -129,8 +123,7 @@ export default function Advice() {
             ))}
           </div>
         </section>
-
-        {/* WHILE USING Section */}
+ 
         <section
           id="while-using"
           ref={whileRef}
@@ -153,13 +146,11 @@ export default function Advice() {
               </div>
             ))}
           </div>
-        </section>
-
-        {/* AFTER USE Section */}
+        </section> 
         <section
           id="after-use"
           ref={afterRef}
-          className="scroll-mt-[120px] md:scroll-mt-[140px] mb-12 md:mb-16" // Consistent margin
+          className="scroll-mt-[120px] md:scroll-mt-[140px] mb-12 md:mb-16"  
         >
           <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4 text-center">After Use</h2>
           <div className="w-24 h-1 bg-[#44844D] mx-auto mb-8 md:mb-12"></div>
