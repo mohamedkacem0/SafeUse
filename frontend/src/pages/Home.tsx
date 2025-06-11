@@ -20,12 +20,10 @@ export default function Home() {
       </div>
 
       
-      <div className='sticky top-0 z-20'> {/* Main sticky container, bg-white removed */}
+      <div className='sticky top-0 z-20'> 
 
-
-        
-      {/* Core Resources Section */}
-      <div className="bg-gray-50 shadow-md py-12 md:py-16 px-4"> {/* Core Resources section with bg-gray-50 and shadow */}
+ 
+      <div className="bg-gray-50 shadow-md py-12 md:py-16 px-4"> 
         <h2 className="text-center text-3xl md:text-4xl font-semibold text-gray-800 mb-4">
           Explore Our Core Resources
         </h2>
@@ -54,8 +52,7 @@ export default function Home() {
               subtitle="Shop drug chekcking kits"
             />
           </NavLink>
-        </div>
-        {/* New Contact Us Button */}
+        </div> 
         <div className="mt-10 md:mt-12 flex justify-center">
           <NavLink to="/contact" className="w-full sm:w-auto sm:max-w-sm block transform hover:scale-105 transition-transform duration-300 ease-in-out">
             <PrimaryButton text="Contact Us" className="!bg-gray-700 hover:!bg-gray-800 text-white h-[45px] md:h-[60px] w-[180px] md:w-[229px] text-[16px] md:text-[24px] font-medium" />

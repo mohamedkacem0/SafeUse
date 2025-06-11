@@ -10,8 +10,7 @@ export default function PasswordReset() {
     if (password !== confirm) {
       alert("Passwords do not match");
       return;
-    }
-    // Aquí iría la lógica para cambiar la contraseña
+    } 
     alert("Password changed!");
   };
 

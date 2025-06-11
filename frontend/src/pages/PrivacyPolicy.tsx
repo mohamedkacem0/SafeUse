@@ -57,8 +57,7 @@ All recipients are bound to strict confidentiality.`,
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 sm:py-12 mt-10">
-      {/* If you have a global Navbar, it would typically be outside or part of a layout component */}
-      {/* <Navbar /> */}
+     
       <main className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <h1 className="mb-10 text-center mt-6 sm:mt-0 text-3xl sm:text-4xl font-extrabold tracking-tight text-neutral-800 lg:text-5xl">
           Privacy Policy
@@ -81,9 +80,7 @@ All recipients are bound to strict confidentiality.`,
             Last updated: May 19, 2025
           </p>
         </div>
-      </main>
-      {/* If you have a global Footer, it would typically be outside or part of a layout component */}
-      {/* <Footer /> */}
+      </main> 
     </div>
   );
 }

@@ -5,12 +5,7 @@ use App\Core\DB;
 use PDO;
 
 class AdviceModel
-{
-    /**
-     * Obtiene todos los consejos
-     *
-     * @return array
-     */
+{ 
     public static function getAll(): array
     {
         $pdo = DB::getInstance()->conn();
@@ -20,13 +15,7 @@ class AdviceModel
         );
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
-    /**
-     * Obtiene un consejo por ID
-     *
-     * @param int $id
-     * @return array|null
-     */
+ 
     public static function getById(int $id): ?array
     {
         $pdo = DB::getInstance()->conn();
@@ -39,13 +28,7 @@ class AdviceModel
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
         return $data !== false ? $data : null;
     }
-
-    /**
-     * Crea un nuevo consejo
-     *
-     * @param array $input
-     * @return int ID del consejo creado
-     */
+ 
     public static function create(array $input): int
     {
         $pdo = DB::getInstance()->conn();
@@ -62,14 +45,7 @@ class AdviceModel
         ]);
         return (int)$pdo->lastInsertId();
     }
-
-    /**
-     * Actualiza un consejo existente
-     *
-     * @param int $id
-     * @param array $input
-     * @return bool
-     */
+ 
     public static function update(int $id, array $input): bool
     {
         $pdo = DB::getInstance()->conn();
@@ -89,13 +65,7 @@ class AdviceModel
         ]);
         return $stmt->rowCount() > 0;
     }
-
-    /**
-     * Elimina un consejo
-     *
-     * @param int $id
-     * @return bool
-     */
+ 
     public static function delete(int $id): bool
     {
         $pdo = DB::getInstance()->conn();

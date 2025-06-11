@@ -10,7 +10,7 @@ interface FetchResult<T> {
 export function useFetchData<T>(
   url: string,
   transform?: (json: any) => T,
-  deps: any[] = [] // Permite dependencias externas como [refresh]
+  deps: any[] = [] 
 ): FetchResult<T> {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);

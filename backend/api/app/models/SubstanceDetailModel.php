@@ -5,12 +5,7 @@ use App\Core\DB;
 use PDO;
 
 class SubstanceDetailModel
-{
-    /**
-     * Obtiene todos los detalles de sustancias
-     *
-     * @return array
-     */
+{ 
     public static function getAll(): array
     {
         $pdo = DB::getInstance()->conn();
@@ -29,13 +24,7 @@ class SubstanceDetailModel
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
-    /**
-     * Obtiene los detalles de una sustancia por ID
-     *
-     * @param int $id
-     * @return array|null
-     */
+ 
     public static function getById(int $id): ?array
     {
         $pdo = DB::getInstance()->conn();
@@ -66,13 +55,7 @@ class SubstanceDetailModel
 
         return $data !== false ? $data : null;
     }
-
-    /**
-     * Crea un nuevo detalle de sustancia
-     *
-     * @param array $input
-     * @return int ID de la sustancia creada
-     */
+ 
     public static function create(array $input): int
     {
         $pdo = DB::getInstance()->conn();
@@ -112,14 +95,7 @@ class SubstanceDetailModel
 
         return (int) $input['ID_Sustancia'];
     }
-
-    /**
-     * Actualiza un detalle de sustancia existente
-     *
-     * @param int $id
-     * @param array $input
-     * @return bool
-     */
+ 
     public static function update(int $id, array $input): bool
     {
         $pdo = DB::getInstance()->conn();
@@ -149,13 +125,7 @@ class SubstanceDetailModel
 
         return $stmt->rowCount() > 0;
     }
-
-    /**
-     * Elimina un detalle de sustancia
-     *
-     * @param int $id
-     * @return bool
-     */
+ 
     public static function delete(int $id): bool
     {
         $pdo = DB::getInstance()->conn();

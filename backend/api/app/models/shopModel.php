@@ -5,8 +5,7 @@ use App\Core\DB;
 use PDO;
 
 class ShopModel
-{
-    /** URL base para las carpetas de subida de imágenes */
+{ 
     private static function baseUploadsUrl(): string
     {
         return 'https://safeuse-lkde.onrender.com/uploads/productos/';

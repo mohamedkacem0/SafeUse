@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import Navbar from '../components/NavigationList'; // Corrected import path
+import Navbar from '../components/NavigationList';  
 import Footer from '../components/Footer';
 import { CheckCircle, Package } from 'lucide-react';
 
-// Re-usamos la interfaz Product si la tienes definida globalmente
-// Si no, la definimos aquí para la estructura esperada
+ 
 interface Product {
   id: string | number;
   name: string;
   price: number;
   quantity: number;
   image?: string;
-  // Añade otras propiedades que tus productos puedan tener
+  
 }
 
 interface LocationState {
@@ -42,8 +41,8 @@ const OrderConfirmation: React.FC = () => {
   const location = useLocation();
   const state = location.state as LocationState | null;
 
-  console.log('OrderConfirmation.tsx: Received state:', state); // DEBUG LINE
-  console.log('OrderConfirmation.tsx: Received items:', state?.items); // DEBUG LINE
+  console.log('OrderConfirmation.tsx: Received state:', state);  
+  console.log('OrderConfirmation.tsx: Received items:', state?.items);   
 
   const [isOrderCreationAttempted, setIsOrderCreationAttempted] = useState(false);
 
@@ -51,18 +50,14 @@ const OrderConfirmation: React.FC = () => {
     const createOrderInBackend = async () => {
       if (state && state.shippingAddress && !isOrderCreationAttempted) {
         const { address, city, postalCode } = state.shippingAddress;
-        // The backend expects 'address', 'city', and 'postalCode'
-        // Ensure your LocationState.shippingAddress matches these or adapt as needed.
-        // For example, if state.shippingAddress.address is the full street, use that.
-        // If it's split into street, number, etc., combine them appropriately for 'address'.
+  
 
-        setIsOrderCreationAttempted(true); // Set flag to prevent duplicate calls
-
-        // Assuming state.shippingAddress.address is the street address line
+        setIsOrderCreationAttempted(true);  
+      
         const payload = {
-          address: address, // e.g., "123 Main St"
-          city: city,       // e.g., "Anytown"
-          postalCode: postalCode // e.g., "12345"
+          address: address,  
+          city: city,       
+          postalCode: postalCode  
         };
 
         try {
@@ -72,29 +67,25 @@ const OrderConfirmation: React.FC = () => {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify(payload),
-            credentials: 'include', // Include if your backend session requires cookies and CORS is configured for it
+            credentials: 'include',  
           });
 
           const responseData = await response.json();
 
           if (response.ok) {
             console.log('Order created successfully in backend:', responseData);
-            // Optionally, you could update the displayed orderId if the backend returns a new one
-            // or store it, or simply confirm it's done.
+       
           } else {
             console.error('Failed to create order in backend:', responseData.error || 'Unknown error');
-            // Handle error, e.g., show a message to the user
           }
         } catch (error) {
           console.error('Error calling create order API:', error);
-          // Handle network error, e.g., show a message to the user
         }
       }
     };
 
     createOrderInBackend();
-  }, [state]); // Dependency array ensures this runs when state changes (typically once on mount with state)
-
+  }, [state]); 
   if (!state) {
     return (
       <div className="flex flex-col min-h-screen">
