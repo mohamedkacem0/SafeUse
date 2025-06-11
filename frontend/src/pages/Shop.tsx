@@ -10,6 +10,15 @@ import toast, { Toaster } from 'react-hot-toast';
 import CatchyQuoteSection from "../components/CatchyQuoteSection";
 import DrugCardSkeleton from "../components/DrugCardSkeleton";
 
+interface RawProduct {
+  ID_Producto: number;
+  Nombre: string;
+  Precio: string;
+  Stock: string;
+  Descripcion: string;
+  Imagen_Principal: string;
+}
+
 interface Product {
   id: number;
   name: string;
@@ -33,7 +42,7 @@ export default function ShopPage() {
   useEffect(() => {
     fetch("/api/productos", { credentials: "include" })
       .then(res => res.json())
-      .then((data: any[]) => {
+            .then((data: RawProduct[]) => {
         const parsed: Product[] = data.map(p => ({
           id: p.ID_Producto,
           name: p.Nombre,
@@ -213,12 +222,13 @@ export default function ShopPage() {
                 transition={{ duration: 0.3, ease: "easeOut" }}
                 key={`motion-${product.id}`}
               >
-                <DrugCard
+                                <DrugCard
                 key={product.id}
                 imageSrc={product.imageSrc}
                 name={product.name}
                 title={product.description}
                 formula={`€${product.price.toFixed(2)}`}
+                stock={product.stock}
                 button={buttonText}
                 onButtonClick={() => handleAddToCart(product.id, product.name)}
                 buttonDisabled={isDisabled} // New prop

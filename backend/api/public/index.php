@@ -20,7 +20,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
 
-// Carga manual de dependencias 
 
 require_once __DIR__ . '/../app/core/config.php';
 require_once __DIR__ . '/../app/core/db.php';

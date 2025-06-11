@@ -5,6 +5,7 @@ interface DrugCardProps {
   name: string;
   title: string;
   formula: string;
+  stock?: number;
   button?: string;
   onButtonClick?: () => void;
   onCardClick?: () => void;
@@ -16,6 +17,8 @@ const DrugCard: React.FC<DrugCardProps> = ({
   imageSrc,
   name,
   title,
+  formula,
+  stock,
   button = "See more",
   onButtonClick,
   onCardClick,
@@ -35,6 +38,14 @@ const DrugCard: React.FC<DrugCardProps> = ({
       <h3 className="font-lato font-bold text-[20px] leading-tight text-center">
         {name}
       </h3>
+      <p className="font-lato text-[16px] text-center font-bold text-emerald-600 my-2">
+        {formula}
+      </p>
+      {stock !== undefined && stock > 0 && stock < 5 && (
+        <p className="font-lato text-[14px] text-center text-red-600 font-bold">
+          Only {stock} units left!
+        </p>
+      )}
       {!hideTitle && (
         <p className="font-lato text-[14px] text-center leading-none">
           {title}
