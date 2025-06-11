@@ -8,8 +8,9 @@ export default function LoginSignup() {
  
   const [login, setLogin] = useState({ email: "", password: "", show: false });
   const [loginError, setLoginError] = useState<string | null>(null);
- 
-  const [sign, setSign] = useState({
+  // Estado signup
+    const [sign, setSign] = useState({
+
     name: "",
     email: "",
     phone: "",
@@ -18,6 +19,7 @@ export default function LoginSignup() {
     confirm: "",
     showPwd: false,
     showConf: false,
+    agreedToTerms: false,
   });
   const [signError, setSignError] = useState<string | null>(null);
  
@@ -64,13 +66,18 @@ export default function LoginSignup() {
         }
       }
     } catch (err) {
+      console.error(err);
       setLoginError("Error de red");
     }
   };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSignError(null);
+        setSignError(null);
+    if (!sign.agreedToTerms) {
+      setSignError("You must agree to the terms to create an account.");
+      return;
+    }
     if (sign.password !== sign.confirm) {
       setSignError("Las contraseñas no coinciden");
       return;
@@ -97,6 +104,7 @@ export default function LoginSignup() {
         navigate("/");
       }
     } catch (err) {
+      console.error(err);
       setSignError("Error de red");
     }
   };
@@ -242,6 +250,19 @@ export default function LoginSignup() {
                 >
                   {sign.showConf ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
+              </div>
+
+                            <div className="mb-6 w-full max-w-xs">
+                <label className="flex items-center text-xs text-gray-600">
+                  <input
+                    type="checkbox"
+                    className="mr-2 h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                    checked={sign.agreedToTerms}
+                    onChange={(e) => setSign({ ...sign, agreedToTerms: e.target.checked })}
+                    required
+                  />
+                                    <span>By creating an account, you agree to our <a href="/terms" className="text-emerald-600 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-emerald-600 hover:underline">Privacy Policy</a>.</span>
+                </label>
               </div>
 
               <button className="w-full max-w-xs rounded-md bg-emerald-600 px-8 py-3 text-sm font-semibold text-white shadow-md hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 active:scale-[0.98] active:brightness-95 transition-all duration-150 ease-in-out">

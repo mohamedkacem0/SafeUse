@@ -56,17 +56,17 @@ export default function ProductManagement() {
     data: productsData,
     loading: loadingProducts,
     error: productsError,
-  } = useFetchData<Product[]>('/api/productos', (json) => {
+  } = useFetchData<Product[]>('/api/productos', (json: unknown) => {
     if (Array.isArray(json)) {
-      return json as Product[];
+      return json;
     }
-    if (Array.isArray((json as any).productos)) {
-      return (json as any).productos as Product[];
+    if (json && typeof json === 'object' && 'productos' in json && Array.isArray((json as { productos: Product[] }).productos)) {
+      return (json as { productos: Product[] }).productos;
     }
     return [];
   });
 
-  const products = productsData ?? [];
+  const products = useMemo(() => productsData ?? [], [productsData]);
 
   const [filter, setFilter] = useState('');
   const filteredProducts = useMemo(() => {
@@ -135,33 +135,41 @@ export default function ProductManagement() {
 
     if (currentProductImages) {
       for (let i = 0; i < currentProductImages.length; i++) {
-        formData.append('imagenes[]', currentProductImages[i]); 
+        formData.append('imagenes[]', currentProductImages[i]);
       }
     }
 
+    const url = editingProduct
+      ? `/api/admin/products/${editingProduct.ID_Producto}`
+      : '/api/admin/products';
+
     try {
-      const endpoint = editingProduct 
-        ? `/api/admin/products/${editingProduct.ID_Producto}` 
-        : '/api/admin/products'; 
-      
-      const response = await fetch(endpoint, {
-        method: 'POST', 
+      const response = await fetch(url, {
+        method: 'POST',
         body: formData,
       });
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || result.error || 'Form submission failed');
+      const responseText = await response.text();
+      let result;
+      try {
+        result = JSON.parse(responseText);
+      } catch {
+        console.error('Failed to parse JSON:', responseText);
+        throw new Error(`El servidor ha devuelto una respuesta inesperada: ${responseText.substring(0, 200)}...`);
       }
 
-      setProductFormSuccess(`Product ${editingProduct ? 'updated' : 'added'} successfully! ${result.id ? `ID: ${result.id}` : ''}`);
+      if (!response.ok) {
+        throw new Error(result.message || result.error || 'Error al enviar el formulario.');
+      }
+
+      setProductFormSuccess(`Producto ${editingProduct ? 'actualizado' : 'añadido'} con éxito!`);
       setIsProductFormVisible(false);
       resetProductFormFields();
-      window.location.reload(); 
-    } catch (err: any) {
-      console.error('Product form submission error:', err);
-      setProductFormError(err.message || 'An unknown error occurred during submission.');
+      window.location.reload();
+    } catch (err) {
+      console.error('Error en el formulario de producto:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Ha ocurrido un error desconocido.';
+      setProductFormError(errorMessage);
     }
   };
 

@@ -20,20 +20,19 @@ class AdminProductModel
         );
         $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Process images: split string into array and prepend base path if needed
         foreach ($products as &$product) {
             if (!empty($product['imagenes'])) {
                 $imageFilenames = explode(';', $product['imagenes']);
-                // Construct a web-accessible path for the primary image
                 $product['Imagen_Principal'] = 'uploads/productos/p' . $product['ID_Producto'] . '/' . $imageFilenames[0];
                 $product['imagenes_list'] = $imageFilenames;
             } else {
-                $product['Imagen_Principal'] = null; 
+                $product['Imagen_Principal'] = null;
                 $product['imagenes_list'] = [];
             }
         }
         return $products;
     }
+
     public static function getById(int $id): ?array
     {
         $pdo = DB::getInstance()->conn();
@@ -50,6 +49,7 @@ class AdminProductModel
         $product['imagenes'] = $stmt_imgs->fetchAll(PDO::FETCH_ASSOC);
         return $product;
     }
+
     public static function create(array $data, array $imageFilenames = []): ?int
     {
         $pdo = DB::getInstance()->conn();
@@ -58,12 +58,7 @@ class AdminProductModel
 
             $sql = "INSERT INTO productos (Nombre, Precio, Stock, Descripcion, Fecha_Creacion) VALUES (?, ?, ?, ?, NOW())";
             $stmt = $pdo->prepare($sql);
-            $stmt->execute([
-                $data['Nombre'], 
-                $data['Precio'], 
-                $data['Stock'], 
-                $data['Descripcion']
-            ]);
+            $stmt->execute([$data['Nombre'], $data['Precio'], $data['Stock'], $data['Descripcion']]);
             $productId = (int)$pdo->lastInsertId();
 
             if ($productId && !empty($imageFilenames)) {
@@ -81,6 +76,7 @@ class AdminProductModel
             return null;
         }
     }
+
     public static function update(int $id, array $data, ?array $newImageFilenames = null): bool
     {
         $pdo = DB::getInstance()->conn();
@@ -89,13 +85,8 @@ class AdminProductModel
 
             $sql = "UPDATE productos SET Nombre = ?, Precio = ?, Stock = ?, Descripcion = ? WHERE ID_Producto = ?";
             $stmt = $pdo->prepare($sql);
-            $success = $stmt->execute([
-                $data['Nombre'], 
-                $data['Precio'], 
-                $data['Stock'], 
-                $data['Descripcion'], 
-                $id
-            ]);
+            $success = $stmt->execute([$data['Nombre'], $data['Precio'], $data['Stock'], $data['Descripcion'], $id]);
+
             if ($newImageFilenames !== null) {
                 $oldImgQuery = $pdo->prepare("SELECT url_imagen FROM imagenes_producto WHERE ID_Producto = ?");
                 $oldImgQuery->execute([$id]);
@@ -109,8 +100,10 @@ class AdminProductModel
                         }
                     }
                 }
+
                 $delImgStmt = $pdo->prepare("DELETE FROM imagenes_producto WHERE ID_Producto = ?");
                 $delImgStmt->execute([$id]);
+
                 if (!empty($newImageFilenames)) {
                     $imgSql = "INSERT INTO imagenes_producto (ID_Producto, url_imagen, numero_imagen) VALUES (?, ?, ?)";
                     $imgStmt = $pdo->prepare($imgSql);
@@ -127,11 +120,13 @@ class AdminProductModel
             return false;
         }
     }
+
     public static function delete(int $id): bool
     {
         $pdo = DB::getInstance()->conn();
         try {
             $pdo->beginTransaction();
+
             $imgQuery = $pdo->prepare("SELECT url_imagen FROM imagenes_producto WHERE ID_Producto = ?");
             $imgQuery->execute([$id]);
             $imagesToDelete = $imgQuery->fetchAll(PDO::FETCH_COLUMN);
@@ -150,7 +145,7 @@ class AdminProductModel
                         unlink($filePath);
                     }
                 }
-                if (is_dir($productImageDir) && count(scandir($productImageDir)) == 2) {
+                if (is_dir($productImageDir) && count(scandir($productImageDir)) == 2) { // Directory is empty
                     rmdir($productImageDir);
                 }
             }
