@@ -1,16 +1,16 @@
-// src/pages/LoginSignup.tsx
+  
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 
 export default function LoginSignup() {
   const navigate = useNavigate();
-
-  // Estado login
+ 
   const [login, setLogin] = useState({ email: "", password: "", show: false });
   const [loginError, setLoginError] = useState<string | null>(null);
   // Estado signup
     const [sign, setSign] = useState({
+
     name: "",
     email: "",
     phone: "",
@@ -22,8 +22,7 @@ export default function LoginSignup() {
     agreedToTerms: false,
   });
   const [signError, setSignError] = useState<string | null>(null);
-
-  // Animation states
+ 
   const [showLoginCard, setShowLoginCard] = useState(false);
   const [showSignupCard, setShowSignupCard] = useState(false);
 
@@ -39,8 +38,7 @@ export default function LoginSignup() {
   const input =
     "w-full rounded-md border border-gray-300 bg-transparent p-2 text-sm placeholder:text-gray-500 focus:border-sky-500 focus:ring-2 focus:ring-sky-500 focus:ring-offset-1 focus:outline-none transition-all duration-300 ease-in-out";
   const label = "mb-2 text-xs font-semibold tracking-wide text-gray-600";
-
-  // Handler login
+ 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError(null);
@@ -54,17 +52,16 @@ export default function LoginSignup() {
       const data = await res.json();
       if (!res.ok) {
         setLoginError(data.error || "Error al iniciar sesión");
-      } else {
-        // Guardar usuario
+      } else { 
         localStorage.setItem("user", JSON.stringify(data.user));
-        // Si es admin, almacenar lista y redirigir
+ 
         if (data.user.Tipo_Usuario === "admin") {
           if (data.users) {
             localStorage.setItem("users", JSON.stringify(data.users));
           }
           navigate("/adminDashboard");
         } else {
-          // Usuario normal
+  
           navigate("/");
         }
       }
@@ -74,7 +71,6 @@ export default function LoginSignup() {
     }
   };
 
-  // Handler signup
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
         setSignError(null);
@@ -119,7 +115,7 @@ export default function LoginSignup() {
         <h1 className="mb-12 text-center text-5xl font-extrabold mt-10">Login/Sign up</h1>
 
         <div className="flex flex-col gap-12 lg:flex-row lg:gap-0">
-          {/* FORM LOGIN */}
+ 
           <div
             className={`w-full lg:w-1/2 lg:pr-6 transform transition-all duration-700 ease-out ${
               showLoginCard ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
@@ -168,8 +164,7 @@ export default function LoginSignup() {
           </div>
 
           <div className="hidden lg:block h-auto w-px self-stretch bg-gray-300 mx-6" />
-
-          {/* FORM SIGNUP */}
+ 
           <div
             className={`w-full lg:w-1/2 lg:pl-6 transform transition-all duration-700 ease-out ${
               showSignupCard ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"

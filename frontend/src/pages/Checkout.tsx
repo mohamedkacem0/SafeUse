@@ -8,7 +8,6 @@ import {
 
 import PrimaryButton from "../components/PrimaryButton";
 
-// Stripe imports
 import { loadStripe, PaymentIntent } from '@stripe/stripe-js';
 import {
   Elements,
@@ -17,7 +16,6 @@ import {
   useElements,
 } from '@stripe/react-stripe-js';
 
-// Define an interface for the user object stored in localStorage
 interface User {
   Nombre: string;
 }
@@ -27,16 +25,10 @@ interface Product {
   name: string;
   price: number;
   quantity: number;
-  image?: string;
-  // Add other properties your product objects might have
-}
-
-// Initialize Stripe outside of the component render to avoid
-// recreating the Stripe object on every render.
-// Replace with your actual publishable key
+  image?: string; 
+} 
 const stripePromise = loadStripe("pk_test_51RVEeLRsCw1rPgQ1kFV5WKJTolyxv34OHCwa8pYCTBoGKawMpRj4qk0cPW5ELFWW88zlmQO3H383OtlDHs3gIoGR00DOXUfYXH");
-
-// Define an interface for shipping address details
+ 
 interface ShippingAddressDetails {
   firstName: string;
   lastName: string;
@@ -45,17 +37,15 @@ interface ShippingAddressDetails {
   postalCode: string;
   country: string;
 }
-
-// New CheckoutForm component
+ 
 const CheckoutForm = ({ orderTotal, userName, initialCardName, onPaymentSuccess }: { orderTotal: number, userName: string | null, initialCardName: string, onPaymentSuccess: (paymentIntent: PaymentIntent, shippingDetails: ShippingAddressDetails) => void }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [paymentSuccess, setPaymentSuccess] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
-  const [cardName, setCardName] = useState(initialCardName); // Separate state for card name
-
-  // State for shipping details
+  const [cardName, setCardName] = useState(initialCardName);  
+ 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [addressLine1, setAddressLine1] = useState('');
@@ -72,17 +62,14 @@ const CheckoutForm = ({ orderTotal, userName, initialCardName, onPaymentSuccess 
     setProcessing(true);
     setPaymentError(null);
     setPaymentSuccess(null);
-
-    // Validate shipping details
+ 
     if (!firstName || !lastName || !addressLine1 || !city || !postalCode || !country) {
       setPaymentError("Please fill in all required shipping details.");
       setProcessing(false);
       return;
     }
 
-    if (!stripe || !elements) {
-      // Stripe.js has not yet loaded.
-      // Make sure to disable form submission until Stripe.js has loaded.
+    if (!stripe || !elements) { 
       setPaymentError("Stripe.js has not loaded yet. Please wait a moment and try again.");
       setProcessing(false);
       return;
@@ -95,19 +82,17 @@ const CheckoutForm = ({ orderTotal, userName, initialCardName, onPaymentSuccess 
       return;
     }
 
-    try {
-      // 1. Create PaymentIntent on the server
-      const response = await fetch('api/create-payment-intent', { // Ensure this matches your backend route
+    try { 
+      const response = await fetch('api/create-payment-intent', {  
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        credentials: 'include', // Important for session/cookies if your backend uses them
+        credentials: 'include', 
         body: JSON.stringify({
-          amount: Math.round(orderTotal * 100), // Stripe expects amount in cents
-          currency: 'eur', // Or your desired currency
-          // You can pass other metadata here if needed
+          amount: Math.round(orderTotal * 100),  
+          currency: 'eur',  
           metadata: {
             customerName: userName || cardName,
             orderTotal: orderTotal.toFixed(2)
@@ -127,14 +112,12 @@ const CheckoutForm = ({ orderTotal, userName, initialCardName, onPaymentSuccess 
       }
 
       const clientSecret = paymentIntentResult.clientSecret;
-
-      // 2. Confirm the card payment
+ 
       const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
           card: cardElement,
           billing_details: {
-            name: cardName, // Use the name from the input field
-            // email: userEmail, // Optional: if you have user's email
+            name: cardName,  
           },
         },
       });
@@ -182,15 +165,14 @@ const CheckoutForm = ({ orderTotal, userName, initialCardName, onPaymentSuccess 
         iconColor: "#fa755a",
       },
     },
-    hidePostalCode: true, // Optional: if you don't collect postal code
+    hidePostalCode: true,  
   };
 
   const inputClass = "w-full rounded-md border border-gray-300 bg-white p-2.5 text-sm shadow-sm placeholder:text-gray-400 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 focus:outline-none transition-colors duration-200 ease-in-out";
   const labelClass = "block mb-1.5 text-xs font-medium text-gray-700";
 
   return (
-    <> {/* Added fragment to wrap shipping and payment sections */}
-      {/* Shipping Details Section */}
+    <> 
       <div className="mb-8">
         <h3 className="text-xl font-semibold text-gray-800 mb-4">Shipping Details</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -220,10 +202,9 @@ const CheckoutForm = ({ orderTotal, userName, initialCardName, onPaymentSuccess 
           </div>
         </div>
       </div>
-
-      {/* Payment Details Section */}
+ 
       <h3 className="text-xl font-semibold text-gray-800 mb-4">Payment Information</h3>
-      {/* End of Shipping Details Section */}
+   
 
     <form onSubmit={handleSubmit}>
       <div className="space-y-5">
@@ -241,7 +222,7 @@ const CheckoutForm = ({ orderTotal, userName, initialCardName, onPaymentSuccess 
         </div>
         <div>
           <label className={labelClass}>Card details</label>
-          <div className={`${inputClass} p-3`}> {/* Style the CardElement container */}
+          <div className={`${inputClass} p-3`}>  
             <CardElement options={cardElementOptions} />
           </div>
         </div>
@@ -257,7 +238,7 @@ const CheckoutForm = ({ orderTotal, userName, initialCardName, onPaymentSuccess 
         className="w-full mt-8 rounded-lg bg-sky-600 py-3.5 text-base font-semibold text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-slate-50 transition-all duration-200 ease-in-out shadow-md hover:shadow-lg active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
       />
     </form>
-    </> /* Closing fragment */
+    </> 
   );
 };
 
@@ -265,7 +246,7 @@ export default function Checkout() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Removed form state for card number, exp, cvc as CardElement handles them
+  
   const [cardHolderName, setCardHolderName] = useState('');
   const [userName, setUserName] = useState<string | null>(null);
   const [currentCartItems, setCurrentCartItems] = useState<Product[]>([]); 
@@ -289,29 +270,28 @@ export default function Checkout() {
     }
   }, [cardHolderName]); 
 
-  useEffect(() => {
-    // Initialize from location state (passed from cart page or previous step)
+  useEffect(() => { 
     const {
       cardName = '',
       userName: initialUserName = null,
-      cartItems = [], // Expect cartItems from location.state
+      cartItems = [], 
       orderTotal = 0,
     } = location.state || {};
 
-    console.log('Checkout.tsx useEffect - location.state:', location.state); // DEBUG LINE
+    console.log('Checkout.tsx useEffect - location.state:', location.state);  
     setCardHolderName(cardName);
     setUserName(initialUserName);
-    setCurrentCartItems(cartItems as Product[]); // Populate cart items
+    setCurrentCartItems(cartItems as Product[]); 
     setCurrentOrderTotal(orderTotal);
   }, [location.state]);
 
   const handlePaymentSuccess = useCallback((paymentIntent: PaymentIntent, shippingDetails: ShippingAddressDetails) => {
     console.log('Payment successful!', paymentIntent);
-    console.log('Checkout.tsx: Navigating to confirmation with items:', currentCartItems); // DEBUG LINE
+    console.log('Checkout.tsx: Navigating to confirmation with items:', currentCartItems);  
     navigate('/order-confirmation', { 
       state: { 
         orderId: paymentIntent.id,
-        items: currentCartItems, // Pass the cart items
+        items: currentCartItems,  
         total: currentOrderTotal,
         paymentDate: new Date().toISOString(),
         shippingAddress: {
@@ -350,7 +330,7 @@ export default function Checkout() {
           </header>
 
           <div className="grid gap-8 lg:grid-cols-2 lg:gap-12"> 
-            {/* Payment details Card */}
+ 
             <div className="bg-white p-6 sm:p-8 rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300">
               <h2 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
                 <CreditCard className="w-6 h-6 mr-3 text-sky-600" />
@@ -359,8 +339,7 @@ export default function Checkout() {
 
               <CheckoutForm orderTotal={currentOrderTotal} userName={userName} initialCardName={cardHolderName} onPaymentSuccess={handlePaymentSuccess} />
             </div>
-
-            {/* Order summary Card */}
+ 
             <aside className="bg-white p-6 sm:p-8 rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 self-start">
               <h2 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
                 <ShoppingCart className="w-6 h-6 mr-3 text-sky-600" />

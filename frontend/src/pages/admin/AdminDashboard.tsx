@@ -1,4 +1,4 @@
-// src/pages/AdminDashboard.tsx
+ 
 import { useState } from 'react';
 import AdminHeader from '../../components/admin/AdminHeader';
 import { useFetchData } from '../admin/useFetchData';
@@ -15,7 +15,7 @@ import {
   Mail,
   ChevronDown,
   ChevronUp,
-  ShoppingCart, // ícono para Orders
+  ShoppingCart,  
 } from 'lucide-react';
 
 import UserManagement from '../../components/admin/UserManagement';
@@ -23,7 +23,7 @@ import SubstancesManagement from '../../components/admin/SubstancesManagement';
 import ProductManagement from '../../components/admin/ProductManagement';
 import ContactSubmissions from '../../components/admin/ContactSubmissions';
 import AdviceManagement from '../../components/admin/AdviceManagement';
-import OrdersManagement from '../../components/admin/OrdersManagement'; // Importamos aquí
+import OrdersManagement from '../../components/admin/OrdersManagement';  
 
 export default function AdminDashboard() {
   const [showUserManagement, setShowUserManagement] = useState(false);
@@ -31,9 +31,9 @@ export default function AdminDashboard() {
   const [showProductManagement, setShowProductManagement] = useState(false);
   const [showContactSubmissions, setShowContactSubmissions] = useState(false);
   const [showAdviceManagement, setShowAdviceManagement] = useState(false);
-  const [showOrdersManagement, setShowOrdersManagement] = useState(false); // Nuevo estado
+  const [showOrdersManagement, setShowOrdersManagement] = useState(false);  
 
-  // Fetches para métricas (usuarios, productos, sustancias, contactos) ...
+  
   const {
     data: usersData,
     loading: loadingUsers,
@@ -93,7 +93,7 @@ export default function AdminDashboard() {
       <div className="p-6 space-y-6 mt-[70px]">
         {/* Metrics Cards */}
         <div className="grid grid-cols-5 gap-4">
-          {/* Total Users */}
+       
           <Card className="p-4">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
@@ -111,8 +111,7 @@ export default function AdminDashboard() {
               )}
             </CardContent>
           </Card>
-
-          {/* Total Products */}
+ 
           <Card className="p-4">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
@@ -130,8 +129,7 @@ export default function AdminDashboard() {
               )}
             </CardContent>
           </Card>
-
-          {/* Total Substances */}
+ 
           <Card className="p-4">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
@@ -149,8 +147,7 @@ export default function AdminDashboard() {
               )}
             </CardContent>
           </Card>
-
-          {/* Total Contact Submissions */}
+ 
           <Card className="p-4">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
@@ -168,8 +165,7 @@ export default function AdminDashboard() {
               )}
             </CardContent>
           </Card>
-
-          {/* Unchecked Submissions */}
+ 
           <Card className="p-4">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
@@ -188,8 +184,7 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
         </div>
-
-        {/* User Management Section */}
+ 
         <div className="bg-white shadow rounded-lg p-4">
           <button
             onClick={() => setShowUserManagement(!showUserManagement)}
@@ -200,8 +195,7 @@ export default function AdminDashboard() {
           </button>
           {showUserManagement && <UserManagement />}
         </div>
-
-        {/* Substances Management Section */}
+ 
         <div className="bg-white shadow rounded-lg p-4">
           <button
             onClick={() => setShowSubstancesManagement(!showSubstancesManagement)}
@@ -212,8 +206,7 @@ export default function AdminDashboard() {
           </button>
           {showSubstancesManagement && <SubstancesManagement />}
         </div>
-
-        {/* Product Management Section */}
+ 
         <div className="bg-white shadow rounded-lg p-4">
           <button
             onClick={() => setShowProductManagement(!showProductManagement)}
@@ -223,9 +216,7 @@ export default function AdminDashboard() {
             {showProductManagement ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
           </button>
           {showProductManagement && <ProductManagement />}
-        </div>
-
-        {/* Contact Submissions Section */}
+        </div> 
         <div className="bg-white shadow rounded-lg p-4">
           <button
             onClick={() => setShowContactSubmissions(!showContactSubmissions)}
@@ -236,8 +227,7 @@ export default function AdminDashboard() {
           </button>
           {showContactSubmissions && <ContactSubmissions />}
         </div>
-
-        {/* Advice Management Section */}
+ 
         <div className="bg-white shadow rounded-lg p-4">
           <button
             onClick={() => setShowAdviceManagement(!showAdviceManagement)}
@@ -248,8 +238,7 @@ export default function AdminDashboard() {
           </button>
           {showAdviceManagement && <AdviceManagement />}
         </div>
-
-        {/* Orders Management Section */}
+ 
         <div className="bg-white shadow rounded-lg p-4">
           <button
             onClick={() => setShowOrdersManagement(!showOrdersManagement)}

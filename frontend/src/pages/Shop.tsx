@@ -1,4 +1,4 @@
-// src/pages/ShopPage.tsx
+ 
 import { useState, useEffect } from "react";
 import { Search, SearchX } from "lucide-react";
 import { motion } from "framer-motion";
@@ -37,8 +37,7 @@ export default function ShopPage() {
   const navigate = useNavigate();
   const [buttonStatus, setButtonStatus] = useState<Record<number, 'idle' | 'adding' | 'added'>>({});
   const [isLoading, setIsLoading] = useState(true);
-
-  // Load products
+ 
   useEffect(() => {
     fetch("/api/productos", { credentials: "include" })
       .then(res => res.json())
@@ -60,14 +59,14 @@ export default function ShopPage() {
       });
   }, []);
 
-  // Listen for stock adjustments from other components (e.g., Cart.tsx)
+  //  stock adjustments from other components (e.g., Cart.tsx)
   useEffect(() => {
     const handleStockAdjusted = (event: Event) => {
       const customEvent = event as CustomEvent<{ productId: number; quantityChange: number }>;
       const { productId, quantityChange } = customEvent.detail;
       setProducts(prevProducts =>
         prevProducts.map(p =>
-          p.id === productId ? { ...p, stock: Math.max(0, p.stock + quantityChange) } : p // Ensure stock doesn't go below 0
+          p.id === productId ? { ...p, stock: Math.max(0, p.stock + quantityChange) } : p
         )
       );
     };
@@ -76,9 +75,7 @@ export default function ShopPage() {
     return () => {
       window.removeEventListener('productStockAdjusted', handleStockAdjusted);
     };
-  }, []); // Empty dependency array ensures this runs once on mount and cleans up on unmount
-
-  // Filter logic
+  }, []); 
   const filtered = products.filter(p =>
     p.name.toLowerCase().includes(query.toLowerCase())
   );
@@ -88,8 +85,7 @@ export default function ShopPage() {
   const canLoadMore = visibleCount < filtered.length;
   const handleLoadMore = () =>
     setVisibleCount(prev => Math.min(prev + PAGE_SIZE, filtered.length));
-
-  // Add to cart
+ 
   const handleAddToCart = async (productId: number, productName: string, quantity: number = 1) => {
     setButtonStatus(prev => ({ ...prev, [productId]: 'adding' }));
 
@@ -172,18 +168,16 @@ export default function ShopPage() {
   return (
     <div>
       <Toaster position="top-center" reverseOrder={false} />
-      {/* Banner */}
+ 
       <div className="sticky top-0 z-10 h-[450px] w-full overflow-hidden">
         <img src={Banner} alt="Shop Banner" className="w-full object-cover" loading="lazy" />
       </div>
-
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-white">
-        {/* Slogan Section */}
+ 
+      <div className="sticky top-0 z-10 bg-white"> 
         <CatchyQuoteSection quote="Test with confidence, stay in control." ariaLabel="Shop page slogan" />
 
         <section className="flex flex-col items-center mt-10 p-6 gap-8 max-w-5xl mx-auto bg-gray-50 rounded-lg shadow-md">
-          {/* Search */}
+ 
           <div className="relative w-full max-w-md mb-8">
             <input
               type="text"
@@ -194,8 +188,7 @@ export default function ShopPage() {
             />
             <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-700" />
           </div>
-
-          {/* Products */}
+ 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-12">
             {isLoading
             ? Array.from({ length: PAGE_SIZE }).map((_, index) => <DrugCardSkeleton key={index} />)
@@ -231,15 +224,13 @@ export default function ShopPage() {
                 stock={product.stock}
                 button={buttonText}
                 onButtonClick={() => handleAddToCart(product.id, product.name)}
-                buttonDisabled={isDisabled} // New prop
-                onCardClick={() => navigate(`/shop/${product.id}`)} // Corrected navigation
+                buttonDisabled={isDisabled}  
+                onCardClick={() => navigate(`/shop/${product.id}`)} 
                 hideTitle={true}
                 />
               </motion.div>
             );})}
-          </div>
-
-          {/* Load more / no results */}
+          </div> 
           {canLoadMore ? (
             <div className="col-span-full flex justify-center mt-8">
               <PrimaryButton

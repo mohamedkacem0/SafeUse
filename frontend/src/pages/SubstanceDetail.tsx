@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Description from "../components/Description";
 
-// Mapeo de campos de la API a títulos legibles
 const FIELD_TITLES: Record<string, string> = {
   descripcion: "Description",
   metodos_consumo: "Consumption Methods",
@@ -21,8 +20,7 @@ export default function SubstanceDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Offset for scrolling to sections, accounting for the sticky main navbar
-  const SCROLL_OFFSET = 86; // Approx 70px navbar + 16px padding
+  const SCROLL_OFFSET = 86; 
 
   useEffect(() => {
     async function fetchData() {
@@ -108,7 +106,7 @@ export default function SubstanceDetail() {
   return (
     <div className="min-h-screen bg-slate-50 pt-[70px]">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        {/* Banner Section */}
+  
         <header className="mb-10 text-center">
           <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-800 mb-4">{data.name}</h1>
           {data.image && (
@@ -121,7 +119,6 @@ export default function SubstanceDetail() {
         </header>
 
         <div className="flex flex-col lg:flex-row lg:gap-x-12">
-          {/* Sticky Navigation - Left Column */}
           <aside className="lg:w-1/4 mb-8 lg:mb-0 lg:sticky lg:top-[86px] self-start">
             <div className="bg-white p-6 rounded-xl shadow-xl border-t-4 border-emerald-500">
               <h2 className="text-xl font-semibold text-gray-700 mb-5">Sections</h2>
@@ -139,8 +136,6 @@ export default function SubstanceDetail() {
               </nav>
             </div>
           </aside>
-
-          {/* Content - Right Column */}
           <motion.main 
             className="lg:w-3/4"
             variants={staggerContainerVariants}
@@ -155,13 +150,11 @@ export default function SubstanceDetail() {
                 variants={cardVariants}
                 whileHover="hover"
               >
-                {/* The Description component will render title and subtitle. 
-                    We might need to adjust its internal styling later if it doesn't look good in a card. */}
-                <Description
-                  title={FIELD_TITLES[key]} // This will be the card title
-                  subtitle={data[key]}       // This will be the card content
-                  link=""                    // link prop is not used, can be removed from Description component later
-                  width="w-full"              // width prop might be redundant if card itself controls width
+              <Description
+                  title={FIELD_TITLES[key]} 
+                  subtitle={data[key]}      
+                  link=""                 
+                  width="w-full"
                 />
               </motion.section>
             ))}

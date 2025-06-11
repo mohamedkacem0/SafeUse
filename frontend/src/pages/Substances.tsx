@@ -71,8 +71,7 @@ export default function SubstancesPage() {
   const handleOpenModal = (drug: Drug) => setModalDrug(drug);
   const handleCloseModal = () => setModalDrug(null);
 
-  function formatFormula(formula: string) {
-    // Reemplaza cada número por <sub>número</sub>
+  function formatFormula(formula: string) { 
     return formula.replace(/([A-Za-z])(\d+)/g, (_, letter, num) => {
       return `${letter}<sub>${num}</sub>`;
     });
@@ -118,8 +117,7 @@ export default function SubstancesPage() {
                 />
               </motion.div>
             ))}
-          </div>
-          {/* Modal */}
+          </div> 
           {modalDrug && (
             <div
               className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"

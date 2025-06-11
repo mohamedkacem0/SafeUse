@@ -19,7 +19,7 @@ export default defineConfig({
   build: {
     outDir: path.resolve(__dirname, 'dist'),
     emptyOutDir: true,
-    chunkSizeWarningLimit: 1500, // Optional: avoid warnings for large chunks
+    chunkSizeWarningLimit: 1500, 
     rollupOptions: {
       output: {
         manualChunks(id) {
@@ -27,7 +27,7 @@ export default defineConfig({
             if (id.includes('react')) return 'vendor-react'
             if (id.includes('lodash')) return 'vendor-lodash'
             if (id.includes('axios')) return 'vendor-axios'
-            return 'vendor' // fallback for other node_modules
+            return 'vendor' 
           }
         },
       },
