@@ -68,7 +68,7 @@ class AdminSubstanceController {
             if (empty($sanitizedFileName)) {
                 $sanitizedFileName = 'image.' . pathinfo($originalFileName, PATHINFO_EXTENSION);
             }
-            $baseUploadDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/sustancias/'; 
+            $baseUploadDir = $_SERVER['DOCUMENT_ROOT'] . '/tmp/uploads/sustancias/'; 
             $targetDir = $baseUploadDir . $substanceFolderName . '/';
 
             if (!is_dir($targetDir)) {
