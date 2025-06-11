@@ -58,17 +58,10 @@ class AdminOrdersModel
             return null;
         }
     }
-
-    /**
-     * Obtiene todas las líneas de detalle asociadas a un pedido.
-     * - Tabla: detalles_pedido
-     * - Columnas: ID_Detalle, ID_Pedido, ID_Producto, Cantidad, Precio_Unitario, Precio_total
-     */
     public static function fetchDetailsByOrderId(int $orderId): ?array
     {
         $pdo = DB::getInstance()->conn();
         try {
-            // Unimos con "productos" para obtener el nombre del producto
             $sql = '
                 SELECT
                     dp.ID_Detalle       AS detail_id,
@@ -90,11 +83,6 @@ class AdminOrdersModel
             return null;
         }
     }
-
-    /**
-     * Actualiza una línea de detalle de pedido (Cantidad y Precio_Unitario).
-     * Recalcula Precio_total = Cantidad * Precio_Unitario.
-     */
     public static function updateDetail(int $detailId, int $quantity, float $unitPrice): bool
     {
         $pdo = DB::getInstance()->conn();
@@ -117,10 +105,6 @@ class AdminOrdersModel
 
         return true;
     }
-
-    /**
-     * Elimina todas las líneas de detalle de un pedido dado (ID_Pedido).
-     */
     public static function deleteDetailsByOrderId(int $orderId): bool
     {
         $pdo = DB::getInstance()->conn();
@@ -128,10 +112,6 @@ class AdminOrdersModel
         $stmt->execute(['orderId' => $orderId]);
         return true;
     }
-
-    /**
-     * Elimina la cabecera de pedido (tabla "pedidos") por su ID_Pedido.
-     */
     public static function deleteById(int $id): bool
     {
         $pdo = DB::getInstance()->conn();

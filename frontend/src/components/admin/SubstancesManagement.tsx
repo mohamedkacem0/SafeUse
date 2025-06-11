@@ -1,4 +1,4 @@
-// src/components/Admin/SubstancesManagement.tsx
+
 import React, { useState, useMemo, useCallback } from 'react';
 import { useFetchData } from '../../pages/admin/useFetchData';
 import {
@@ -61,7 +61,6 @@ const createSlug = (name: string) => {
 
 export default function SubstancesManagement() {
   const [editingSubstance, setEditingSubstance] = useState<SubstanceMerged | null>(null);
-  // State for the "Add New Substance" form
   const [newSubstanceName, setNewSubstanceName] = useState('');
   const [newSubstanceImage, setNewSubstanceImage] = useState<File | null>(null);
   const [newSubstanceTitle, setNewSubstanceTitle] = useState('');
@@ -78,13 +77,13 @@ export default function SubstancesManagement() {
   const [isAdding, setIsAdding] = useState(false);
   const [addError, setAddError] = useState<string | null>(null);
   const [addSuccess, setAddSuccess] = useState<string | null>(null);
-  const [isFormVisible, setIsFormVisible] = useState(false); // State to control form visibility
+  const [isFormVisible, setIsFormVisible] = useState(false); 
 
   const resetFormFields = useCallback(() => {
     setNewSubstanceName('');
     setNewSubstanceImage(null);
     const fileInput = document.getElementById('newSubstanceImage') as HTMLInputElement;
-    if (fileInput) fileInput.value = ''; // Reset file input
+    if (fileInput) fileInput.value = ''; 
     setNewSubstanceTitle('');
     setNewSubstanceFormula('');
     setDescripcion('');
@@ -100,7 +99,7 @@ export default function SubstancesManagement() {
   }, []);
 
   const handleShowAddForm = () => {
-    setEditingSubstance(null); // Ensure not in editing mode
+    setEditingSubstance(null); 
     resetFormFields();
     setIsFormVisible(true);
   };
@@ -122,28 +121,25 @@ export default function SubstancesManagement() {
           throw new Error(result.error || 'Failed to delete substance');
         }
         alert(`Substance "${substanceName}" deleted successfully!`);
-        window.location.reload(); // Reload to reflect changes
+        window.location.reload(); 
       } catch (error) {
         console.error('Error deleting substance:', error);
         alert(`Error deleting substance: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
     }
   };
-
-  // Function to handle form submission (for both Add and Update)
+ 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setIsAdding(true);
     setAddError(null);
     setAddSuccess(null);
-
-    // Validation for required fields
+ 
     if (!newSubstanceName || !newSubstanceTitle || !newSubstanceFormula) {
       setAddError('Name, Title, and Formula are required.');
       setIsAdding(false);
       return;
-    }
-    // Image is required only for new substances, not for updates
+    } 
     if (!editingSubstance && !newSubstanceImage) {
       setAddError('Image is required for new substances.');
       setIsAdding(false);
@@ -159,8 +155,7 @@ export default function SubstancesManagement() {
       
       if (newSubstanceImage) {
         formData.append('Imagen', newSubstanceImage);
-      }
-      // For updates, include ID_Sustancia
+      } 
       if (editingSubstance) {
         formData.append('ID_Sustancia', editingSubstance.ID_Sustancia.toString());
       }
@@ -176,8 +171,7 @@ export default function SubstancesManagement() {
 
       const endpoint = editingSubstance ? '/api/admin/substances/update' : '/api/admin/substances/add';
       const response = await fetch(endpoint, {
-        method: 'POST',
-        // headers: { 'Content-Type': 'application/json', } // REMOVED: Browser sets it for FormData
+        method: 'POST', 
         body: formData,
       });
 
@@ -189,17 +183,16 @@ export default function SubstancesManagement() {
 
       setAddSuccess(`Substance "${newSubstanceName}" ${editingSubstance ? 'updated' : 'added'} successfully! ${result.substanceId ? `ID: ${result.substanceId}` : ''}`);
       resetFormFields();
-      setIsFormVisible(false); // Hide the form after successful submission
-      if (editingSubstance) setEditingSubstance(null); // Clear editing state
-      window.location.reload(); // Reload the page to see changes
+      setIsFormVisible(false); 
+      if (editingSubstance) setEditingSubstance(null);  
+      window.location.reload();  
     } catch (error) {
       setAddError(error instanceof Error ? error.message : 'An unknown error occurred.');
     } finally {
       setIsAdding(false);
     }
   };
-
-  // 1) Fetch lista básica de sustancias
+ 
   const {
     data: basicListData,
     loading: loadingBasicList,
@@ -219,8 +212,7 @@ export default function SubstancesManagement() {
     }));
   });
   const basicList = basicListData ?? [];
-
-  // 2) Fetch detalles de sustancias
+ 
   const {
     data: detailListData,
     loading: loadingDetailList,
@@ -244,8 +236,7 @@ export default function SubstancesManagement() {
     }));
   });
   const detailList = detailListData ?? [];
-
-  // 3) Unir ambas listas por ID_Sustancia
+ 
   const mergedSubstances: SubstanceMerged[] = useMemo(() => {
     const detalleMap = detailList.reduce<Record<number, SubstanceDetail>>(
       (acc, det) => {
@@ -284,8 +275,7 @@ export default function SubstancesManagement() {
       };
     });
   }, [basicList, detailList]);
-
-  // Estado y filtro para la tabla
+ 
   const [filter, setFilter] = useState('');
   const filteredSubstances = useMemo(() => {
     const term = filter.trim().toLowerCase();
@@ -302,9 +292,9 @@ export default function SubstancesManagement() {
       setNewSubstanceName(substanceToEdit.Nombre);
       setNewSubstanceTitle(substanceToEdit.Titulo);
       setNewSubstanceFormula(substanceToEdit.Formula);
-      setNewSubstanceImage(null); // Clear previous image selection for new upload
+      setNewSubstanceImage(null);  
       const fileInput = document.getElementById('newSubstanceImage') as HTMLInputElement;
-      if (fileInput) fileInput.value = ''; // Reset file input
+      if (fileInput) fileInput.value = '';  
       
       setDescripcion(substanceToEdit.descripcion || '');
       setMetodosConsumo(substanceToEdit.metodos_consumo || '');
@@ -326,9 +316,9 @@ export default function SubstancesManagement() {
 
   return (
     <Card>
-      {/* Search bar y título en la misma línea */}
+      
       <CardContent>
-        {/* Button to toggle form visibility */}
+       
         <div className="mb-4">
           {!isFormVisible && (
             <Button onClick={handleShowAddForm} className="mb-4">
@@ -337,7 +327,7 @@ export default function SubstancesManagement() {
           )}
         </div>
 
-        {/* Conditionally rendered "Add New Substance" Form Section */}
+        
         {isFormVisible && (
           <div className="mb-6 border-b pb-6">
         <h3 className="text-lg font-semibold mb-3">{editingSubstance ? `Edit Substance: ${editingSubstance.Nombre}` : 'Add New Substance'}</h3>
@@ -367,7 +357,7 @@ export default function SubstancesManagement() {
                   setNewSubstanceImage(null);
                 }
               }}
-              required={!editingSubstance} // Image is required only if not editing
+              required={!editingSubstance}  
               className="mt-1 block w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
             />
             {newSubstanceImage && <img src={URL.createObjectURL(newSubstanceImage)} alt="New Preview" className="mt-2 h-24 w-24 object-cover rounded-md shadow" />}
@@ -444,9 +434,8 @@ export default function SubstancesManagement() {
           {addError && <p className="text-red-600 mt-2 text-sm">{addError}</p>}
         </form>
           </div>
-        )} {/* End of isFormVisible conditional rendering */}
-
-      {/* EXISTING: Filter and Table Section */}
+        )}  
+  
       <div className="flex items-center justify-between mb-4">
           <span className="text-[20px] font-semibold">Substance Management</span>
           <div className="flex items-center space-x-2">
@@ -460,8 +449,7 @@ export default function SubstancesManagement() {
             </Button>
           </div>
         </div>
-
-        {/* Tabla responsiva */}
+ 
         <div className="w-full overflow-x-auto">
           <Table className="min-w-[1000px]">
             <TableHeader>
@@ -482,8 +470,7 @@ export default function SubstancesManagement() {
                 <TableHead scope="col">Delete</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
-              {/* Estados: loading, error, vacío, datos */}
+            <TableBody> 
               {loadingBasicList || loadingDetailList ? (
                 <TableRow>
                   <TableCell colSpan={14} className="text-center py-4">

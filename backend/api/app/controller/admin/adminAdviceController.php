@@ -6,10 +6,6 @@ use App\Core\Response;
 
 class AdminAdviceController
 {
-    /**
-     * GET /api/admin/advice
-     * Devuelve todos los consejos en JSON: { advice: [ … ] }
-     */
     public static function index(): void
     {
         session_start();
@@ -26,11 +22,6 @@ class AdminAdviceController
 
         Response::json(['advice' => $all], 200);
     }
-
-    /**
-     * DELETE /api/admin/advice/{id}
-     * Elimina un consejo dado su ID_Advice.
-     */
     public static function destroy(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
@@ -57,11 +48,6 @@ class AdminAdviceController
             Response::json(['error' => 'No se pudo eliminar o no existe'], 404);
         }
     }
-
-    /**
-     * PUT /api/admin/advice/{id}
-     * Actualiza un consejo. Espera JSON con { title, description, articulo, stage }.
-     */
     public static function update(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'PUT') {
@@ -89,8 +75,6 @@ class AdminAdviceController
             Response::json(['error' => 'Datos inválidos.'], 400);
             return;
         }
-
-        // Permitir articulo null
         $toUpdate = [
             'title'       => trim($data['title']),
             'description' => trim($data['description']),
@@ -105,11 +89,6 @@ class AdminAdviceController
             Response::json(['error' => 'No se pudo actualizar o no existe'], 404);
         }
     }
-
-    /**
-     * POST /api/admin/advice
-     * Crea un nuevo consejo. Espera JSON con { title, description, articulo, stage }.
-     */
     public static function store(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

@@ -4,7 +4,6 @@ const CookieBanner = () => {
   const [showBanner, setShowBanner] = useState<boolean>(false);
 
   useEffect(() => {
-    // Check if user has already made a choice
     const consent = localStorage.getItem('cookieConsent');
     if (consent === null) {
       setShowBanner(true);

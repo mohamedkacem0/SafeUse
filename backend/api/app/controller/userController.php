@@ -6,10 +6,6 @@ use App\Models\UserModel;
 use App\Core\Response;
 
 class UserController {
-    /**
-     * Registra un nuevo usuario y lo autentica (inicia sesión).
-     * Espera JSON: { nombre, correo, password, telefono, direccion, tipo_usuario }
-     */
     public static function register(): void {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             Response::json(['error' => 'Método no permitido'], 405);
@@ -21,8 +17,6 @@ class UserController {
             Response::json(['error' => 'Payload no válido'], 400);
             return;
         }
-
-        // Sanear y validar
         $nombre    = filter_var($data['nombre']    ?? '', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $correo    = filter_var($data['correo']    ?? '', FILTER_VALIDATE_EMAIL);
         $password  = $data['password'] ?? '';
@@ -36,13 +30,12 @@ class UserController {
             return;
         }
 
-        // Comprueba si ya existe
+
         if (UserModel::findByEmail($correo)) {
             Response::json(['error' => 'User already exists'], 409);
             return;
         }
 
-        // Hashea la contraseña
         $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
         $newId = UserModel::create([
@@ -54,7 +47,6 @@ class UserController {
             'tipo_usuario' => $tipo,
         ]);
 
-        // Inicia sesión inmediatamente
         session_start();
         $_SESSION['user'] = [
             'ID_Usuario'   => $newId,
@@ -69,10 +61,6 @@ class UserController {
         ], 201);
     }
 
-    /**
-     * Autentica un usuario. Si es admin, devuelve también la lista completa de usuarios.
-     * Espera JSON: { correo, password }
-     */
     public static function login(): void {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             Response::json(['error' => 'Método no permitido'], 405);
@@ -103,7 +91,6 @@ class UserController {
             return;
         }
 
-        // Inicia sesión
         session_start();
         $_SESSION['user'] = [
             'ID_Usuario'   => $user['ID_Usuario'],
@@ -112,23 +99,16 @@ class UserController {
             'Tipo_Usuario' => $user['Tipo_Usuario'],
         ];
 
-        // Prepara la respuesta base
         $response = [
             'success' => true,
             'user'    => $_SESSION['user'],
         ];
-
-        // Si es admin, agregamos la lista completa de usuarios
         if ($_SESSION['user']['Tipo_Usuario'] === 'admin') {
             $response['users'] = UserModel::getAll();
         }
 
         Response::json($response);
     }
-
-    /**
-     * Cierra la sesión del usuario.
-     */
     public static function logout(): void {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             Response::json(['error' => 'Método no permitido'], 405);
@@ -139,10 +119,6 @@ class UserController {
         session_destroy();
         Response::json(['success' => true]);
     }
-
-    /**
-     * Devuelve el perfil del usuario autenticado.
-     */
     public static function profile(): void {
         session_start();
         if (empty($_SESSION['user']['ID_Usuario'])) {
@@ -166,10 +142,6 @@ class UserController {
             'Tipo_Usuario' => $user['Tipo_Usuario'],
         ]]);
     }
-
-    /**
-     * Devuelve todos los usuarios.
-     */
     public static function users(): void {
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
             Response::json(['error' => 'Método no permitido'], 405);
@@ -179,16 +151,6 @@ class UserController {
         $users = UserModel::getAll();
         Response::json(['users' => $users]);
     }
-
-    /**
-     * Actualiza el perfil del usuario autenticado.
-     * Espera JSON: { "Nombre": "nuevo valor", "Telefono": "nuevo valor", ... }
-     */
-
-    /**
-     * Actualiza el perfil del usuario autenticado.
-     * Espera JSON: { "Nombre": "nuevo valor", "Telefono": "nuevo valor", "Direccion": "nuevo valor" }
-     */
     public static function updateProfile(): void {
         if ($_SERVER['REQUEST_METHOD'] !== 'PUT') {
             Response::json(['error' => 'Method not allowed for profile update'], 405);
@@ -208,15 +170,12 @@ class UserController {
             Response::json(['error' => 'Invalid payload'], 400);
             return;
         }
-
-        // Fields that can be updated
         $allowedFields = ['Nombre', 'Telefono', 'Direccion'];
         $updateData = [];
         $loggableChanges = [];
 
         foreach ($allowedFields as $field) {
             if (isset($data[$field])) {
-                // Sanitize input - adjust sanitization as per field type
                 $sanitizedValue = filter_var(trim($data[$field]), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
                 if ($field === 'Telefono' && !preg_match('/^[\d\s\+\-()]*$/', $sanitizedValue)) {
                     Response::json(['error' => 'Invalid phone number format for ' . $field], 400);
@@ -239,27 +198,22 @@ class UserController {
         $success = UserModel::update($userId, $updateData);
 
         if ($success) {
-            // Fetch the full updated user profile to return
             $updatedUser = UserModel::findById($userId);
             if (!$updatedUser) {
-                 // This should ideally not happen if update was successful and user exists
                 Response::json(['error' => 'Failed to retrieve updated profile, user may have been deleted'], 404);
                 return;
             }
-
-            // Update session with changed data that is stored in session
             if (isset($updateData['Nombre'])) {
                 $_SESSION['user']['Nombre'] = $updateData['Nombre'];
             }
-            // Add other session fields if necessary, e.g., $_SESSION['user']['Email'] if it were updatable and in session
-
+    
             Response::json([
                 'success' => true,
                 'message' => 'Profile updated successfully.',
                 'user' => [
                     'ID_Usuario'   => $updatedUser['ID_Usuario'],
                     'Nombre'       => $updatedUser['Nombre'],
-                    'Correo'       => $updatedUser['Correo'], // Correo is not updatable here, but good to return full profile
+                    'Correo'       => $updatedUser['Correo'], 
                     'Telefono'     => $updatedUser['Telefono'],
                     'Direccion'    => $updatedUser['Direccion'],
                     'Tipo_Usuario' => $updatedUser['Tipo_Usuario'],
@@ -269,10 +223,6 @@ class UserController {
             Response::json(['error' => 'Failed to update profile in database'], 500);
         }
     }
-    /**
- * Elimina un usuario por ID (solo admin).
- * Espera DELETE a /api/users/delete con JSON: { "id": 5 }
- */
 public static function deleteUser(): void {
     if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
         Response::json(['error' => 'Método no permitido'], 405);
@@ -284,8 +234,6 @@ public static function deleteUser(): void {
         Response::json(['error' => 'No autorizado'], 403);
         return;
     }
-
-    // Obtener el ID del usuario a eliminar desde el body JSON
     $data = json_decode(file_get_contents('php://input'), true);
     $id = isset($data['id']) ? (int)$data['id'] : 0;
 
@@ -293,8 +241,6 @@ public static function deleteUser(): void {
         Response::json(['error' => 'ID inválido'], 400);
         return;
     }
-
-    // No permitir que un admin se elimine a sí mismo
     if ($id === (int)$_SESSION['user']['ID_Usuario']) {
         Response::json(['error' => 'No puedes eliminar tu propio usuario'], 403);
         return;
@@ -334,8 +280,6 @@ public static function updateUserByAdmin(): void {
         Response::json(['error' => 'ID inválido'], 400);
         return;
     }
-
-    // Opcional: No permitir que un admin edite a otro admin
     $targetUser = UserModel::findById($id);
     if (!$targetUser) {
         Response::json(['error' => 'Usuario no encontrado'], 404);
@@ -346,7 +290,6 @@ public static function updateUserByAdmin(): void {
         return;
     }
 
-    // Campos permitidos
     $allowedFields = ['Nombre', 'Correo', 'Telefono', 'Direccion', 'Contraseña'];
     $updateData = [];
     foreach ($allowedFields as $field) {
@@ -355,7 +298,6 @@ public static function updateUserByAdmin(): void {
         }
     }
 
-    // Solo actualiza la contraseña si viene y no está vacía
     if (array_key_exists('password', $data) && !empty($data['password'])) {
         if (strlen($data['password']) < 8) {
             Response::json(['error' => 'La nueva contraseña debe tener al menos 8 caracteres.'], 400);
@@ -377,11 +319,6 @@ public static function updateUserByAdmin(): void {
         Response::json(['error' => 'No se pudo actualizar el usuario'], 500);
     }
 }
-
-/**
- * Cambia la contraseña del usuario autenticado.
- * Espera JSON: { currentPassword, newPassword }
- */
 public static function changePassword(): void {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         Response::json(['error' => 'Method not allowed'], 405);
@@ -408,8 +345,6 @@ public static function changePassword(): void {
         Response::json(['error' => 'Current password and new password cannot be empty.'], 400);
         return;
     }
-
-    // Validar longitud de la nueva contraseña (ejemplo: mínimo 8 caracteres)
     if (strlen($newPassword) < 8) {
         Response::json(['error' => 'New password must be at least 8 characters long.'], 400);
         return;
@@ -425,11 +360,7 @@ public static function changePassword(): void {
         Response::json(['error' => 'Current password does not match.'], 401);
         return;
     }
-
-    // Hashear la nueva contraseña
     $newPasswordHash = password_hash($newPassword, PASSWORD_DEFAULT);
-
-    // Actualizar la contraseña en la base de datos
     if (UserModel::updatePassword($userId, $newPasswordHash)) {
         Response::json(['success' => true, 'message' => 'Password updated successfully.']);
     } else {

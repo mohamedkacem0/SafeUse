@@ -1,4 +1,4 @@
-// src/components/Admin/UserManagement.tsx
+ 
 import React, { useState, useMemo, useCallback } from 'react';
 import { useFetchData } from '../../pages/admin/useFetchData';
 import {
@@ -38,7 +38,7 @@ interface UserRow {
   Direccion: string;
   Telefono: string;
   created_at: string;
-  password?: string; // <-- Añadido para el hash bcrypt
+  password?: string;  
 }
 
 export default function UserManagement() {
@@ -54,7 +54,7 @@ export default function UserManagement() {
   const [isAddUserFormVisible, setIsAddUserFormVisible] = useState(false);
 
   const handleShowAddUserForm = () => {
-    setAddUserValues({}); // Reset form fields
+    setAddUserValues({});
     setAddUserError(null);
     setAddUserSuccess(null);
     setIsAddUserFormVisible(true);
@@ -85,7 +85,7 @@ export default function UserManagement() {
       Direccion: item.Direccion ?? item.address ?? '',
       Telefono: item.Telefono ?? item.phone ?? '',
       created_at: item.created_at ?? item.createdAt ?? '',
-      password: item.password ?? '', // <-- Añadido
+      password: item.password ?? '',  
     }));
   });
 
@@ -107,7 +107,7 @@ export default function UserManagement() {
         Telefono: user.Telefono,
         Direccion: user.Direccion,
         Correo: user.Correo,
-        password: '', // <-- Añadido para el input de nueva contraseña
+        password: '', 
       });
       setEditError(null);
     }
@@ -117,7 +117,7 @@ export default function UserManagement() {
     setEditingId(null);
     setEditValues({});
     setEditError(null);
-    setResetError(null); // Added to match existing inline cancel logic
+    setResetError(null);  
   };
 
   const handleSaveEdit = async () => {
@@ -189,8 +189,7 @@ export default function UserManagement() {
     event.preventDefault();
     setAddUserError(null);
     setAddUserSuccess(null);
-
-    // Validación básica
+ 
     if (
       !addUserValues.Nombre ||
       !addUserValues.Correo ||
@@ -212,9 +211,7 @@ export default function UserManagement() {
     body: JSON.stringify({
       Nombre: addUserValues.Nombre,
       Correo: addUserValues.Correo,
-      password: addUserValues.password,      // coincide con la clave que espera el controlador
-      // NO hace falta enviar Tipo_Usuario, pero si lo envías, el backend lo ignora
-      // Tipo_Usuario: "usuario",
+      password: addUserValues.password,      
       Direccion: addUserValues.Direccion ?? '',
       Telefono: addUserValues.Telefono ?? '',
     }),
@@ -224,9 +221,9 @@ export default function UserManagement() {
       const data = await res.json();
       if (data.success) {
         setAddUserSuccess('Usuario añadido correctamente');
-        setAddUserValues({}); // Limpiar formulario
-        setIsAddUserFormVisible(false); // Hide form
-        setRefresh((r) => r + 1); // Refrescar la lista de usuarios
+        setAddUserValues({});  
+        setIsAddUserFormVisible(false);  
+        setRefresh((r) => r + 1); 
       } else {
         setAddUserError(data.error || 'No se pudo crear el usuario');
       }
@@ -258,7 +255,7 @@ export default function UserManagement() {
           )}
           {isAddUserFormVisible && (
             <form onSubmit={handleAddUser} className="mb-6 flex flex-wrap gap-2 items-end bg-gray-50 p-4 rounded">
-              {/* Form inputs remain the same as before */}
+          
               <Input
                 placeholder="Nombre"
                 value={addUserValues.Nombre ?? ''}
@@ -321,7 +318,7 @@ export default function UserManagement() {
                 <TableHead scope="col">Role</TableHead>
                 <TableHead scope="col">Direccion</TableHead>
                 <TableHead scope="col">Telefono</TableHead>
-                <TableHead scope="col">Password</TableHead> {/* Nueva columna */}
+                <TableHead scope="col">Password</TableHead>
                 <TableHead scope="col">Created At</TableHead>
                 <TableHead scope="col">Actions</TableHead>
               </TableRow>
@@ -389,7 +386,7 @@ export default function UserManagement() {
                         />
                       ) : u.Telefono?.trim() ? u.Telefono : <span className="text-gray-400 italic">No phone number</span>}
                     </TableCell>
-                    {/* Password */}
+              
                     <TableCell>
                       {editingId === u.ID_Usuario ? (
                         <input

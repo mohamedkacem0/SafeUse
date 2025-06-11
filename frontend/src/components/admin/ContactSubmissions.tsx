@@ -1,4 +1,4 @@
-// src/components/admin/ContactSubmissions.tsx
+ 
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import {
   Card,
@@ -39,8 +39,7 @@ interface ContactSubmission {
   created_at: string;
 }
 
-export default function ContactSubmissions() {
-  // 1) Carga inicial desde la API de ADMIN (se necesita incluir credenciales)
+export default function ContactSubmissions() { 
   const [localSubmissions, setLocalSubmissions] = useState<ContactSubmission[]>([]);
   const [loadingSubmissions, setLoadingSubmissions] = useState(true);
   const [submissionsError, setSubmissionsError] = useState<string | null>(null);
@@ -59,8 +58,7 @@ export default function ContactSubmissions() {
           const err = await res.json();
           throw new Error(err.error || 'Error loading submissions');
         }
-        const json = await res.json();
-        // La ruta devuelve { submissions: ContactSubmission[] }
+        const json = await res.json(); 
         const array: any[] = Array.isArray(json.submissions) ? json.submissions : [];
         const parsed: ContactSubmission[] = array.map((item) => ({
           ID_Submission:
@@ -93,8 +91,7 @@ export default function ContactSubmissions() {
 
     fetchSubmissions();
   }, []);
-
-  // 2) Filtro sencillo
+ 
   const [filter, setFilter] = useState('');
   const filtered = useMemo(() => {
     const term = filter.trim().toLowerCase();
@@ -108,8 +105,7 @@ export default function ContactSubmissions() {
       );
     });
   }, [localSubmissions, filter]);
-
-  // 3) Función que borra una submission dado su ID (admin)
+ 
   const handleDelete = useCallback(async (id: number) => {
     if (!confirm('¿Seguro que quieres borrar esta submission?')) return;
 
@@ -130,8 +126,7 @@ export default function ContactSubmissions() {
       alert('No se pudo borrar la submission: ' + err.message);
     }
   }, []);
-
-  // 4) Función que cambia el estado "checked" (0 ó 1) (admin)
+  
   async function handleToggleChecked(id: number, currentChecked: number) {
     const newChecked = currentChecked === 1 ? 0 : 1;
 
@@ -146,9 +141,7 @@ export default function ContactSubmissions() {
       if (!res.ok) {
         const errorJson = await res.json();
         throw new Error(errorJson.error || 'Error al actualizar el estado');
-      }
-
-      // Si fue 200 OK, actualizamos localmente:
+      } 
       setLocalSubmissions((prev) =>
         prev.map((item) =>
           item.ID_Submission === id
@@ -160,9 +153,7 @@ export default function ContactSubmissions() {
       console.error(err);
       alert('No se pudo actualizar el estado: ' + err.message);
     }
-  }
-
-  // 5) Estado para el modal de mensaje completo
+  } 
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedSubmission, setSelectedSubmission] = useState<ContactSubmission | null>(null);
 
@@ -273,8 +264,7 @@ export default function ContactSubmissions() {
           </div>
         </CardContent>
       </Card>
-
-      {/* 6) Modal para mostrar el mensaje completo */}
+ 
       {modalOpen && selectedSubmission && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg max-w-lg w-full mx-4">

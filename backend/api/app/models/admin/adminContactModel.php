@@ -7,13 +7,6 @@ use App\Core\Response;
 
 class AdminContactModel
 {
-    /**
-     * Actualiza el campo "checked" (0 o 1) de una fila en la tabla contact_submissions.
-     *
-     * @param int $id      El ID_Submission que se quiere marcar/desmarcar.
-     * @param int $checked El nuevo valor: 0 o 1.
-     * @return bool        True si la fila existía y se actualizó; false en caso contrario.
-     */
     public static function updateChecked(int $id, int $checked): bool
     {
         $pdo = DB::getInstance()->conn();
@@ -28,8 +21,6 @@ class AdminContactModel
                 'checked' => $checked,
                 'id'      => $id,
             ]);
-
-            // Si execute() devolvió true y rowCount() > 0 significa que se actualizó al menos una fila.
             return ($ok && $stmt->rowCount() > 0);
         } catch (\PDOException $e) {
             error_log('Error en AdminContactModel::updateChecked: ' . $e->getMessage());
@@ -39,12 +30,6 @@ class AdminContactModel
             return false;
         }
     }
-
-    /**
-     * (Opcional) Obtiene todas las submissions de contacto, ordenadas por fecha descendente.
-     *
-     * @return array|null
-     */
     public static function fetchAll(): ?array
     {
         $pdo = DB::getInstance()->conn();
@@ -56,13 +41,6 @@ class AdminContactModel
             return null;
         }
     }
-
-    /**
-     * (Opcional) Busca una sola submission por ID_Submission.
-     *
-     * @param int $id
-     * @return array|null
-     */
     public static function findById(int $id): ?array
     {
         $pdo = DB::getInstance()->conn();
@@ -71,13 +49,6 @@ class AdminContactModel
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row ?: null;
     }
-
-    /**
-     * Elimina una submission de contacto por ID_Submission.
-     *
-     * @param int $id
-     * @return bool True si se eliminó al menos una fila, false si no existía o hubo error.
-     */
     public static function deleteById(int $id): bool
     {
         $pdo = DB::getInstance()->conn();

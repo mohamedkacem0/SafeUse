@@ -1,4 +1,4 @@
-// src/components/Header.tsx
+ 
 import { useState, useEffect } from "react";
 import { NavLink, Link, useLocation } from "react-router-dom";
 import { ShoppingCart, Menu, X, User } from "lucide-react";
@@ -12,12 +12,11 @@ export default function Header() {
   const navLinkClasses = "block md:inline px-4 py-2 md:p-0";
   const location = useLocation();
 
-  // Cada vez que cambie la ruta (login/logout produce un cambio de ruta), recarga el user
+   
   useEffect(() => {
     const stored = localStorage.getItem("user");
     setUser(stored ? JSON.parse(stored) : null);
-
-    // Fetch cart item count
+ 
     const fetchCartCount = async () => {
       try {
         const response = await fetch('/api/cart/count', {
@@ -30,9 +29,8 @@ export default function Header() {
         if (response.ok) {
           const data = await response.json();
           setCartItemCount(data.count || 0);
-        } else {
-          // console.error('Failed to fetch cart count');
-          setCartItemCount(0); // Reset or handle error appropriately
+        } else { 
+          setCartItemCount(0);  
         }
       } catch (error) {
         console.error('Error fetching cart count:', error);
@@ -41,8 +39,7 @@ export default function Header() {
     };
 
     fetchCartCount();
-
-    // Listen for custom cart update events
+ 
     const handleCartUpdate = () => fetchCartCount();
     window.addEventListener('cartUpdated', handleCartUpdate);
 
@@ -56,15 +53,14 @@ export default function Header() {
   return (
     <div className="fixed top-0 left-0 right-0 z-50 border-b-[1px] border-[#111111] bg-white">
       <div className="h-[70px] max-w-[1440px] mx-auto flex flex-row justify-between items-center px-4">
-        {/*  */}
+      
         <Link to="/" className="flex flex-row items-center">
           <img src={logo} alt="logo" className="w-10 h-10 mr-2" />
           <span className="font-lato font-bold text-[32px] md:text-[64px] leading-none tracking-normal">
             SafeUse
           </span>
         </Link>
-
-        {/* */}
+ 
         <nav className="hidden md:flex space-x-[30px] text-[20px] md:text-[24px] font-medium">
           <NavLink to="/sustancias" className={navLinkClasses}>
             Substances
@@ -79,8 +75,7 @@ export default function Header() {
             Contact
           </NavLink>
         </nav>
-
-        {/**/}
+ 
         <div className="hidden md:flex flex-row items-center gap-[12px]">
           <NavLink to="/cart" aria-label="Cart" className="relative">
             <ShoppingCart />
@@ -109,9 +104,7 @@ export default function Header() {
         >
           {menuOpen ? <X size={32} /> : <Menu size={32} />}
         </button>
-      </div>
-
-      {/* Mobile menu */}
+      </div> 
       {menuOpen && (
         <div className="md:hidden absolute top-[70px] left-0 w-full bg-white border-b border-[#111111] z-50">
           <nav className="flex flex-col items-center py-4 space-y-4 text-[20px] font-medium">

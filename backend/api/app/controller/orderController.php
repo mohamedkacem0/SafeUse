@@ -28,20 +28,16 @@ class OrderController {
             return;
         }
 
-        // Extract delivery address components
         $address = trim($input['address'] ?? '');
         $city = trim($input['city'] ?? '');
         $postalCode = trim($input['postalCode'] ?? '');
-        // Optional: paymentIntentId for reference
-        // $paymentIntentId = trim($input['paymentIntentId'] ?? ''); 
 
         if (empty($address) || empty($city) || empty($postalCode)) {
             Response::json(['error' => 'Missing delivery address details (address, city, postalCode)'], 400);
             return;
         }
         $direccionEntrega = $address . ', ' . $postalCode . ' ' . $city;
-        $estadoPedido = 'processing'; // Or 'pending_payment' if confirmation is separate
-
+        $estadoPedido = 'processing';
         $cartItems = CartModel::getByUser($userId);
         if (empty($cartItems)) {
             Response::json(['error' => 'Cart is empty'], 400);
@@ -51,8 +47,6 @@ class OrderController {
         $pdo = DB::getInstance()->conn();
         try {
             $pdo->beginTransaction();
-
-            // Calculate total order price from cart items
             $totalOrderPrice = 0;
             foreach ($cartItems as $item) {
                 $totalOrderPrice += (float)$item['Precio'] * (int)$item['quantity'];
@@ -66,7 +60,7 @@ class OrderController {
             foreach ($cartItems as $item) {
                 $productId = (int)$item['product_id'];
                 $quantity = (int)$item['quantity'];
-                $precioUnitario = (float)$item['Precio']; // Assuming 'Precio' is the unit price from cart
+                $precioUnitario = (float)$item['Precio']; 
                 $precioTotal = $precioUnitario * $quantity;
 
                 if (!OrderModel::addDetail($orderId, $productId, $quantity, $precioUnitario, $precioTotal, $pdo)) {
@@ -74,13 +68,8 @@ class OrderController {
                 }
             }
 
-            // If all items added successfully, clear the cart (without adjusting stock again)
             if (!CartModel::clearCartForOrder($userId)) {
-                // This is not ideal, as the order is created but cart isn't cleared.
-                // Log this specific issue for manual review if it happens.
                 error_log("CRITICAL: Order $orderId created for user $userId, but cart could not be cleared.");
-                // Depending on policy, you might choose to still commit or rollback.
-                // For now, we'll consider it a partial success but log it.
             }
 
             $pdo->commit();

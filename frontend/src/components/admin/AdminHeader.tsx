@@ -7,24 +7,17 @@ const AdminHeader: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch('api/logout', { // Align with Profile.tsx
+      const response = await fetch('api/logout', { 
         method: 'POST',
-        credentials: 'include', // Align with Profile.tsx
+        credentials: 'include', 
         headers: {
-          'Content-Type': 'application/json',
-          // Include authorization headers if your logout endpoint requires them
-          // For example, if using a token:
-          // 'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'application/json', 
         },
       });
 
-      if (response.ok) {
-        // Clear client-side session storage
-        localStorage.removeItem('user'); // Align with Profile.tsx
-        // localStorage.removeItem('token'); // Profile.tsx only removes 'user'
-        
-        // Redirect to login page
-        navigate('/'); // Redirect to home page, align with Profile.tsx
+      if (response.ok) { 
+        localStorage.removeItem('user');  
+        navigate('/');  
       } else {
         const errorData = await response.json();
         alert(`Error al cerrar sesión: ${errorData.error || 'Error desconocido'}`);

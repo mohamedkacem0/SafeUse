@@ -1,4 +1,4 @@
-// src/components/admin/AdviceManagement.tsx
+ 
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import {
   Card,
@@ -63,13 +63,11 @@ export default function AdviceManagement() {
   const [localAdvice, setLocalAdvice] = useState<Advice[]>([]);
   const [loadingAdvice, setLoadingAdvice] = useState(true);
   const [adviceError, setAdviceError] = useState<string | null>(null);
-
-  // Modal state
+ 
   const [showModal, setShowModal] = useState(false);
   const [editingAdvice, setEditingAdvice] = useState<Advice | null>(null);
   const [form, setForm] = useState(emptyAdvice);
-
-  // Fetch advice
+ 
   useEffect(() => {
     fetchAdvice();
   }, []);
@@ -111,9 +109,7 @@ export default function AdviceManagement() {
     } finally {
       setLoadingAdvice(false);
     }
-  }
-
-  // Filtro
+  } 
   const [filter, setFilter] = useState('');
   const filteredAdvice = useMemo(() => {
     const term = filter.trim().toLowerCase();
@@ -125,8 +121,7 @@ export default function AdviceManagement() {
       );
     });
   }, [localAdvice, filter]);
-
-  // Eliminar
+ 
   const handleDelete = useCallback(async (id: number) => {
     if (!confirm('¿Seguro que quieres borrar este consejo?')) return;
     try {
@@ -148,15 +143,13 @@ export default function AdviceManagement() {
       alert('No se pudo borrar el consejo: ' + err.message);
     }
   }, []);
-
-  // Abrir modal para crear
+ 
   const handleCreate = () => {
     setEditingAdvice(null);
     setForm(emptyAdvice);
     setShowModal(true);
   };
-
-  // Abrir modal para editar
+ 
   const handleEdit = (advice: Advice) => {
     setEditingAdvice(advice);
     setForm({
@@ -166,9 +159,7 @@ export default function AdviceManagement() {
       stage: advice.stage,
     });
     setShowModal(true);
-  };
-
-  // Guardar (crear o editar)
+  }; 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -197,10 +188,7 @@ export default function AdviceManagement() {
   };
 
   return (
-    <Card>
-      {/* ------------------------------------------------- */}
-      {/* Renderizado condicional “inline” del Modal:      */}
-      {/* ------------------------------------------------- */}
+    <Card> 
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
           <form
@@ -270,8 +258,7 @@ export default function AdviceManagement() {
             </div>
           </form>
         </div>
-      )}
-      {/* ------------------------------------------------- */}
+      )} 
 
       <CardHeader className="flex items-center justify-between">
         <CardTitle>Advice Management</CardTitle>

@@ -1,4 +1,4 @@
-// src/components/admin/OrdersManagement.tsx
+ 
 import { useState, useEffect, useMemo } from 'react';
 import {
   Card,
@@ -52,7 +52,7 @@ function formatDate(dateStr: string) {
 }
 
 export default function OrdersManagement() {
-  // 1) Traemos órdenes (cabeceras)
+  
   const {
     data: ordersData,
     loading: loadingOrders,
@@ -66,16 +66,14 @@ export default function OrdersManagement() {
       return [];
     }
   );
-
-  // 2) Estado local para filtrar y eliminar
+ 
   const [localOrders, setLocalOrders] = useState<Order[]>([]);
   useEffect(() => {
     if (ordersData) {
       setLocalOrders(ordersData);
     }
   }, [ordersData]);
-
-  // 3) Filtro por ID, estado o dirección
+ 
   const [filter, setFilter] = useState('');
   const filteredOrders = useMemo(() => {
     const term = filter.trim().toLowerCase();
@@ -88,8 +86,7 @@ export default function OrdersManagement() {
       );
     });
   }, [localOrders, filter]);
-
-  // 4) Eliminar orden
+ 
   const handleDelete = async (id: number) => {
     if (!confirm('¿Seguro que quieres borrar esta orden?')) return;
 
@@ -110,16 +107,13 @@ export default function OrdersManagement() {
       console.error('Error en DELETE:', err);
       alert('No se pudo borrar la orden: ' + err.message);
     }
-  };
-
-  // 5) Modal de detalles
+  }; 
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [orderDetails, setOrderDetails] = useState<OrderDetail[]>([]);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [detailsError, setDetailsError] = useState<string | null>(null);
-
-  // Abrir modal y cargar detalles (convertir strings a números)
+ 
   const openModal = async (order: Order) => {
     setSelectedOrder(order);
     setModalOpen(true);
@@ -139,8 +133,7 @@ export default function OrdersManagement() {
         throw new Error(err.error || 'Error fetching details');
       }
       const json = await res.json();
-
-      // Este mapeo convierte los campos de cadena a número:
+ 
       const detailsParsed: OrderDetail[] = (json.details as any[]).map((d) => ({
         detail_id: Number(d.detail_id),
         order_id: Number(d.order_id),
@@ -164,9 +157,7 @@ export default function OrdersManagement() {
     setSelectedOrder(null);
     setOrderDetails([]);
     setDetailsError(null);
-  };
-
-  // 6) Actualizar campo en el estado local antes de enviar al backend
+  }; 
   const handleDetailChange = (
     detailId: number,
     field: 'quantity' | 'unit_price',
@@ -177,8 +168,7 @@ export default function OrdersManagement() {
         d.detail_id === detailId
           ? {
               ...d,
-              [field]: value,
-              // Recalculamos total_price
+              [field]: value, 
               total_price:
                 field === 'quantity'
                   ? Number((value * d.unit_price).toFixed(2))
@@ -188,8 +178,7 @@ export default function OrdersManagement() {
       )
     );
   };
-
-  // 7) Guardar cambios en backend
+ 
   const handleSaveChanges = async () => {
     if (!selectedOrder) return;
 
@@ -312,8 +301,7 @@ export default function OrdersManagement() {
           </div>
         </CardContent>
       </Card>
-
-      {/* ------------------------ MODAL DE DETALLES ------------------------ */}
+ 
       {modalOpen && selectedOrder && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg max-w-3xl w-full mx-4">
@@ -336,8 +324,7 @@ export default function OrdersManagement() {
               ) : detailsError ? (
                 <p className="text-red-500">Error: {detailsError}</p>
               ) : (
-                <>
-                  {/* Cabecera del pedido */}
+                <> 
                   <div className="mb-4 space-y-1">
                     <p>
                       <strong>Usuario ID:</strong> {selectedOrder.user_id}
@@ -353,9 +340,7 @@ export default function OrdersManagement() {
                       <strong>Creado en:</strong>{' '}
                       {formatDate(selectedOrder.created_at)}
                     </p>
-                  </div>
-
-                  {/* Tabla de líneas de detalle */}
+                  </div> 
                   <Table className="min-w-full border">
                     <TableHeader>
                       <TableRow>
