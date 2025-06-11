@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Package, AlertCircle, Loader2, ShoppingCart, Home } from 'lucide-react';
-import Navbar from '../components/NavigationList'; // Assuming you have a Navbar component
-
-// Interface for individual product item within an order from the backend
+import Navbar from '../components/NavigationList';  
 interface BackendOrderItem {
   ID_Producto: string | number;
   NombreProducto: string;
@@ -12,29 +10,27 @@ interface BackendOrderItem {
   Precio_total: number;
   ImagenProducto?: string;
 }
-
-// Interface for a single order from the backend
+ 
 interface BackendOrder {
-  ID_Pedido: string; // Or number, depending on your DB
-  Fecha_Pedido: string; // e.g., "2024-06-02 10:00:00"
+  ID_Pedido: string;  
+  Fecha_Pedido: string;  
   Estado_Pedido: string;
-  Direccion_entrega: string; // Combined address string from backend
+  Direccion_entrega: string;  
   Total_Pedido: number;
   detalles: BackendOrderItem[];
 }
-
-// Interface for the API response structure
+ 
 interface ApiResponse {
   success?: boolean;
   orders?: BackendOrder[];
-  message?: string; // For 'No orders found' or errors
+  message?: string;  
   error?: string;
 }
 
 const navLinks = [
   { name: 'Home', path: '/', current: false, icon: Home },
   { name: 'Shop', path: '/Shop', current: false, icon: ShoppingCart },
-  // Add other nav links as needed, e.g., My Profile, My Orders (if not this page)
+  
 ];
 
 const MyOrders: React.FC = () => {
@@ -52,38 +48,36 @@ const MyOrders: React.FC = () => {
           headers: {
             'Content-Type': 'application/json',
           },
-          credentials: 'include', // Important for sending session cookies
+          credentials: 'include',  
         });
         const data: ApiResponse = await response.json();
 
         if (!response.ok || data.error) {
-          // Prioritize error message from backend if available
+          
           throw new Error(data.error || data.message || `HTTP error! status: ${response.status}`);
         }
         
         if (data.success && data.orders) {
           setOrders(data.orders);
         } else if (data.message === 'No orders found for this user.') {
-          setOrders([]); // Explicitly set to empty array if no orders
+          setOrders([]);  
         } else {
-          // Handle cases where success might be false but no specific error given, or unexpected structure
+           
           setOrders([]);
           console.warn('Received unexpected data structure or non-successful response:', data);
-          // Optionally set an error message for the user in this case too
-          // setError('Could not retrieve orders at this time.');
+ 
         }
 
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An unknown error occurred while fetching orders.');
-        setOrders([]); // Clear orders on error
+        setOrders([]); 
       } finally {
         setLoading(false);
       }
     };
 
     fetchOrders();
-  }, []); // Empty dependency array means this effect runs once on mount
-
+  }, []);  
   if (loading) {
     return (
       <div className="flex flex-col min-h-screen">
@@ -92,7 +86,7 @@ const MyOrders: React.FC = () => {
           <Loader2 className="h-12 w-12 animate-spin text-emerald-600" />
           <p className="mt-4 text-lg text-gray-700">Loading your orders...</p>
         </div>
-        {/* Consider adding a Footer here if consistent with other pages */}
+ 
       </div>
     );
   }
@@ -108,7 +102,7 @@ const MyOrders: React.FC = () => {
             Go to Homepage
           </Link>
         </div>
-        {/* Consider adding a Footer here */}
+   
       </div>
     );
   }
@@ -157,9 +151,9 @@ const MyOrders: React.FC = () => {
                           order.Estado_Pedido.toLowerCase() === 'delivered' ? 'bg-green-100 text-green-800' : 
                           order.Estado_Pedido.toLowerCase() === 'shipped' ? 'bg-yellow-100 text-yellow-800' : 
                           order.Estado_Pedido.toLowerCase() === 'processing' ? 'bg-blue-100 text-blue-800' :
-                          order.Estado_Pedido.toLowerCase() === 'pending' ? 'bg-orange-100 text-orange-800' : // Example for 'pending'
-                          order.Estado_Pedido.toLowerCase() === 'cancelled' ? 'bg-red-100 text-red-800' : // Example for 'cancelled'
-                          'bg-gray-100 text-gray-800' // Default/other statuses
+                          order.Estado_Pedido.toLowerCase() === 'pending' ? 'bg-orange-100 text-orange-800' :  
+                          order.Estado_Pedido.toLowerCase() === 'cancelled' ? 'bg-red-100 text-red-800' :  
+                          'bg-gray-100 text-gray-800'  
                         }`}
                       >
                         {order.Estado_Pedido}
@@ -196,11 +190,6 @@ const MyOrders: React.FC = () => {
                     <h3 className="text-md font-semibold text-gray-700 mb-2">Shipping Address:</h3>
                     <div className="text-sm text-gray-600 bg-slate-50 p-3 rounded-md">
                       <p>{order.Direccion_entrega}</p>
-                      {/* If Direccion_entrega is a JSON string with multiple fields, you'd parse it here */}
-                      {/* Example if it were JSON: 
-                          const addr = JSON.parse(order.Direccion_entrega);
-                          <p>{addr.address}, {addr.city}, {addr.postalCode}</p> 
-                      */}
                     </div>
                   </div>
                 </div>
@@ -208,9 +197,7 @@ const MyOrders: React.FC = () => {
             ))}
           </div>
         )}
-      </main>
-      {/* Consider adding a Footer component here for consistency */}
-      {/* <Footer /> */}
+      </main> 
     </div>
   );
 };

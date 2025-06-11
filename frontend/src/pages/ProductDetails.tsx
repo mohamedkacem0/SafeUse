@@ -3,31 +3,29 @@ import { useParams, useNavigate } from "react-router-dom";
 import PrimaryButton from "../components/PrimaryButton";
 import Description   from "../components/Description";
 import toast, { Toaster } from 'react-hot-toast';
-
-// --------- Tipos -----------------------------------------------------------
+ 
 interface Product {
   id: number;
   name: string;
   description: string;
   price: number;
-  image: string;          // imagen principal (URL absoluta)
-  gallery: string[];      // URLs absolutas de la galería
+  image: string;        
+  gallery: string[];      
   stock: number;
 }
-
-// --------- Componente ------------------------------------------------------
+ 
 export default function ProductDetailPage() {
-  const { id } = useParams();               // /shop/:id
+  const { id } = useParams();                
   const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [qty, setQty] = useState(1);
-  const [mainIdx, setMainIdx] = useState(0); // imagen principal activa
+  const [mainIdx, setMainIdx] = useState(0);  
   const [isAutoPlayActive, setIsAutoPlayActive] = useState(true);
   const [addToCartStatus, setAddToCartStatus] = useState<'idle' | 'adding' | 'added'>('idle');
 
-  // --- Fetch del producto --------------------------------------------------
+ 
   useEffect(() => {
     if (!id) return;
 
@@ -55,14 +53,12 @@ export default function ProductDetailPage() {
       .catch(err => setError(err.message))
       .finally(() => setLoading(false));
   }, [id]);
-
-  // Listen for stock adjustments from other components (e.g., Cart.tsx)
+ 
   useEffect(() => {
     const handleStockAdjusted = (event: Event) => {
       const customEvent = event as CustomEvent<{ productId: number; quantityChange: number }>;
       const { productId: adjustedProductId, quantityChange } = customEvent.detail;
-
-      // Only update if the adjusted product is the one currently being viewed
+ 
       if (product && product.id === adjustedProductId) {
         setProduct(prevProduct =>
           prevProduct ? { ...prevProduct, stock: Math.max(0, prevProduct.stock + quantityChange) } : null
@@ -74,22 +70,19 @@ export default function ProductDetailPage() {
     return () => {
       window.removeEventListener('productStockAdjusted', handleStockAdjusted);
     };
-  }, [product]); // Dependency on 'product' to ensure 'product.id' is current in the closure
-
-  // --- Auto-cycle gallery images -------------------------------------------
+  }, [product]);   
   useEffect(() => {
     if (!product || !product.gallery || product.gallery.length <= 1 || !isAutoPlayActive) {
-      return; // Don't start interval if no gallery, only one image, or autoplay is paused
+      return;  
     }
 
     const intervalId = setInterval(() => {
       setMainIdx(prevIdx => (prevIdx + 1) % product.gallery.length);
-    }, 3000); // Change image every 3 seconds
+    }, 3000); 
 
-    return () => clearInterval(intervalId); // Cleanup interval on unmount or when dependencies change
+    return () => clearInterval(intervalId);  
   }, [product, product?.gallery, isAutoPlayActive]);
-
-  // --- Vista de carga / error ---------------------------------------------
+ 
   if (loading) return <p className="mt-24 text-center">Loading...</p>;
   if (error)   return <p className="mt-24 text-center text-red-600">{error}</p>;
   if (!product) return null;
@@ -109,9 +102,9 @@ export default function ProductDetailPage() {
       const data = await response.json();
 
       if (!response.ok || !data.success) {
-        if (response.status === 401) { // Specific check for unauthorized
+        if (response.status === 401) { 
             toast.error('Please log in to add items to your cart.');
-            navigate("/login"); // Optionally navigate to login
+            navigate("/login");  
         } else {
             toast.error(data.message || 'Failed to add product. Please try again.');
         }
@@ -135,9 +128,7 @@ export default function ProductDetailPage() {
       toast.error(err.message || "Could not add product to cart.");
       setAddToCartStatus('idle');
     }
-  };
-
-  // --- Render --------------------------------------------------------------
+  }; 
   let buttonText = "Add to cart";
   if (addToCartStatus === 'adding') buttonText = "Adding...";
   if (addToCartStatus === 'added') buttonText = "Added!";
@@ -155,10 +146,9 @@ export default function ProductDetailPage() {
           </svg>
           Back to shop
         </button>
-
-        {/* Main Product Card */}
+ 
         <div className="bg-white p-6 sm:p-8 rounded-xl shadow-xl border-t-4 border-emerald-500 flex flex-col md:flex-row gap-8 md:gap-12">
-          {/* Image Gallery - Left Side */}
+     
           <div className="md:w-1/2 flex flex-col items-center">
             <div className="w-full max-w-md h-auto aspect-[4/3] bg-gray-100 rounded-lg overflow-hidden shadow-inner mb-4 flex items-center justify-center">
               <img
@@ -174,7 +164,7 @@ export default function ProductDetailPage() {
                     key={idx}
                     onClick={() => {
                       setMainIdx(idx);
-                      setIsAutoPlayActive(false); // Pause autoplay on manual click
+                      setIsAutoPlayActive(false);  
                     }}
                     className={`w-20 h-20 rounded-md overflow-hidden border-2 transition-all duration-150 hover:opacity-80 focus:outline-none ${
                       mainIdx === idx ? "border-emerald-500 ring-2 ring-emerald-500/50" : "border-gray-200"
@@ -190,8 +180,7 @@ export default function ProductDetailPage() {
               </div>
             )}
           </div>
-
-          {/* Product Info & Actions - Right Side */}
+ 
           <div className="md:w-1/2 flex flex-col">
             <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-800 mb-3">{product.name}</h1>
             <div className="text-3xl font-bold text-emerald-600 mb-6">€{product.price.toFixed(2)}</div>
@@ -222,21 +211,18 @@ export default function ProductDetailPage() {
               onClick={handleAddToCart}
               disabled={product.stock === 0 || addToCartStatus === 'adding' || addToCartStatus === 'added'}
             />
-            {/* Placeholder for other actions like 'Add to wishlist' if needed */}
+            
           </div>
         </div>
-
-        {/* Additional Information Card */}
+ 
         {product.description && (
           <div className="mt-12 bg-white p-6 sm:p-8 rounded-xl shadow-xl border-t-4 border-emerald-500">
-            {/* Assuming Description component handles its own title styling well. 
-                If not, we might need to add a <h2 className="text-2xl font-bold mb-4">Additional Information</h2> here 
-                and pass only the content to Description's subtitle. */}
+          
             <Description
-              title="Additional Information" // This could be a prop or part of Description's internal logic
+              title="Additional Information"  
               subtitle={product.description}
-              link="" // Prop can be removed from Description if not used
-              width="w-full" // Prop might be redundant if card controls width
+              link=""  
+              width="w-full" //  
             />
           </div>
         )}

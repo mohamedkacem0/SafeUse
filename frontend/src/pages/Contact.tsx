@@ -1,4 +1,4 @@
-// src/pages/Contact.tsx
+ 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -56,7 +56,7 @@ export default function Contact() {
       });
 
       if (res.ok) {
-        // redirige a /success
+  
         navigate("/success");
       } else {
         setStatus("error");
@@ -70,10 +70,9 @@ export default function Contact() {
   return (
     <section className="bg-gray-50 mx-auto max-w-6xl px-4 py-16">
       <CatchyQuoteSection quote="We’d love to hear from you. Get in touch!" ariaLabel="Contact page slogan" />
-
-      {/* Main Contact Box */}
-      <div className="mx-auto max-w-6xl overflow-hidden bg-[#335A2C] rounded-xl shadow-xl md:grid md:grid-cols-3 md:gap-0"> {/* Removed gap-8, panels will control their padding */}
-        {/* Left panel */}
+ 
+      <div className="mx-auto max-w-6xl overflow-hidden bg-[#335A2C] rounded-xl shadow-xl md:grid md:grid-cols-3 md:gap-0">  
+ 
         <aside className="flex flex-col gap-8 bg-primary px-8 py-10 text-white sm:px-10 md:col-span-1 md:rounded-l-xl">
           <header>
             <h2 className="text-2xl font-semibold">Contact Information</h2>
@@ -110,8 +109,7 @@ export default function Contact() {
             </a>
           </footer>
         </aside>
-
-        {/* Form or Error Message */}
+ 
         <div className="md:col-span-2 md:px-12 md:py-10 p-8 bg-white md:rounded-r-xl">
           {status === "error" && (
             <p className="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded-md mb-6 text-sm">

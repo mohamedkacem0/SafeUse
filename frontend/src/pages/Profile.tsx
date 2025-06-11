@@ -1,4 +1,4 @@
-// src/pages/Profile.tsx
+
 import React, { useState, useEffect } from "react";
 import { Pencil, Check, X as CloseIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -23,24 +23,21 @@ export default function Profile() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // State for Change Password Form
+ 
   const [showChangePasswordForm, setShowChangePasswordForm] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [passwordChangeError, setPasswordChangeError] = useState<string | null>(null);
   const [passwordChangeSuccess, setPasswordChangeSuccess] = useState<string | null>(null);
-
-  // Inline editing state
+ 
   const [editing, setEditing] = useState<EditableField>(null);
   const [draftValue, setDraftValue] = useState<string>("");
-
-  // Load profile on mount
+ 
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch("/api/profile", { // Use absolute path for consistency
+        const res = await fetch("/api/profile", { 
           method: "GET",
           credentials: "include",
           headers: {
@@ -61,8 +58,7 @@ export default function Profile() {
       }
     })();
   }, []);
-
-  // Logout
+ 
   const handleLogout = async () => {
     try {
       await fetch("api/logout", { 
@@ -79,8 +75,7 @@ export default function Profile() {
       console.error("Error al cerrar sesión:", err);
     }
   };
-
-  // Password Change Handler
+ 
   const handleChangePassword = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setPasswordChangeError(null);
@@ -117,8 +112,7 @@ export default function Profile() {
       setPasswordChangeError("An unexpected error occurred. Please try again.");
     }
   };
-
-  // Inline edit helpers
+ 
   const startEdit = (field: EditableField) => {
     if (!user || !field) return;
     setEditing(field);
@@ -131,9 +125,8 @@ export default function Profile() {
   const saveEdit = async () => {
     if (!editing || !user) return;
 
-    const originalUser = { ...user }; // Store original for potential revert
+    const originalUser = { ...user }; 
 
-    // Optimistic UI update
     setUser(prevUser => ({
       ...prevUser!,
       [editing]: draftValue,
@@ -157,11 +150,9 @@ export default function Profile() {
       
       const responseData = await res.json();
       if (responseData.success && responseData.user && typeof responseData.user === 'object' && responseData.user !== null) {
-        // Ensure responseData.user is a valid-looking object before updating state
         setUser(responseData.user as UserProfile); 
-        setError(null); // Clear any previous general errors
+        setError(null); 
       } else {
-        // If backend didn't confirm success or send back a valid user object, throw an error
         let errorMessage = 'Failed to update profile.';
         if (responseData.error) {
           errorMessage = responseData.error;
@@ -173,13 +164,12 @@ export default function Profile() {
         throw new Error(errorMessage);
       }
 
-      setEditing(null); // Exit editing mode on success
+      setEditing(null); 
     } catch (err: any) {
-      setUser(originalUser); // Revert optimistic update on error
+      setUser(originalUser); 
       setError(`Error updating ${editing}: ${err.message}`);
       console.error(`Error updating ${editing}:`, err);
-      // Optionally, keep editing mode active for user to retry or cancel
-      // setEditing(null); 
+   
     }
   };
 
@@ -193,7 +183,7 @@ export default function Profile() {
 
   const renderField = (
     label: string,
-    fieldKey: keyof UserProfile, // Changed 'field' to 'fieldKey' for clarity with UserProfile keys
+    fieldKey: keyof UserProfile,  
     type: string = "text"
   ) => (
     <div className="flex flex-col sm:flex-row justify-between sm:items-center py-4">
@@ -218,7 +208,7 @@ export default function Profile() {
         ) : (
           <>
             <span className="text-gray-800">{user[fieldKey] || "N/A"}</span>
-          {/* Only show edit button if fieldKey is not 'Correo' */}
+         
           {fieldKey !== "Correo" && (
             <button
               onClick={() => startEdit(fieldKey as EditableField)}
@@ -232,9 +222,7 @@ export default function Profile() {
         )}
       </div>
     </div>
-  );
-
-  // Main content structure for user details
+  ); 
   const userDetailsContent = (
     <div className="bg-white p-6 sm:p-8 rounded-xl shadow-xl mt-10 w-full divide-y divide-gray-200 border-t-4 border-emerald-500">
       {renderField("Full Name", "Nombre")}
@@ -248,20 +236,17 @@ export default function Profile() {
     <div className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center">
       <div className="max-w-2xl w-full">
       <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-800 mb-10 text-center sm:text-left mt-10">Your Profile</h1>
-
-      {/* User Info Fields Card */}
+ 
       {userDetailsContent}
-
-      {/* My Orders Button */}
+ 
       <div className="mt-10 w-full max-w-md mx-auto">
         <PrimaryButton
           text="My Orders"
-          onClick={() => navigate('/my-orders')} // Assuming '/my-orders' is the route for orders
+          onClick={() => navigate('/my-orders')}  
           className="w-full !bg-emerald-600 hover:!bg-emerald-700 text-white font-semibold py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 ease-in-out active:scale-[0.98]"
         />
       </div>
-
-      {/* Change Password Section */}
+ 
       <div className="mt-10 w-full max-w-md mx-auto">
         <PrimaryButton
           text={showChangePasswordForm ? "Cancel Change Password" : "Change Password"}
@@ -269,7 +254,7 @@ export default function Profile() {
             setShowChangePasswordForm(!showChangePasswordForm);
             setPasswordChangeError(null);
             setPasswordChangeSuccess(null);
-            // Clear fields if canceling
+      
             if (showChangePasswordForm) {
                 setCurrentPassword("");
                 setNewPassword("");
@@ -348,19 +333,16 @@ export default function Profile() {
           </form>
         </div>
       )}
-
-      {/* Logout Button */}
+ 
       <div className="mt-12 w-full max-w-xs mx-auto">
-        {/* <a href="#" className="text-sm text-sky-600 hover:underline text-center block mb-4">
-          Change your password
-        </a> */}
+     
         <PrimaryButton
           text="Logout"
           onClick={handleLogout}
           className="w-full !bg-red-600 hover:!bg-red-700 text-white font-semibold py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 ease-in-out active:scale-[0.98]"
         />
       </div>
-      </div> {/* Closes max-w-2xl w-full */}
-    </div>   /* Closes min-h-screen */
+      </div>  
+    </div>    
   );
 }

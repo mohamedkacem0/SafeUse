@@ -5,10 +5,7 @@ use App\Core\DB;
 use PDO;
 
 class AdminOrdersModel
-{
-    /**
-     * Obtiene todas las órdenes (cabeceras) desde la tabla `pedidos`.
-     */
+{ 
     public static function fetchAll(): ?array
     {
         $pdo = DB::getInstance()->conn();
@@ -31,10 +28,7 @@ class AdminOrdersModel
             return null;
         }
     }
-
-    /**
-     * Busca una sola orden por su ID_Pedido.
-     */
+ 
     public static function findById(int $id): ?array
     {
         $pdo = DB::getInstance()->conn();

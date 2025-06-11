@@ -6,10 +6,7 @@ use App\Core\Response;
 
 class ContactController
 {
-    /**
-     * Almacena una nueva consulta de contacto
-     * y devuelve todas las columnas del registro creado.
-     */
+    
     public static function store(): void
     {
         $input = json_decode(file_get_contents('php://input'), true);

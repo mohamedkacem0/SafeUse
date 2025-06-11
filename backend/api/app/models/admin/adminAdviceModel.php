@@ -6,11 +6,7 @@ use PDO;
 use App\Core\Response;
 
 class AdminAdviceModel
-{
-    /**
-     * Obtiene todos los registros de la tabla `advice`, ordenados por fecha descendente.
-     * @return array|null
-     */
+{ 
     public static function fetchAll(): ?array
     {
         $pdo = DB::getInstance()->conn();
@@ -22,12 +18,7 @@ class AdminAdviceModel
             return null;
         }
     }
-
-    /**
-     * Elimina un registro de la tabla `advice` por su ID_Advice.
-     * @param int $id
-     * @return bool True si se eliminó al menos una fila, false en caso contrario.
-     */
+ 
     public static function deleteById(int $id): bool
     {
         $pdo = DB::getInstance()->conn();
@@ -40,13 +31,7 @@ class AdminAdviceModel
             return false;
         }
     }
-
-    /**
-     * (Opcional) Actualiza un consejo por ID_Advice.
-     * @param int $id
-     * @param array $data  ['title'=>..., 'description'=>..., 'articulo'=>..., 'stage'=>...]
-     * @return bool
-     */
+ 
     public static function updateById(int $id, array $data): bool
     {
         $pdo = DB::getInstance()->conn();
@@ -73,12 +58,7 @@ class AdminAdviceModel
             return false;
         }
     }
-
-    /**
-     * (Opcional) Crea un nuevo consejo. Devuelve el ID recién creado o null si falla.
-     * @param array $data ['title'=>..., 'description'=>..., 'articulo'=>..., 'stage'=>...]
-     * @return int|null
-     */
+ 
     public static function create(array $data): ?int
     {
         $pdo = DB::getInstance()->conn();
@@ -99,12 +79,7 @@ class AdminAdviceModel
             return null;
         }
     }
-
-    /**
-     * Obtiene un consejo por su ID_Advice.
-     * @param int $id
-     * @return array|null
-     */
+ 
     public static function fetchById(int $id): ?array
     {
         $pdo = DB::getInstance()->conn();
