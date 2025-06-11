@@ -10,6 +10,11 @@ RUN a2enmod rewrite
 # Copy the whole backend/api directory (including app, public, etc.)
 COPY backend/api/ /var/www/html/
 
+# Ensure uploads directory exists and set permissions
+RUN mkdir -p /var/www/html/uploads && \
+    chown -R www-data:www-data /var/www/html/uploads && \
+    chmod -R 755 /var/www/html/uploads
+
 # Install PDO and PDO MySQL extensions
 RUN docker-php-ext-install pdo pdo_mysql
 
