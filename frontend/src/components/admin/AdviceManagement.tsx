@@ -68,19 +68,17 @@ export default function AdviceManagement() {
   const [editingAdvice, setEditingAdvice] = useState<Advice | null>(null);
   const [form, setForm] = useState(emptyAdvice);
  
-  useEffect(() => {
-    fetchAdvice();
-  }, []);
-
-  async function fetchAdvice() {
+  const fetchAdvice = useCallback(async () => {
     setLoadingAdvice(true);
     setAdviceError(null);
     try {
       const res = await fetch(
-        'api/admin/advice',
+        '/api/admin/advice',
         {
           method: 'GET',
-          credentials: 'include',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+          }
         }
       );
       if (!res.ok) {
@@ -88,14 +86,17 @@ export default function AdviceManagement() {
         throw new Error(err.error || 'Error loading advice');
       }
       const json = await res.json();
-      const arr: any[] = Array.isArray(json.advice) ? json.advice : [];
+      
+      type AdviceItem = {
+        ID_Advice?: number; id_advice?: number; ID?: number; id?: number;
+        title?: string; description?: string; articulo?: string | null;
+        stage?: string; created_at?: string; createdAt?: string;
+        updated_at?: string; updatedAt?: string;
+      };
+
+      const arr: AdviceItem[] = Array.isArray(json.advice) ? json.advice : [];
       const parsed: Advice[] = arr.map((item) => ({
-        ID_Advice:
-          item.ID_Advice ??
-          item.id_advice ??
-          item.ID ??
-          item.id ??
-          0,
+        ID_Advice: item.ID_Advice ?? item.id_advice ?? item.ID ?? item.id ?? 0,
         title: item.title ?? '',
         description: item.description ?? '',
         articulo: item.articulo ?? null,
@@ -104,12 +105,21 @@ export default function AdviceManagement() {
         updated_at: item.updated_at ?? item.updatedAt ?? '',
       }));
       setLocalAdvice(parsed);
-    } catch (err: any) {
-      setAdviceError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setAdviceError(err.message);
+      } else {
+        setAdviceError('An unknown error occurred');
+      }
     } finally {
       setLoadingAdvice(false);
     }
-  } 
+  }, []);
+
+  useEffect(() => {
+    fetchAdvice();
+  }, [fetchAdvice]);
+
   const [filter, setFilter] = useState('');
   const filteredAdvice = useMemo(() => {
     const term = filter.trim().toLowerCase();
@@ -123,13 +133,15 @@ export default function AdviceManagement() {
   }, [localAdvice, filter]);
  
   const handleDelete = useCallback(async (id: number) => {
-    if (!confirm('¿Seguro que quieres borrar este consejo?')) return;
+    if (!confirm('Are you sure you want to delete this advice?')) return;
     try {
       const res = await fetch(
-        `api/admin/advice/${id}`,
+        `/api/admin/advice/${id}`,
         {
           method: 'DELETE',
-          credentials: 'include',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+          }
         }
       );
       if (!res.ok) {
@@ -139,8 +151,12 @@ export default function AdviceManagement() {
       setLocalAdvice((prev) =>
         prev.filter((item) => item.ID_Advice !== id)
       );
-    } catch (err: any) {
-      alert('No se pudo borrar el consejo: ' + err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        alert('Could not delete advice: ' + err.message);
+      } else {
+        alert('An unknown error occurred while deleting advice.');
+      }
     }
   }, []);
  
@@ -160,30 +176,37 @@ export default function AdviceManagement() {
     });
     setShowModal(true);
   }; 
-  const handleSave = async (e: React.FormEvent) => {
+  
+  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       const isEdit = !!editingAdvice;
       const url = isEdit
-        ? `api/admin/advice/${editingAdvice?.ID_Advice}`
-        : 'api/admin/advice';
+        ? `/api/admin/advice/${editingAdvice?.ID_Advice}`
+        : '/api/admin/advice';
       const method = isEdit ? 'PUT' : 'POST';
       const res = await fetch(url, {
         method,
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
         body: JSON.stringify(form),
       });
       const json = await res.json();
       if (!res.ok) {
-        throw new Error(json.error || 'Error guardando consejo');
+        throw new Error(json.error || 'Error saving advice');
       }
       setShowModal(false);
       setEditingAdvice(null);
       setForm(emptyAdvice);
       fetchAdvice();
-    } catch (err: any) {
-      alert('No se pudo guardar: ' + err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        alert('Could not save advice: ' + err.message);
+      } else {
+        alert('An unknown error occurred while saving advice.');
+      }
     }
   };
 
@@ -196,52 +219,56 @@ export default function AdviceManagement() {
             onSubmit={handleSave}
           >
             <h2 className="text-lg font-bold mb-4">
-              {editingAdvice ? 'Editar consejo' : 'Nuevo consejo'}
+              {editingAdvice ? 'Edit Advice' : 'New Advice'}
             </h2>
             <div className="mb-2">
-              <label className="block text-sm mb-1">Título</label>
+              <label className="block text-sm mb-1" htmlFor="title">Title</label>
               <Input
+                id="title"
                 value={form.title}
-                onChange={(e) =>
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setForm((f) => ({ ...f, title: e.target.value }))
                 }
                 required
               />
             </div>
             <div className="mb-2">
-              <label className="block text-sm mb-1">Descripción</label>
+              <label className="block text-sm mb-1" htmlFor="description">Description</label>
               <Input
+                id="description"
                 value={form.description}
-                onChange={(e) =>
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setForm((f) => ({ ...f, description: e.target.value }))
                 }
                 required
               />
             </div>
             <div className="mb-2">
-              <label className="block text-sm mb-1">
-                Artículo (opcional, URL)
+              <label className="block text-sm mb-1" htmlFor="articulo">
+                Article (optional, URL)
               </label>
               <Input
+                id="articulo"
                 value={form.articulo ?? ''}
-                onChange={(e) =>
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setForm((f) => ({ ...f, articulo: e.target.value }))
                 }
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Etapa</label>
+              <label className="block text-sm mb-1" htmlFor="stage">Stage</label>
               <select
+                id="stage"
                 className="w-full border rounded px-2 py-1"
                 value={form.stage}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, stage: e.target.value as any }))
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                  setForm((f) => ({ ...f, stage: e.target.value as 'before' | 'while' | 'after' }))
                 }
                 required
               >
-                <option value="before">Antes</option>
-                <option value="while">Durante</option>
-                <option value="after">Después</option>
+                <option value="before">Before</option>
+                <option value="while">During</option>
+                <option value="after">After</option>
               </select>
             </div>
             <div className="flex justify-end space-x-2">
@@ -250,25 +277,26 @@ export default function AdviceManagement() {
                 variant="outline"
                 onClick={() => setShowModal(false)}
               >
-                Cancelar
+                Cancel
               </Button>
               <Button type="submit">
-                {editingAdvice ? 'Guardar' : 'Crear'}
+                {editingAdvice ? 'Save Changes' : 'Create Advice'}
               </Button>
             </div>
           </form>
         </div>
       )} 
 
-      <CardHeader className="flex items-center justify-between">
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Advice Management</CardTitle>
         <div className="flex space-x-2">
           <Input
             placeholder="Search advice..."
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
+            className="max-w-sm"
           />
-          <Button onClick={handleCreate}>Nuevo consejo</Button>
+          <Button onClick={handleCreate}>New Advice</Button>
         </div>
       </CardHeader>
       <CardContent>
@@ -281,7 +309,7 @@ export default function AdviceManagement() {
                 <TableHead scope="col" className="max-w-[250px]">
                   Description
                 </TableHead>
-                <TableHead scope="col">Artículo</TableHead>
+                <TableHead scope="col">Article</TableHead>
                 <TableHead scope="col">Stage</TableHead>
                 <TableHead scope="col">Created At</TableHead>
                 <TableHead scope="col">Updated At</TableHead>
@@ -292,7 +320,7 @@ export default function AdviceManagement() {
               {loadingAdvice ? (
                 <TableRow>
                   <TableCell colSpan={8} className="text-center py-4">
-                    Loading…
+                    Loading advice...
                   </TableCell>
                 </TableRow>
               ) : adviceError ? (
@@ -339,14 +367,15 @@ export default function AdviceManagement() {
                     <TableCell>{formatDate(a.updated_at)}</TableCell>
                     <TableCell className="flex space-x-2">
                       <Button
+                        size="sm"
+                        variant="outline"
                         onClick={() => handleEdit(a)}
-                        className="text-gray-700 hover:text-gray-900"
                       >
                         Edit
                       </Button>
                       <Button
-                        variant="outline"
-                        className="text-red-600 hover:bg-red-50"
+                        size="sm"
+                        variant="destructive"
                         onClick={() => handleDelete(a.ID_Advice)}
                       >
                         Delete
