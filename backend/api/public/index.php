@@ -235,6 +235,16 @@ switch ($routeBase) {
             Response::json(['error' => 'ID de producto no especificado para eliminar.'], 400);
         }
         break;
+
+    case (preg_match('/^api\/admin\/products\/delete\/(\d+)$/', $route, $matches) ? $route : ''):
+        if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+            $productId = $matches[1];
+            AdminProductController::destroy($productId);
+        } else {
+            App\Core\Response::json(['error' => 'Method not allowed. Use DELETE for deleting products.'], 405);
+        }
+        break;
+
     case 'api/admin/users/addUser':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             AdminUserController::addUser();

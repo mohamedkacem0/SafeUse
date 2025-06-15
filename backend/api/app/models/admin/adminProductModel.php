@@ -21,6 +21,9 @@ class AdminProductModel
         $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($products as &$product) {
+            $product['ID_Producto'] = (int)$product['ID_Producto'];
+            $product['Precio'] = (float)$product['Precio'];
+            $product['Stock'] = (int)$product['Stock'];
             if (!empty($product['imagenes'])) {
                 $imageFilenames = explode(';', $product['imagenes']);
                 $product['Imagen_Principal'] = 'uploads/productos/p' . $product['ID_Producto'] . '/' . $imageFilenames[0];
@@ -43,6 +46,10 @@ class AdminProductModel
         if (!$product) {
             return null;
         }
+
+        $product['ID_Producto'] = (int)$product['ID_Producto'];
+        $product['Precio'] = (float)$product['Precio'];
+        $product['Stock'] = (int)$product['Stock'];
 
         $stmt_imgs = $pdo->prepare("SELECT url_imagen, numero_imagen FROM imagenes_producto WHERE ID_Producto = ? ORDER BY numero_imagen");
         $stmt_imgs->execute([$id]);
