@@ -6,7 +6,14 @@ use App\Core\Response;
 
 class AdminProductController
 {
-    private static $baseUploadPath = __DIR__ . '/../../../../../uploads/productos/';
+    private static function getBaseUploadPath(): string
+    {
+        $renderPath = getenv('UPLOAD_PATH');
+        if ($renderPath) {
+            return rtrim($renderPath, '/') . '/productos/';
+        }
+        return __DIR__ . '/../../../../../uploads/productos/';
+    }
 
     public static function index(): void
     {
@@ -91,7 +98,7 @@ class AdminProductController
     private static function handleImageUploads(int $productId, array $files): array|false
     {
         $savedFilenames = [];
-        $productImageDir = rtrim(self::$baseUploadPath, '/') . '/p' . $productId . '/';
+        $productImageDir = rtrim(self::getBaseUploadPath(), '/') . '/p' . $productId . '/';
 
         if (!is_dir($productImageDir)) {
             if (!mkdir($productImageDir, 0777, true)) {
@@ -100,17 +107,19 @@ class AdminProductController
             }
         }
 
+        $imageCounter = 1;
         foreach ($files['tmp_name'] as $key => $tmp_name) {
             if (empty($tmp_name) || $files['error'][$key] !== UPLOAD_ERR_OK) {
                 continue;
             }
 
-            $fileName = basename($files['name'][$key]);
-            $newFileName = uniqid() . '_' . $fileName;
+            $fileExtension = pathinfo($files['name'][$key], PATHINFO_EXTENSION);
+            $newFileName = 'p' . $productId . '_' . $imageCounter . '.' . $fileExtension;
             $destination = $productImageDir . $newFileName;
 
             if (move_uploaded_file($tmp_name, $destination)) {
                 $savedFilenames[] = $newFileName;
+                $imageCounter++;
             } else {
                 error_log("Failed to move uploaded file to: " . $destination);
                 return false;
