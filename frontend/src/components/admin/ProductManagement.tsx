@@ -17,7 +17,7 @@ import {
   TableBody,
   TableCell,
 } from '../ui/table';
-import { Edit3 } from 'lucide-react';
+import { Edit3, Trash2 } from 'lucide-react';
 
 function formatDate(dateStr: string) {
   const date = new Date(dateStr);
@@ -52,21 +52,23 @@ export default function ProductManagement() {
   const [productFormError, setProductFormError] = useState<string | null>(null);
   const [productFormSuccess, setProductFormSuccess] = useState<string | null>(null);
 
-  const {
-    data: productsData,
-    loading: loadingProducts,
-    error: productsError,
-  } = useFetchData<Product[]>('/api/productos', (json: unknown) => {
-    if (Array.isArray(json)) {
-      return json;
-    }
-    if (json && typeof json === 'object' && 'productos' in json && Array.isArray((json as { productos: Product[] }).productos)) {
-      return (json as { productos: Product[] }).productos;
-    }
-    return [];
-  });
+  const [products, setProducts] = useState<Product[]>([]);
+  const { 
+    data: productsData, 
+    loading: loadingProducts, 
+    error: productsError
+  } = useFetchData<Product[]>('/api/admin/products');
 
-  const products = useMemo(() => productsData ?? [], [productsData]);
+  React.useEffect(() => {
+    if (productsData) {
+      const sanitizedProducts = productsData.map(p => ({
+        ...p,
+        Precio: Number(p.Precio),
+        Stock: Number(p.Stock)
+      }));
+      setProducts(sanitizedProducts);
+    }
+  }, [productsData]);
 
   const [filter, setFilter] = useState('');
   const filteredProducts = useMemo(() => {
@@ -120,6 +122,35 @@ export default function ProductManagement() {
     setIsProductFormVisible(false);
     resetProductFormFields();
     setEditingProduct(null);
+  };
+
+  const handleDelete = async (id: number) => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+      try {
+        const response = await fetch(`http://localhost/tfg/SafeUse/backend/api/public/?route=api/admin/products/delete/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
+          },
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || 'Error al eliminar el producto.');
+        }
+
+        setProducts(prevProducts => prevProducts.filter(p => p.ID_Producto !== id));
+        setProductFormSuccess('Producto eliminado con éxito.');
+        setTimeout(() => setProductFormSuccess(null), 3000);
+
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Ocurrió un error desconocido.';
+        setProductFormError(errorMessage);
+        console.error('Error deleting product:', error);
+        setTimeout(() => setProductFormError(null), 5000);
+      }
+    }
   };
 
   const handleProductFormSubmit = async (event: React.FormEvent) => {
@@ -279,6 +310,14 @@ export default function ProductManagement() {
                         onClick={() => handleEdit(p.ID_Producto)}
                       >
                         <Edit3 size={16} />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="ml-2 text-red-500 border-red-500 hover:bg-red-500 hover:text-white"
+                        aria-label={`Eliminar producto ${p.Nombre}`}
+                        onClick={() => handleDelete(p.ID_Producto)}
+                      >
+                        <Trash2 size={16} />
                       </Button>
                     </TableCell>
                   </TableRow>
