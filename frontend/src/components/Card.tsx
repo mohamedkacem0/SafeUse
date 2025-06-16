@@ -35,17 +35,22 @@ const DrugCard: React.FC<DrugCardProps> = ({
         alt={name}
         className="w-[150px] h-[150px] object-contain mb-2 rounded-md"
       />
-      <h3 className="font-lato font-bold text-[20px] leading-tight text-center">
-        {name}
-      </h3>
+      <h3 className="font-lato font-bold text-[20px] leading-tight text-center truncate w-full text-ellipsis overflow-hidden">
+  {name}
+</h3>
       <p className="font-lato text-[16px] text-center font-bold text-emerald-600 my-2">
         {formula}
       </p>
-      {stock !== undefined && stock > 0 && stock < 5 && (
-        <p className="font-lato text-[14px] text-center text-red-600 font-bold">
-          Only {stock} units left!
-        </p>
-      )}
+      <div className="h-[20px]">
+  {stock !== undefined && stock > 0 && stock < 5 ? (
+    <p className="font-lato text-[14px] text-center text-red-600 font-bold">
+      Only {stock} units left!
+    </p>
+  ) : (
+    <span className="invisible">Only 4 units left!</span>
+  )}
+</div>
+
       {!hideTitle && (
         <p className="font-lato text-[14px] text-center leading-none">
           {title}
