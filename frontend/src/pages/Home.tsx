@@ -31,7 +31,7 @@ export default function Home() {
           Dive into detailed information on substances, learn essential harm reduction strategies, and find resources for testing.
         </p>
         <div className="flex flex-wrap justify-center items-stretch gap-8 md:gap-10 lg:gap-12 max-w-5xl mx-auto">
-          <NavLink to="/substances" className="block transform hover:scale-105 transition-transform duration-300 ease-in-out">
+          <NavLink to="/sustancias" className="block transform hover:scale-105 transition-transform duration-300 ease-in-out">
             <SquareBox
               image={InfoDrugs}
               title="InfoDrugs"
