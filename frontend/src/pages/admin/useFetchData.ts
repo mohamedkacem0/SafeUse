@@ -7,10 +7,12 @@ interface FetchResult<T> {
   error: Error | null;
 }
 
+const API_BASE_URL = 'http://localhost/tfg/SafeUse/backend/api/public/index.php';
+
 export function useFetchData<T>(
-  url: string,
+  route: string,
   transform?: (json: any) => T,
-  deps: any[] = [] 
+  deps: any[] = []
 ): FetchResult<T> {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
@@ -19,6 +21,8 @@ export function useFetchData<T>(
   useEffect(() => {
     let isMounted = true;
     setLoading(true);
+
+    const url = `${API_BASE_URL}?route=${route}`;
 
     fetch(url, { method: 'GET', credentials: 'include' })
       .then(async (res) => {
