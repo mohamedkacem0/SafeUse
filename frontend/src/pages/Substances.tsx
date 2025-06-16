@@ -34,6 +34,18 @@ export default function SubstancesPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
+  if (modalDrug) {
+    document.body.style.overflow = "hidden";
+  } else {
+    document.body.style.overflow = "";
+  }
+
+  return () => {
+    document.body.style.overflow = "";
+  };
+}, [modalDrug]);
+
+  useEffect(() => {
     fetch(
       "api/sustancias", { credentials: "include" }
     )
@@ -78,7 +90,7 @@ export default function SubstancesPage() {
   }
 
   return (
-    <div>
+    <div >
       <div className="sticky top-0 z-10 h-[450px] w-full overflow-hidden">
         <img src={Banner} alt="Substances Banner" className="w-full object-cover" loading="lazy" />
       </div>
@@ -120,7 +132,7 @@ export default function SubstancesPage() {
           </div> 
           {modalDrug && (
             <div
-              className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+              className="fixed pt-[70px] inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm"
               onClick={handleCloseModal}
             >
               <div
