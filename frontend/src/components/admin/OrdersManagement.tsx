@@ -57,15 +57,12 @@ export default function OrdersManagement() {
     data: ordersData,
     loading: loadingOrders,
     error: ordersError,
-  } = useFetchData<Order[]>(
-    'api/admin/orders',
-    (json) => {
-      if (json && Array.isArray((json as any).orders)) {
-        return (json as any).orders;
-      }
-      return [];
+  } = useFetchData<Order[]>('api/admin/orders', (json) => {
+    if (json && Array.isArray((json as any).orders)) {
+      return (json as any).orders;
     }
-  );
+    return [];
+  });
  
   const [localOrders, setLocalOrders] = useState<Order[]>([]);
   useEffect(() => {
@@ -92,7 +89,7 @@ export default function OrdersManagement() {
 
     try {
       const res = await fetch(
-        `api/admin/orders/${id}`,
+        `http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/admin/orders&id=${id}`,
         {
           method: 'DELETE',
           credentials: 'include',
@@ -122,7 +119,7 @@ export default function OrdersManagement() {
 
     try {
       const res = await fetch(
-        `api/admin/orders/${order.id}/details`,
+        `http://localhost/tfg/SafeUse/backend/api/public/index.php?route=api/admin/orders/details&id=${order.id}`,
         {
           method: 'GET',
           credentials: 'include',
